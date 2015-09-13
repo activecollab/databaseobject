@@ -2,6 +2,7 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use mysqli;
+use ActiveCollab\DatabaseConnection\Connection;
 
 /**
  * @package ActiveCollab\JobsQueue\Test
@@ -12,6 +13,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      * @var mysqli
      */
     protected $link;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * Set up test environment
@@ -25,6 +31,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         if ($this->link->connect_error) {
             throw new \RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
         }
+
+        $this->connection = new Connection($this->link);
     }
 
     /**
@@ -32,6 +40,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
      */
     public function tearDown()
     {
+        $this->connection = null;
         $this->link->close();
 
         parent::tearDown();
