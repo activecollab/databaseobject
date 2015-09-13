@@ -24,20 +24,17 @@ class Pool
         $this->connection = $connection;
     }
 
-    public function persist(Object $object)
-    {
-
-    }
-
     /**
      * Return true if object of the given type with the given ID exists
      *
-     * @param  string  $type
-     * @param  integer $id
+     * @param  Object|string $sample_or_type
+     * @param  integer       $id
      * @return bool
      */
-    public function exists($type, $id)
+    public function exists($sample_or_type, $id)
     {
+        $type = $sample_or_type instanceof Object ? get_class($sample_or_type) : $sample_or_type;
+
         return (boolean) $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->getTableByType($type)) . ' WHERE `id` = ?', $id);
     }
 

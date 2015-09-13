@@ -5,6 +5,7 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
+use LogicException;
 
 abstract class Object
 {
@@ -741,8 +742,8 @@ abstract class Object
             if ($this->primary_key_modified) {
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
-                if ($this->pool->exists(get_class($this), $this->getId())) {
-                    throw new \LogicException("Object #" . $this->getId() . " can't be overwritten");
+                if ($this->pool->exists($this, $this->getId())) {
+                    throw new LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
                     $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
                 }
