@@ -146,7 +146,7 @@ abstract class Object
      *
      * @var boolean
      */
-    private $primary_key_updated = false;
+    private $primary_key_modified = false;
 
     /**
      * Validate object properties before object is saved
@@ -396,15 +396,15 @@ abstract class Object
     /**
      * Create a copy of this object and optionally save it
      *
-     * @param  boolean    $save
-     * @return DataObject
+     * @param  boolean $save
+     * @return Object
      */
     public function copy($save = false)
     {
         $object_class = get_class($this);
 
         /**
-         * @var DataObject $copy
+         * @var Object $copy
          */
         $copy = new $object_class();
 
@@ -476,52 +476,6 @@ abstract class Object
         return $this->is_loading;
     }
 
-//    // ---------------------------------------------------
-//    //  Etag
-//    // ---------------------------------------------------
-//
-//    /**
-//     * Return true if this object can be tagged and cached on client side
-//     *
-//     * @return bool|null
-//     */
-//    public function canBeTagged()
-//    {
-//        return $this->fieldExists('updated_on');
-//    }
-//
-//    /**
-//     * Cached tag value
-//     *
-//     * @var string
-//     */
-//    private $tag = false;
-//
-//    /**
-//     * Return collection etag
-//     *
-//     * @param  IUser   $user
-//     * @param  boolean $use_cache
-//     * @return string
-//     */
-//    public function getTag(IUser $user, $use_cache = true)
-//    {
-//        if ($this->canBeTagged() && ($this->tag === false || empty($use_cache))) {
-//            $timestamp = $this->getFieldValue('updated_on') instanceof DateTimeValue ? $this->getFieldValue('updated_on')->toMySQL() : '-- unknown --';
-//
-//            $this->tag = '"' . implode(',', [
-//            APPLICATION_VERSION,
-//            'object',
-//            $this->getModelName(),
-//            $this->getId(),
-//            $user->getEmail(),
-//            sha1(APPLICATION_UNIQUE_KEY . $timestamp),
-//            ]) . '"';
-//        }
-//
-//        return $this->tag;
-//    }
-
     // ---------------------------------------------------
     //  Fields
     // ---------------------------------------------------
@@ -589,6 +543,16 @@ abstract class Object
     public function isModifiedField($field)
     {
         return in_array($field, $this->modified_fields);
+    }
+
+    /**
+     * Return true if primary key is modified
+     *
+     * @return bool
+     */
+    public function isPrimaryKeyModified()
+    {
+        return $this->primary_key_modified;
     }
 
     /**
@@ -711,11 +675,8 @@ abstract class Object
 
                     // Save primary key value. Also make sure that only the first PK value is
                     // saved as old. Not to save second value on third modification ;)
-                    if ($this->isPrimaryKey($field) && !isset($this->primary_key_updated[$field])) {
-                        if (!is_array($this->primary_key_updated)) {
-                            $this->primary_key_updated = array();
-                        }
-                        $this->primary_key_updated[$field] = true;
+                    if ($this->isPrimaryKey($field) && !$this->primary_key_modified) {
+                        $this->primary_key_modified = true;
                     }
 
                     // Save old value if we haven't done that already
@@ -789,7 +750,7 @@ abstract class Object
                 $updates[$modified_field] = $this->values[$modified_field];
             }
 
-            if (is_array($this->primary_key_updated)) {
+            if ($this->primary_key_modified) {
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
                 if ($this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($this->getId()))) {
@@ -831,7 +792,7 @@ abstract class Object
     public function resetModifiedFlags()
     {
         $this->modified_fields = $this->old_values = [];
-        $this->primary_key_updated = false;
+        $this->primary_key_modified = false;
     }
 
     /**
@@ -918,10 +879,6 @@ abstract class Object
         }
     }
 
-    // ---------------------------------------------------
-    //  Describe
-    // ---------------------------------------------------
-
     /**
      * Return array or property => value pairs that describes this object
      *
@@ -929,85 +886,10 @@ abstract class Object
      */
     public function jsonSerialize()
     {
-        $result = [
-            'id' => $this->getId(),
-            'class' => get_class($this),
-//        'url_path' => $this instanceof IRoutingContext && $this->isLoaded() ? $this->getUrlPath() : '#',
-        ];
-
-//        if ($this->fieldExists('name')) {
-//            $result['name'] = $this->getName();
-//        }
+        $result = ['id' => $this->getId(), 'class' => get_class($this)];
 
         $this->triggerEvent('on_json_serialize', [ &$result ]);
 
         return $result;
     }
-
-//    // ---------------------------------------------------
-//    //  Touch
-//    // ---------------------------------------------------
-//
-//    /**
-//     * Is this object untouchable
-//     *
-//     * @var bool
-//     */
-//    private $is_untouchable = false;
-//
-//    /**
-//     * Run $callback while this object is untouchable
-//     *
-//     * @param callable $callback
-//     */
-//    public function untouchable(callable $callback)
-//    {
-//        $original_untouchable = $this->is_untouchable;
-//
-//        $this->is_untouchable = true;
-//
-//        call_user_func($callback);
-//
-//        $this->is_untouchable = $original_untouchable;
-//    }
-//
-//    /**
-//     * Refresh object's updated_on flag
-//     *
-//     * @param User|null  $by
-//     * @param null|array $additional
-//     * @param bool       $save
-//     */
-//    public function touch($by = null, $additional = null, $save = true)
-//    {
-//        if ($this->is_untouchable) {
-//            return;
-//        }
-//
-//        $this->triggerEvent('on_before_touch', [ $by, $additional, $save ]);
-//
-//        if ($this instanceof IUpdatedBy && $by instanceof IUser) {
-//            $this->setUpdatedBy($by);
-//        }
-//
-//        if ($this instanceof IUpdatedOn) {
-//            $this->setUpdatedOn(DateTimeValue::now());
-//        }
-//
-//        if ($save) {
-//            $this->save();
-//        }
-//
-//        $this->triggerEvent('on_after_touch', [ $by, $additional, $save ]);
-//    }
-//
-//    /**
-//     * Return a list of properties that are watched
-//     *
-//     * @return array
-//     */
-//    public function touchParentOnPropertyChange()
-//    {
-//        return false;
-//    }
 }

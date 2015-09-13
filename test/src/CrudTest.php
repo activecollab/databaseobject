@@ -100,12 +100,17 @@ class CrudTest extends TestCase
 
         $chekhov->save();
 
+        $this->assertFalse($chekhov->isPrimaryKeyModified());
+
         $this->assertSame(4, $chekhov->getId());
 
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
         $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 18));
 
+        // Update primary key and save the object
         $chekhov->setId(18);
+        $this->assertTrue($chekhov->isPrimaryKeyModified());
+
         $chekhov->save();
 
         $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
