@@ -1,0 +1,29 @@
+{
+  "name" : "activecollab/databaseobject",
+  "type": "library",
+  "description": "Library that enables easy persistance of objects to the database",
+  "license" : "MIT",
+  "prefer-stable": true,
+  "keywords": [ "persistence", "mysql", "activecollab" ],
+  "homepage": "https://labs.activecollab.com",
+  "authors": [
+    {
+      "name": "Ilija Studen",
+      "email": "ilija.studen@activecollab.com"
+    }
+  ],
+  "require" : {
+    "php": ">=5.5.0",
+    "activecollab/databaseconnection" : "dev-master"
+  },
+  "require-dev" : {
+    "phpunit/phpunit": "~4.8"
+  },
+  "minimum-stability": "dev",
+  "autoload": {
+    "psr-4": {
+      "ActiveCollab\\DatabaseObject\\": "src",
+      "ActiveCollab\\DatabaseObject\\Test\\": "test/src"
+    }
+  }
+}
