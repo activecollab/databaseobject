@@ -5,6 +5,9 @@ namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 use ActiveCollab\DatabaseObject\Object;
 use InvalidArgumentException;
 
+/**
+ * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
+ */
 abstract class BaseWriter extends Object
 {
     /**
@@ -27,13 +30,6 @@ abstract class BaseWriter extends Object
      * @var array
      */
     protected $default_field_values = [ 'name' => 'Unknown Writer' ];
-
-    /**
-     * Primary key fields
-     *
-     * @var array
-     */
-    protected $primary_key = [ 'id' ];
 
     /**
      * Return name of this model
@@ -122,6 +118,8 @@ abstract class BaseWriter extends Object
             return parent::setFieldValue($name, null);
         } else {
             switch ($name) {
+                case 'id':
+                    return parent::setFieldValue($name, (integer) $value);
                 case 'name':
                     return parent::setFieldValue($name, (string) $value);
                 case 'birthday':

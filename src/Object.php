@@ -26,6 +26,20 @@ abstract class Object
     protected $table_name;
 
     /**
+     * Primary key fields
+     *
+     * @var array
+     */
+    protected $primary_key = 'id';
+
+    /**
+     * Name of autoincrement field (if exists)
+     *
+     * @var string
+     */
+    protected $auto_increment = 'id';
+
+    /**
      * Array of field names
      *
      * @var array
@@ -38,20 +52,6 @@ abstract class Object
      * @var array
      */
     protected $default_field_values = [];
-
-    /**
-     * Array of PK fields
-     *
-     * @var array
-     */
-    protected $primary_key = [];
-
-    /**
-     * Name of autoincrement field (if exists)
-     *
-     * @var string
-     */
-    protected $auto_increment = null;
 
     /**
      * List of protected fields (can't be set using setAttributes() method)
@@ -169,14 +169,14 @@ abstract class Object
      * Comparison is done on class - PK values for loaded objects, or as simple
      * object comparison in case objects are not saved and loaded
      *
-     * @param DataObject|mixed $var
+     * @param  Object  $var
      * @return boolean
      */
     public function is(&$var)
     {
-        if ($var instanceof DataObject) {
+        if ($var instanceof Object) {
             if ($this->isLoaded()) {
-                return $var->isLoaded() && get_class($this) == get_class($var) && $this->getPrimaryKeyValue() == $var->getPrimaryKeyValue();
+                return $var->isLoaded() && get_class($this) == get_class($var) && $this->getId() == $var->getId();
             } else {
                 foreach ($this->getFields() as $field_name) {
                     if (!$var->fieldExists($field_name) || $this->getFieldValue($field_name) !== $var->getFieldValue($field_name)) {
@@ -247,25 +247,6 @@ abstract class Object
     public function getPrimaryKey()
     {
         return $this->primary_key;
-    }
-
-    /**
-     * Return value of primary key
-     *
-     * @return array
-     */
-    public function getPrimaryKeyValue()
-    {
-        if ($this->primary_key && count($this->primary_key)) {
-            $ret = array();
-            foreach ($this->primary_key as $pk) {
-                $ret[$pk] = $this->getFieldValue($pk);
-            }
-
-            return count($ret) > 1 ? $ret : $ret[$this->primary_key[0]];
-        }
-
-        return null;
     }
 
     /**
@@ -376,9 +357,9 @@ abstract class Object
         }
 
         if ($this->isNew()) {
-            $this->doInsert();
+            $this->insert();
         } else {
-            $this->doUpdate();
+            $this->update();
         }
 
 //        AngieApplication::cache()->removeByObject($this);
@@ -398,9 +379,9 @@ abstract class Object
 
 //            Angie\Events::trigger('on_before_object_deleted', [ &$this, $bulk ]);
 
-            $this->connection->delete($this->table_name, $this->getWherePartById($this->getPrimaryKeyValue()));
+            $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
 
-//            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getPrimaryKeyValue()));
+//            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getId()));
 
             $this->is_new = true;
 
@@ -634,7 +615,7 @@ abstract class Object
      */
     public function isPrimaryKey($field)
     {
-        return in_array($field, $this->primary_key);
+        return $field === 'id';
     }
 
     /**
@@ -701,7 +682,7 @@ abstract class Object
      *
      * @param  string                   $field
      * @param  mixed                    $value
-     * @return mixed
+     * @return $this
      * @throws InvalidArgumentException
      */
     public function setFieldValue($field, $value)
@@ -782,28 +763,16 @@ abstract class Object
     // ---------------------------------------------------
 
     /**
-     * Check if specific row exists in database
-     *
-     * @param  integer $id
-     * @return boolean
-     */
-    public function exists($id)
-    {
-        return (boolean) $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($id));
-    }
-
-    /**
      * Insert record in the database
      */
-    private function doInsert()
+    private function insert()
     {
         $last_insert_id = $this->connection->insert($this->table_name, $this->values);
 
-//        DB::execute($this->getInsertSQL());
-
-        if (($this->auto_increment !== null) && (!isset($this->values[$this->auto_increment]) || !$this->values[$this->auto_increment])) {
+        if (empty($this->values[$this->auto_increment])) {
             $this->values[$this->auto_increment] = $last_insert_id;
         }
+
         $this->resetModifiedFlags();
         $this->setLoaded(true);
     }
@@ -811,7 +780,7 @@ abstract class Object
     /**
      * Update database record
      */
-    private function doUpdate()
+    private function update()
     {
         if (count($this->modified_fields)) {
             $updates = [];
@@ -821,34 +790,19 @@ abstract class Object
             }
 
             if (is_array($this->primary_key_updated)) {
-//                $pks = $this->getPrimaryKey();
-//                $old = [];
-//
-//                foreach ($pks as $pk) {
-//                    $old[$pk] = isset($this->old_values[$pk]) ? $this->old_values[$pk] : $this->getFieldValue($pk);
-//                }
-//
-//                if (count($old) && $this->exists($old)) {
-//                    return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($old));
-//                } else {
-//                    return $this->getInsertSQL();
-//                }
+                $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
+
+                if ($this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($this->getId()))) {
+                    $this->connection->transact(function() use ($updates, $old_id) {
+                        $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
+                        $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
+                    });
+                } else {
+                    $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
+                }
             } else {
-                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getPrimaryKeyValue()));
-
-//                return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($this->getPrimaryKeyValue()));
+                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
-        }
-
-
-        // ---------------------------------------------------
-        //  Old
-        // ---------------------------------------------------
-
-        $sql = $this->getUpdateSQL();
-
-        if ($sql) {
-            DB::execute($sql);
 
             $this->resetModifiedFlags();
             $this->setLoaded(true);
@@ -856,85 +810,18 @@ abstract class Object
     }
 
     /**
-     * Prepare insert query
-     *
-     * @return string
-     */
-    public function getInsertSQL()
-    {
-        $fields = $values = [];
-
-        foreach ($this->values as $field_name => $field_value) {
-            if ($this->fieldExists($field_name)) {
-                $fields[] = $field_name;
-                $values[] = DB::escape($field_value);
-            }
-        }
-
-        return 'INSERT INTO ' . $this->getTableName() . ' (' . implode(', ', $fields) . ') VALUES (' . implode(', ', $values) . ')';
-    }
-
-    /**
-     * Prepare update query
-     *
-     * @return string
-     */
-    public function getUpdateSQL()
-    {
-        $fields = [];
-
-        if (!count($this->modified_fields)) {
-            return null;
-        }
-
-        foreach ($this->fields as $field_name) {
-            if ($this->isModifiedField($field_name)) {
-                $fields[] = $field_name . ' = ' . DB::escape($this->values[$field_name]);
-            }
-        }
-
-        if (is_array($this->primary_key_updated)) {
-            $pks = $this->getPrimaryKey();
-            $old = [];
-
-            foreach ($pks as $pk) {
-                $old[$pk] = isset($this->old_values[$pk]) ? $this->old_values[$pk] : $this->getFieldValue($pk);
-            }
-
-            if (count($old) && $this->exists($old)) {
-                return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($old));
-            } else {
-                return $this->getInsertSQL();
-            }
-        } else {
-            return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($this->getPrimaryKeyValue()));
-        }
-    }
-
-    /**
      * Return where part of query
      *
-     * @param  mixed  $value Array of values if we need them
+     * @param  integer $id
      * @return string
      */
-    public function getWherePartById($value = null)
+    public function getWherePartById($id)
     {
-        $pks = $this->getPrimaryKey();
-
-        if (count($pks) > 1) {
-            $where = array();
-            foreach ($pks as $field) {
-                $field_value = isset($value[$field]) ? $value[$field] : $this->getFieldValue($field);
-                $where[] = $field . ' = ' . DB::escape($field_value);
-            }
-
-            return count($where) > 1 ? implode(' AND ', $where) : $where[0];
-        } else {
-            $pk = $pks[0];
-            $pk_value = is_array($value) ? $value[$pk] : $value;
-
-            return $pk . ' = ' . DB::escape($pk_value);
+        if (empty($id)) {
+            throw new InvalidArgumentException("Value '$id' is not a valid ID");
         }
+
+        return $this->connection->prepare('(`id` = ?)', $id);
     }
 
     /**
@@ -1025,7 +912,7 @@ abstract class Object
                     $event_parameters = [];
                 }
 
-                if ($handler instanceof Closure) {
+                if ($handler instanceof \Closure) {
                     call_user_func_array($handler, $event_parameters);
                 } else {
                     call_user_func_array([ $this, $handler ], $event_parameters);
@@ -1046,9 +933,9 @@ abstract class Object
     public function jsonSerialize()
     {
         $result = [
-        'id' => $this->getId(),
-        'class' => get_class($this),
-        'url_path' => $this instanceof IRoutingContext && $this->isLoaded() ? $this->getUrlPath() : '#',
+            'id' => $this->getId(),
+            'class' => get_class($this),
+//        'url_path' => $this instanceof IRoutingContext && $this->isLoaded() ? $this->getUrlPath() : '#',
         ];
 
 //        if ($this->fieldExists('name')) {
@@ -1060,254 +947,70 @@ abstract class Object
         return $result;
     }
 
-    /**
-     * Describe single
-     *
-     * @param  array $result
-     */
-    public function describeSingleForFeather(array &$result)
-    {
-        $this->triggerEvent('on_describe_single', [ &$result ]);
-    }
-
-    // ---------------------------------------------------
-    //  Touch
-    // ---------------------------------------------------
-
-    /**
-     * Is this object untouchable
-     *
-     * @var bool
-     */
-    private $is_untouchable = false;
-
-    /**
-     * Run $callback while this object is untouchable
-     *
-     * @param callable $callback
-     */
-    public function untouchable(callable $callback)
-    {
-        $original_untouchable = $this->is_untouchable;
-
-        $this->is_untouchable = true;
-
-        call_user_func($callback);
-
-        $this->is_untouchable = $original_untouchable;
-    }
-
-    /**
-     * Refresh object's updated_on flag
-     *
-     * @param User|null  $by
-     * @param null|array $additional
-     * @param bool       $save
-     */
-    public function touch($by = null, $additional = null, $save = true)
-    {
-        if ($this->is_untouchable) {
-            return;
-        }
-
-        $this->triggerEvent('on_before_touch', [ $by, $additional, $save ]);
-
-        if ($this instanceof IUpdatedBy && $by instanceof IUser) {
-            $this->setUpdatedBy($by);
-        }
-
-        if ($this instanceof IUpdatedOn) {
-            $this->setUpdatedOn(DateTimeValue::now());
-        }
-
-        if ($save) {
-            $this->save();
-        }
-
-        $this->triggerEvent('on_after_touch', [ $by, $additional, $save ]);
-    }
-
-    /**
-     * Return a list of properties that are watched
-     *
-     * @return array
-     */
-    public function touchParentOnPropertyChange()
-    {
-        return false;
-    }
-
-    // ---------------------------------------------------------------
-    //  Validators
-    // ---------------------------------------------------------------
-
-    /**
-     * Validates presence of specific field
-     *
-     * In case of string value is trimmed and compared with the empty string. In
-     * case of any other type empty() function is used. If $min_value argument is
-     * provided value will also need to be larger or equal to it
-     * (validateMinValueOf validator is used)
-     *
-     * @param  string  $field     Field name
-     * @param  mixed   $min_value
-     * @param  Closure $modifier
-     * @return boolean
-     */
-    public function validatePresenceOf($field, $min_value = null, $modifier = null)
-    {
-        $value = $this->getFieldValue($field);
-
-        if ($modifier && ($modifier instanceof Closure || function_exists($modifier))) {
-            $value = call_user_func($modifier, $value);
-        }
-
-        if (is_string($value)) {
-            if (trim($value)) {
-                return $min_value === null ? true : $this->validateMinValueOf($field, $min_value);
-            } else {
-                return false;
-            }
-        } else {
-            if (empty($value)) {
-                return false;
-            } else {
-                return $min_value === null ? true : $this->validateMinValueOf($field, $min_value);
-            }
-        }
-    }
-
-    /**
-     * This validator will return true if $value is unique (there is no row with such value in that field)
-     *
-     * @param  string  $field
-     * @return boolean
-     */
-    public function validateUniquenessOf($field)
-    {
-        // Don't do COUNT(*) if we have one PK column
-        $escaped_pk = is_array($pk_fields = $this->getPrimaryKey()) ? '*' : $pk_fields;
-
-        // Get columns
-        $fields = func_get_args();
-        if (!is_array($fields) || count($fields) < 1) {
-            return true;
-        }
-
-        // Check if we have existsing columns
-        foreach ($fields as $field) {
-            if (!$this->fieldExists($field)) {
-                return false;
-            }
-        }
-
-        // Get where parets
-        $where_parts = array();
-        foreach ($fields as $field) {
-            $where_parts[] = $field . ' = ' . DB::escape($this->values[$field]);
-        }
-
-        // If we have new object we need to test if there is any other object
-        // with this value. Else we need to check if there is any other EXCEPT
-        // this one with that value
-        if ($this->isNew()) {
-            $sql = sprintf("SELECT COUNT($escaped_pk) AS 'row_count' FROM %s WHERE %s", $this->getTableName(), implode(' AND ', $where_parts));
-        } else {
-
-            // Prepare PKs part...
-            $pks = $this->getPrimaryKey();
-            $pk_values = array();
-            if (is_array($pks)) {
-                foreach ($pks as $pk) {
-                    if (isset($this->primary_key_updated[$pk]) && $this->primary_key_updated[$pk]) {
-                        $primary_key_value = $this->old_values[$pk];
-                    } else {
-                        $primary_key_value = $this->values[$pk];
-                    }
-                    $pk_values[] = sprintf('%s <> %s', $pk, DB::escape($primary_key_value));
-                }
-            }
-
-            // Prepare SQL
-            $sql = sprintf("SELECT COUNT($escaped_pk) AS 'row_count' FROM %s WHERE (%s) AND (%s)", $this->getTableName(), implode(' AND ', $where_parts), implode(' AND ', $pk_values));
-        }
-
-        return DB::executeFirstCell($sql) < 1;
-    }
-
-    /**
-     * Validate max value of specific field. If that field is string time
-     * max lenght will be validated
-     *
-     * @param  string  $field
-     * @param  integer $max
-     * @return boolean
-     */
-    public function validateMaxValueOf($field, $max)
-    {
-        if ($this->fieldExists($field)) {
-            $value = $this->getFieldValue($field);
-
-            if (is_string($value) && !is_numeric($value)) {
-                return strlen(trim($value)) <= $max;
-            } else {
-                return $value <= $max;
-            }
-        } else {
-            return false;
-        }
-    }
-
-    /**
-     * Valicate minimal value of specific field.
-     *
-     * If string minimal lenght is checked (string is trimmed before it is
-     * compared). In any other case >= operator is used
-     *
-     * @param  string  $field
-     * @param  integer $min   Minimal value
-     * @return boolean
-     */
-    public function validateMinValueOf($field, $min)
-    {
-        if ($this->fieldExists($field)) {
-            $value = $this->getFieldValue($field);
-
-            if (is_string($value) && !is_numeric($value)) {
-                return strlen_utf(trim($value)) >= $min;
-            } else {
-                return $value >= $min;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Valicate that field value is in range of $min and $max
-     *
-     * If field value is string, lenght is checked (string is trimmed before it is
-     * compared). In any other case <= and >= operator is used
-     *
-     * @param  string  $field
-     * @param  integer $min
-     * @param  integer $max
-     * @return boolean
-     */
-    public function validateValueInRange($field, $min, $max)
-    {
-        if ($this->fieldExists($field)) {
-            $value = $this->getFieldValue($field);
-
-            if (is_string($value) && !is_numeric($value)) {
-                $string_length = strlen_utf(trim($value));
-
-                return $string_length >= $min && $string_length <= $max;
-            } else {
-                return $value >= $min && $value <= $max;
-            }
-        }
-
-        return false;
-    }
+//    // ---------------------------------------------------
+//    //  Touch
+//    // ---------------------------------------------------
+//
+//    /**
+//     * Is this object untouchable
+//     *
+//     * @var bool
+//     */
+//    private $is_untouchable = false;
+//
+//    /**
+//     * Run $callback while this object is untouchable
+//     *
+//     * @param callable $callback
+//     */
+//    public function untouchable(callable $callback)
+//    {
+//        $original_untouchable = $this->is_untouchable;
+//
+//        $this->is_untouchable = true;
+//
+//        call_user_func($callback);
+//
+//        $this->is_untouchable = $original_untouchable;
+//    }
+//
+//    /**
+//     * Refresh object's updated_on flag
+//     *
+//     * @param User|null  $by
+//     * @param null|array $additional
+//     * @param bool       $save
+//     */
+//    public function touch($by = null, $additional = null, $save = true)
+//    {
+//        if ($this->is_untouchable) {
+//            return;
+//        }
+//
+//        $this->triggerEvent('on_before_touch', [ $by, $additional, $save ]);
+//
+//        if ($this instanceof IUpdatedBy && $by instanceof IUser) {
+//            $this->setUpdatedBy($by);
+//        }
+//
+//        if ($this instanceof IUpdatedOn) {
+//            $this->setUpdatedOn(DateTimeValue::now());
+//        }
+//
+//        if ($save) {
+//            $this->save();
+//        }
+//
+//        $this->triggerEvent('on_after_touch', [ $by, $additional, $save ]);
+//    }
+//
+//    /**
+//     * Return a list of properties that are watched
+//     *
+//     * @return array
+//     */
+//    public function touchParentOnPropertyChange()
+//    {
+//        return false;
+//    }
 }

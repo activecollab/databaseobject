@@ -59,6 +59,14 @@ class CrudTest extends TestCase
         $unknown_writer->setName(null);
     }
 
+    public function testIdIsPrimaryKey()
+    {
+        $unknown_writer = new Writer($this->pool, $this->connection);
+
+        $this->assertTrue($unknown_writer->isPrimaryKey('id'));
+        $this->assertFalse($unknown_writer->isPrimaryKey('name'));
+    }
+
     /**
      * Object create
      */
@@ -75,5 +83,48 @@ class CrudTest extends TestCase
         $this->assertSame(4, $chekhov->getId());
         $this->assertSame('Anton Chekhov', $chekhov->getName());
         $this->assertEquals('1860-01-29', $chekhov->getBirthday()->format('Y-m-d'));
+    }
+    
+    public function testChangeIdToNewRecord()
+    {
+        $chekhov = new Writer($this->pool, $this->connection);
+
+        $chekhov->setName('Anton Chekhov');
+        $chekhov->setBirthday(new DateTime('1860-01-29'));
+
+        $chekhov->save();
+
+        $this->assertSame(4, $chekhov->getId());
+
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
+        $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 18));
+
+        $chekhov->setId(18);
+        $chekhov->save();
+
+        $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 18));
+    }
+
+    public function testChangeIdToExistingRecord()
+    {
+        $chekhov = new Writer($this->pool, $this->connection);
+
+        $chekhov->setName('Anton Chekhov');
+        $chekhov->setBirthday(new DateTime('1860-01-29'));
+
+        $chekhov->save();
+
+        $this->assertSame(4, $chekhov->getId());
+
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 1));
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
+
+        $chekhov->setId(1);
+        $chekhov->save();
+
+        $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 1));
+        $this->assertEquals('Anton Chekhov', $this->connection->executeFirstCell('SELECT `name` FROM `writers` WHERE `id` = ?', 1));
     }
 }
