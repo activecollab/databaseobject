@@ -67,18 +67,6 @@ abstract class Object
      */
     protected $accept = null;
 
-//    /**
-//     * Construct data object and if $id is present load
-//     *
-//     * @param mixed $id
-//     */
-//    public function __construct($id = null)
-//    {
-//        if ($id !== null) {
-//            $this->load($id);
-//        }
-//    }
-
     /**
      * @param Pool       $pool
      * @param Connection $connection
@@ -753,7 +741,7 @@ abstract class Object
             if ($this->primary_key_modified) {
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
-                if ($this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($this->getId()))) {
+                if ($this->pool->exists(get_class($this), $this->getId())) {
                     throw new \LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
                     $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
