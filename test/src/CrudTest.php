@@ -42,7 +42,7 @@ class CrudTest extends TestCase
     }
 
     /**
-     *
+     * Test if instances get default values pre-populated
      */
     public function testNewInstancesGetDefaultFieldValues()
     {
@@ -59,6 +59,9 @@ class CrudTest extends TestCase
         $unknown_writer->setName(null);
     }
 
+    /**
+     * Test if ID is primary key
+     */
     public function testIdIsPrimaryKey()
     {
         $unknown_writer = new Writer($this->pool, $this->connection);
@@ -84,7 +87,10 @@ class CrudTest extends TestCase
         $this->assertSame('Anton Chekhov', $chekhov->getName());
         $this->assertEquals('1860-01-29', $chekhov->getBirthday()->format('Y-m-d'));
     }
-    
+
+    /**
+     * Test if we can change ID to a new value that is not yet reserved
+     */
     public function testChangeIdToNewRecord()
     {
         $chekhov = new Writer($this->pool, $this->connection);
@@ -106,6 +112,9 @@ class CrudTest extends TestCase
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 18));
     }
 
+    /**
+     * @expectedException \LogicException
+     */
     public function testChangeIdToExistingRecord()
     {
         $chekhov = new Writer($this->pool, $this->connection);
@@ -122,9 +131,5 @@ class CrudTest extends TestCase
 
         $chekhov->setId(1);
         $chekhov->save();
-
-        $this->assertEquals(0, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 4));
-        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 1));
-        $this->assertEquals('Anton Chekhov', $this->connection->executeFirstCell('SELECT `name` FROM `writers` WHERE `id` = ?', 1));
     }
 }

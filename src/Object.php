@@ -793,10 +793,7 @@ abstract class Object
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
                 if ($this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($this->getId()))) {
-                    $this->connection->transact(function() use ($updates, $old_id) {
-                        $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
-                        $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
-                    });
+                    throw new \LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
                     $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
                 }
