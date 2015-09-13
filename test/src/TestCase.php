@@ -1,6 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Pool;
 use mysqli;
 use ActiveCollab\DatabaseConnection\Connection;
 
@@ -20,6 +21,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $connection;
 
     /**
+     * @var Pool
+     */
+    protected $pool;
+
+    /**
      * Set up test environment
      */
     public function setUp()
@@ -33,6 +39,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         }
 
         $this->connection = new Connection($this->link);
+        $this->pool = new Pool($this->connection);
     }
 
     /**
@@ -41,6 +48,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function tearDown()
     {
         $this->connection = null;
+        $this->pool = null;
         $this->link->close();
 
         parent::tearDown();

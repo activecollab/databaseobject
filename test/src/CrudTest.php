@@ -46,7 +46,7 @@ class CrudTest extends TestCase
      */
     public function testNewInstancesGetDefaultFieldValues()
     {
-        $unknown_writer = new Writer();
+        $unknown_writer = new Writer($this->pool, $this->connection);
         $this->assertEquals('Unknown Writer', $unknown_writer->getName());
     }
 
@@ -55,7 +55,7 @@ class CrudTest extends TestCase
      */
     public function testFieldsWithDefaultValueCantBeNull()
     {
-        $unknown_writer = new Writer();
+        $unknown_writer = new Writer($this->pool, $this->connection);
         $unknown_writer->setName(null);
     }
 
@@ -64,7 +64,7 @@ class CrudTest extends TestCase
      */
     public function testCreate()
     {
-        $chekhov = new Writer();
+        $chekhov = new Writer($this->pool, $this->connection);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateTime('1860-01-29'));

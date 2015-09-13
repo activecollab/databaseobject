@@ -90,7 +90,7 @@ abstract class BaseWriter extends Object
      *
      * @return \DateTime
      */
-    public function getBirtday()
+    public function getBirthday()
     {
         return $this->getFieldValue('birthday');
     }

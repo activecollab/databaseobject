@@ -2,11 +2,22 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 
 abstract class Object
 {
+    /**
+     * @var Pool
+     */
+    protected $pool;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
+
     /**
      * Name of the table
      *
@@ -56,6 +67,28 @@ abstract class Object
      */
     protected $accept = null;
 
+//    /**
+//     * Construct data object and if $id is present load
+//     *
+//     * @param mixed $id
+//     */
+//    public function __construct($id = null)
+//    {
+//        if ($id !== null) {
+//            $this->load($id);
+//        }
+//    }
+
+    /**
+     * @param Pool       $pool
+     * @param Connection $connection
+     */
+    public function __construct(Pool $pool, Connection $connection)
+    {
+        $this->pool = $pool;
+        $this->connection = $connection;
+    }
+
     /**
      * Return name of this model
      *
@@ -64,29 +97,6 @@ abstract class Object
      * @return string
      */
     abstract public function getModelName($underscore = false, $singular = false);
-
-    /**
-     * Return object ID
-     *
-     * @return integer
-     */
-    public function getId()
-    {
-        return $this->getFieldValue('id');
-    }
-
-    /**
-     * Set value of id field
-     *
-     * @param  integer $value
-     * @return $this
-     */
-    public function &setId($value)
-    {
-        $this->setFieldValue('id', $value);
-
-        return $this;
-    }
 
     // ---------------------------------------------------
     //  Internals, not overridable
@@ -137,18 +147,6 @@ abstract class Object
      * @var boolean
      */
     private $primary_key_updated = false;
-
-    /**
-     * Construct data object and if $id is present load
-     *
-     * @param mixed $id
-     */
-    public function __construct($id = null)
-    {
-        if ($id !== null) {
-            $this->load($id);
-        }
-    }
 
     /**
      * Validate object properties before object is saved
@@ -383,7 +381,7 @@ abstract class Object
             $this->doUpdate();
         }
 
-        AngieApplication::cache()->removeByObject($this);
+//        AngieApplication::cache()->removeByObject($this);
     }
 
     /**
@@ -394,21 +392,23 @@ abstract class Object
     public function delete($bulk = false)
     {
         if ($this->isLoaded()) {
-            $cache_id = $this->getCacheKey();
+//            $cache_id = $this->getCacheKey();
 
             $this->triggerEvent('on_before_delete', [ $bulk ]);
 
-            Angie\Events::trigger('on_before_object_deleted', [ &$this, $bulk ]);
+//            Angie\Events::trigger('on_before_object_deleted', [ &$this, $bulk ]);
 
-            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getPrimaryKeyValue()));
+            $this->connection->delete($this->table_name, $this->getWherePartById($this->getPrimaryKeyValue()));
+
+//            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getPrimaryKeyValue()));
 
             $this->is_new = true;
 
-            AngieApplication::cache()->remove($cache_id);
+//            AngieApplication::cache()->remove($cache_id);
 
             $this->triggerEvent('on_after_delete', [ $bulk ]);
 
-            Angie\Events::trigger('on_object_deleted', [ &$this, $bulk ]);
+//            Angie\Events::trigger('on_object_deleted', [ &$this, $bulk ]);
         }
     }
 
@@ -544,6 +544,29 @@ abstract class Object
     // ---------------------------------------------------
     //  Fields
     // ---------------------------------------------------
+
+    /**
+     * Return object ID
+     *
+     * @return integer
+     */
+    public function getId()
+    {
+        return $this->getFieldValue('id');
+    }
+
+    /**
+     * Set value of id field
+     *
+     * @param  integer $value
+     * @return $this
+     */
+    public function &setId($value)
+    {
+        $this->setFieldValue('id', $value);
+
+        return $this;
+    }
 
     /**
      * Check if specific field is defined
@@ -761,12 +784,12 @@ abstract class Object
     /**
      * Check if specific row exists in database
      *
-     * @param  mixed   $id
+     * @param  integer $id
      * @return boolean
      */
     public function exists($id)
     {
-        return (boolean) DB::executeFirstCell("SELECT count(*) AS 'row_count' FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($id));
+        return (boolean) $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->connection->escapeTableName($this->table_name) . ' WHERE ' . $this->getWherePartById($id));
     }
 
     /**
@@ -774,10 +797,12 @@ abstract class Object
      */
     private function doInsert()
     {
-        DB::execute($this->getInsertSQL());
+        $last_insert_id = $this->connection->insert($this->table_name, $this->values);
+
+//        DB::execute($this->getInsertSQL());
 
         if (($this->auto_increment !== null) && (!isset($this->values[$this->auto_increment]) || !$this->values[$this->auto_increment])) {
-            $this->values[$this->auto_increment] = DB::lastInsertId();
+            $this->values[$this->auto_increment] = $last_insert_id;
         }
         $this->resetModifiedFlags();
         $this->setLoaded(true);
@@ -788,6 +813,38 @@ abstract class Object
      */
     private function doUpdate()
     {
+        if (count($this->modified_fields)) {
+            $updates = [];
+
+            foreach ($this->modified_fields as $modified_field) {
+                $updates[$modified_field] = $this->values[$modified_field];
+            }
+
+            if (is_array($this->primary_key_updated)) {
+//                $pks = $this->getPrimaryKey();
+//                $old = [];
+//
+//                foreach ($pks as $pk) {
+//                    $old[$pk] = isset($this->old_values[$pk]) ? $this->old_values[$pk] : $this->getFieldValue($pk);
+//                }
+//
+//                if (count($old) && $this->exists($old)) {
+//                    return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($old));
+//                } else {
+//                    return $this->getInsertSQL();
+//                }
+            } else {
+                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getPrimaryKeyValue()));
+
+//                return sprintf("UPDATE %s SET %s WHERE %s", $this->getTableName(), implode(', ', $fields), $this->getWherePartById($this->getPrimaryKeyValue()));
+            }
+        }
+
+
+        // ---------------------------------------------------
+        //  Old
+        // ---------------------------------------------------
+
         $sql = $this->getUpdateSQL();
 
         if ($sql) {

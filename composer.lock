@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "623887379e9abd0edf7983cb178875f2bc0ed62d"
+                "reference": "62e58536c8536dc3aa26b5472284a240b07ec994"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/623887379e9abd0edf7983cb178875f2bc0ed62d",
-                "reference": "623887379e9abd0edf7983cb178875f2bc0ed62d",
+                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/62e58536c8536dc3aa26b5472284a240b07ec994",
+                "reference": "62e58536c8536dc3aa26b5472284a240b07ec994",
                 "shasum": ""
             },
             "require": {
@@ -49,7 +49,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "time": "2015-09-13 20:24:39"
+            "time": "2015-09-13 21:46:34"
         }
     ],
     "packages-dev": [
