@@ -292,13 +292,13 @@ abstract class Object implements LoadFromRow
      *
      * If $cache_row is set to true row data will be added to cache
      *
-     * @param  array   $row
-     * @return boolean
+     * @param  array                    $row
+     * @throws InvalidArgumentException
      */
     public function loadFromRow(array $row)
     {
         if ($row && is_array($row)) {
-            $this->is_loading = true;
+            $this->startLoading();
 
             foreach ($row as $k => $v) {
                 if ($this->fieldExists($k)) {
@@ -306,19 +306,10 @@ abstract class Object implements LoadFromRow
                 }
             }
 
-//            if ($cache_row) {
-//                AngieApplication::cache()->set($this->getCacheKey(null, (integer) $row['id']), $row);
-//            }
-
-            $this->setLoaded(true);
-            $this->is_loading = false;
-            $this->resetModifiedFlags();
+            $this->doneLoading();
         } else {
-            $this->is_loading = false;
-            throw new InvalidParamError('row', $row, '$row is expected to be loaded database row');
+            throw new InvalidArgumentException('$row is expected to be loaded database row');
         }
-
-        return true;
     }
 
     /**
@@ -434,13 +425,32 @@ abstract class Object implements LoadFromRow
     }
 
     /**
-     * Set loaded stamp value
-     *
-     * @param boolean $value New value
+     * Mark start of loading from row
      */
-    private function setLoaded($value)
+    private function startLoading()
     {
-        $this->is_new = !$value;
+        $this->is_loading = true;
+    }
+
+    /**
+     * Done loading from row
+     */
+    private function doneLoading()
+    {
+        if ($this->is_loading) {
+            $this->is_loading = false;
+        }
+
+        $this->setAsLoaded();
+    }
+
+    /**
+     * Set loaded stamp value
+     */
+    private function setAsLoaded()
+    {
+        $this->is_new = false;
+        $this->resetModifiedFlags();
     }
 
     /**
@@ -646,7 +656,7 @@ abstract class Object implements LoadFromRow
 
                 // If we are loading object there is no need to remember if this field
                 // was modified, if PK has been updated and old value. We just skip that
-                if (!$this->is_loading) {
+                if (!$this->isLoading()) {
                     if (isset($this->values[$field])) {
                         $old_value = $this->values[$field]; // Remember old value
                     }
@@ -712,8 +722,7 @@ abstract class Object implements LoadFromRow
             $this->values[$this->auto_increment] = $last_insert_id;
         }
 
-        $this->resetModifiedFlags();
-        $this->setLoaded(true);
+        $this->setAsLoaded();
     }
 
     /**
@@ -740,8 +749,7 @@ abstract class Object implements LoadFromRow
                 $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
 
-            $this->resetModifiedFlags();
-            $this->setLoaded(true);
+            $this->setAsLoaded();
         }
     }
 
