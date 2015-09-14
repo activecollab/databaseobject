@@ -3,11 +3,12 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 use LogicException;
 
-abstract class Object
+abstract class Object implements LoadFromRow
 {
     /**
      * @var Pool
@@ -291,12 +292,10 @@ abstract class Object
      *
      * If $cache_row is set to true row data will be added to cache
      *
-     * @param  array             $row
-     * @param  boolean           $cache_row
+     * @param  array   $row
      * @return boolean
-     * @throws InvalidParamError
      */
-    public function loadFromRow($row, $cache_row = false)
+    public function loadFromRow(array $row)
     {
         if ($row && is_array($row)) {
             $this->is_loading = true;
@@ -307,9 +306,9 @@ abstract class Object
                 }
             }
 
-            if ($cache_row) {
-                AngieApplication::cache()->set($this->getCacheKey(null, (integer) $row['id']), $row);
-            }
+//            if ($cache_row) {
+//                AngieApplication::cache()->set($this->getCacheKey(null, (integer) $row['id']), $row);
+//            }
 
             $this->setLoaded(true);
             $this->is_loading = false;
@@ -425,16 +424,6 @@ abstract class Object
     }
 
     /**
-     * Set new stamp value
-     *
-     * @param boolean $value New value
-     */
-    public function setNew($value)
-    {
-        $this->is_new = (boolean) $value;
-    }
-
-    /**
      * Returns true if this object have row in database
      *
      * @return boolean
@@ -449,7 +438,7 @@ abstract class Object
      *
      * @param boolean $value New value
      */
-    public function setLoaded($value)
+    private function setLoaded($value)
     {
         $this->is_new = !$value;
     }
@@ -460,7 +449,7 @@ abstract class Object
      *
      * @return boolean
      */
-    public function isLoading()
+    private function isLoading()
     {
         return $this->is_loading;
     }
