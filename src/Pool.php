@@ -43,7 +43,7 @@ class Pool
      * @param  integer $id
      * @return Object
      */
-    public function getById($type, $id)
+    public function &getById($type, $id)
     {
         $type_fields = $this->getTypeFields($type);
 
@@ -58,6 +58,18 @@ class Pool
         }
 
         return null;
+    }
+
+    /**
+     * Reload an object of the give type with the given ID
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return Object
+     */
+    public function &reload($type, $id)
+    {
+        return $this->getById($type, $id);
     }
 
     /**

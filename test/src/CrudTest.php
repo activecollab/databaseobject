@@ -120,7 +120,7 @@ class CrudTest extends TestCase
         $tolstoy->setName('Lev Nikolayevich Tolstoy');
         $tolstoy->save();
 
-        $tolstoy = $this->pool->getById(Writer::class, 1);
+        $tolstoy = $this->pool->reload(Writer::class, 1);
 
         $this->assertInstanceOf(Writer::class, $tolstoy);
         $this->assertTrue($tolstoy->isLoaded());
