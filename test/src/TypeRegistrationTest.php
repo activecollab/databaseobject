@@ -2,6 +2,8 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
 use DateTime;
 
 /**
@@ -68,5 +70,16 @@ class TypeRegistrationTest extends TestCase
         $this->assertContains('id', $fileds);
         $this->assertContains('name', $fileds);
         $this->assertContains('birthday', $fileds);
+    }
+
+    /**
+     * Get trait names by type
+     */
+    public function testTraitNamesByType()
+    {
+        $trait_names = $this->pool->getTraitNamesByType(Writer::class);
+
+        $this->assertInternalType('array', $trait_names);
+        $this->assertEquals([Russian::class, ClassicWriter::class], $trait_names);
     }
 }

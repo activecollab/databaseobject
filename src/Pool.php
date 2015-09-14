@@ -3,8 +3,8 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Connection;
-
 use InvalidArgumentException;
+use ReflectionClass;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -47,7 +47,7 @@ class Pool
     {
         $type_fields = $this->getTypeFields($type);
 
-        if ($row = $this->connection->executeFirstRow('SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true) . ' WHERE id = ?', $id)) {
+        if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($type), [$id])) {
             $object_class = isset($type_fields['type']) ? $type_fields['type'] : $type;
 
             /** @var Object $object */
@@ -109,15 +109,21 @@ class Pool
         }
     }
 
-    public function getEscapedTypeFields($type)
+    /**
+     * Return select by ID-s query for the given type
+     *
+     * @param  string $type
+     * @return string
+     */
+    private function getSelectOneByType($type)
     {
-        if (empty($this->types[$type]['escaped_fields'])) {
-            $this->types[$type]['escaped_fields'] = implode(',', array_map(function($field_name) {
+        if (empty($this->types[$type]['sql_select_by_ids'])) {
+            $this->types[$type]['sql_select_by_ids'] = 'SELECT ' . implode(',', array_map(function($field_name) {
                 return $this->connection->escapeFieldName($field_name);
-            }, $this->getTypeFields($type)));
+            }, $this->getTypeFields($type))) . ' FROM ' . $this->getTypeTable($type, true) . ' WHERE `id` IN ? ORDER BY `id`';
         }
 
-        return $this->types[$type]['escaped_fields'];
+        return $this->types[$type]['sql_select_by_ids'];
     }
 
     /**
@@ -151,7 +157,7 @@ class Pool
     {
         foreach ($types as $type) {
             if (class_exists($type, true)) {
-                $reflection = new \ReflectionClass($type);
+                $reflection = new ReflectionClass($type);
 
                 if ($reflection->isSubclassOf(Object::class)) {
                     $default_properties = $reflection->getDefaultProperties();
@@ -166,6 +172,38 @@ class Pool
             } else {
                 throw new InvalidArgumentException("Type '$type' is not defined");
             }
+        }
+    }
+
+    /**
+     * Return trait names by object
+     *
+     * @param  string $type
+     * @return array
+     */
+    public function getTraitNamesByType($type)
+    {
+        if (empty($this->types[$type]['traits'])) {
+            $this->types[$type]['traits'] = [];
+
+            $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[$type]['traits']);
+        }
+
+        return $this->types[$type]['traits'];
+    }
+
+    /**
+     * Recursively get trait names for the given class
+     *
+     * @param ReflectionClass $class
+     * @param array           $trait_names
+     */
+    private function recursiveGetTraitNames(ReflectionClass $class, array &$trait_names)
+    {
+        $trait_names = array_merge($trait_names, $class->getTraitNames());
+
+        if ($class->getParentClass()) {
+            $this->recursiveGetTraitNames($class->getParentClass(), $trait_names);
         }
     }
 }
