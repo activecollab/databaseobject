@@ -8,6 +8,9 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 use LogicException;
 
+/**
+ * @package ActiveCollab\DatabaseObject
+ */
 abstract class Object implements LoadFromRow
 {
     /**
@@ -779,32 +782,23 @@ abstract class Object implements LoadFromRow
     /**
      * Register an internal event handler
      *
-     * @param $event
-     * @param $handler
-     * @throws InvalidParamError
+     * @param string   $event
+     * @param callable $handler
      */
-    protected function registerEventHandler($event, $handler)
+    protected function registerEventHandler($event, callable $handler)
     {
-        if (AngieApplication::isInDevelopment()) {
+        if (empty($event)) {
+            throw new InvalidArgumentException('Event name is required');
+        }
+
+        if (is_callable($handler)) {
             if (empty($this->event_handlers[$event])) {
                 $this->event_handlers[$event] = [];
             }
 
-            if ($handler instanceof Closure) {
-                $this->event_handlers[$event][] = $handler;
-            } elseif (method_exists($this, $handler)) {
-                $reflection = new ReflectionMethod($this, $handler);
-
-                if ($reflection->isPublic()) {
-                    $this->event_handlers[$event][] = $handler;
-                } else {
-                    throw new InvalidParamError('handler', $handler, 'Handler "' . $handler . '" is not a public method. To use private methods, put them in closures');
-                }
-            } else {
-                throw new InvalidParamError('handler', $handler, 'Even handler can be an existing method name or a Closure instance');
-            }
-        } else {
             $this->event_handlers[$event][] = $handler;
+        } else {
+            throw new InvalidArgumentException('Handler not callable');
         }
     }
 
@@ -817,16 +811,12 @@ abstract class Object implements LoadFromRow
     protected function triggerEvent($event, $event_parameters = null)
     {
         if (isset($this->event_handlers[$event])) {
-            foreach ($this->event_handlers[$event] as $handler) {
-                if (empty($event_parameters)) {
-                    $event_parameters = [];
-                }
+            if (empty($event_parameters)) {
+                $event_parameters = [];
+            }
 
-                if ($handler instanceof \Closure) {
-                    call_user_func_array($handler, $event_parameters);
-                } else {
-                    call_user_func_array([ $this, $handler ], $event_parameters);
-                }
+            foreach ($this->event_handlers[$event] as $handler) {
+                call_user_func_array($handler, $event_parameters);
             }
         }
     }
