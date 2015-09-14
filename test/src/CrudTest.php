@@ -29,6 +29,9 @@ class CrudTest extends TestCase
         $this->assertTrue($create_table);
 
         $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+
+        $this->pool->registerType(Writer::class);
+        $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
     }
 
     /**
@@ -71,6 +74,21 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test get object by ID
+     */
+    public function testGetById()
+    {
+        /** @var Writer $tolstoy */
+        $tolstoy = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $tolstoy);
+        $this->assertTrue($tolstoy->isLoaded());
+        $this->assertSame(1, $tolstoy->getId());
+        $this->assertSame('Leo Tolstoy', $tolstoy->getName());
+        $this->assertSame('1828-09-09', $tolstoy->getBirthday());
+    }
+
+    /**
      * Object create
      */
     public function testCreate()
@@ -86,6 +104,28 @@ class CrudTest extends TestCase
         $this->assertSame(4, $chekhov->getId());
         $this->assertSame('Anton Chekhov', $chekhov->getName());
         $this->assertEquals('1860-01-29', $chekhov->getBirthday()->format('Y-m-d'));
+    }
+
+    /**
+     * Test record update
+     */
+    public function testUpdate()
+    {
+        /** @var Writer $tolstoy */
+        $tolstoy = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $tolstoy);
+        $this->assertTrue($tolstoy->isLoaded());
+
+        $tolstoy->setName('Lev Nikolayevich Tolstoy');
+        $tolstoy->save();
+
+        $tolstoy = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $tolstoy);
+        $this->assertTrue($tolstoy->isLoaded());
+
+        $this->assertEquals('Lev Nikolayevich Tolstoy', $tolstoy->getName());
     }
 
     /**
@@ -136,5 +176,23 @@ class CrudTest extends TestCase
 
         $chekhov->setId(1);
         $chekhov->save();
+    }
+
+    /**
+     * Test delete
+     */
+    public function testDelete()
+    {
+        $this->assertTrue($this->pool->exists(Writer::class, 1));
+
+        /** @var Writer $tolstoy */
+        $tolstoy = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $tolstoy);
+        $this->assertTrue($tolstoy->isLoaded());
+
+        $tolstoy->delete();
+
+        $this->assertFalse($this->pool->exists(Writer::class, 1));
     }
 }

@@ -254,40 +254,6 @@ abstract class Object implements LoadFromRow
     // ---------------------------------------------------
 
     /**
-     * Load object by specific ID
-     *
-     * @param  mixed             $id
-     * @return boolean
-     * @throws InvalidParamError
-     */
-    public function load($id)
-    {
-        if ($id) {
-            $key = $this->getCacheKey(null, (integer) $id);
-
-            $row = AngieApplication::cache()->isCached($key) ? AngieApplication::cache()->get($key) : null;
-
-            if (empty($row)) {
-                $fields = $this->getFields();
-                $table_name = $this->getTableName();
-                $where = $this->getWherePartById($id);
-
-                $row = AngieApplication::cache()->get($key, function () use ($id, $fields, $table_name, $where) {
-                    return DB::executeFirstRow("SELECT " . implode(', ', $fields) . " FROM $table_name WHERE $where  LIMIT 0, 1");
-                });
-            }
-
-            if (is_array($row)) {
-                return $this->loadFromRow($row);
-            } else {
-                return false;
-            }
-        } else {
-            throw new InvalidParamError('id', $id, '$id is expected to be a valid object ID');
-        }
-    }
-
-    /**
      * Load data from database row
      *
      * If $cache_row is set to true row data will be added to cache
