@@ -22,30 +22,14 @@ abstract class BaseWriter extends Object
      *
      * @var array
      */
-    protected $fields = [ 'id', 'name', 'birthday' ];
+    protected $fields = ['id', 'name', 'birthday'];
 
     /**
      * List of default field values
      *
      * @var array
      */
-    protected $default_field_values = [ 'name' => 'Unknown Writer' ];
-
-    /**
-     * Return name of this model
-     *
-     * @param  boolean $underscore
-     * @param  boolean $singular
-     * @return string
-     */
-    public function getModelName($underscore = false, $singular = false)
-    {
-        if ($singular) {
-            return $underscore ? 'writer' : 'Writer';
-        } else {
-            return $underscore ? 'writers' : 'Writers';
-        }
-    }
+    protected $default_field_values = ['name' => 'Unknown Writer'];
 
     /**
      * Name of AI field (if any)

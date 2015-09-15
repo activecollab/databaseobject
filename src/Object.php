@@ -2,16 +2,16 @@
 
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
+use JsonSerializable;
 use InvalidArgumentException;
 use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
-abstract class Object implements LoadFromRow
+abstract class Object implements LoadFromRow, JsonSerializable
 {
     /**
      * @var Pool
@@ -54,35 +54,12 @@ abstract class Object implements LoadFromRow
     protected $default_field_values = [];
 
     /**
-     * List of protected fields (can't be set using setAttributes() method)
-     *
-     * @var array
-     */
-    protected $protect = null;
-
-    /**
-     * List of accepted fields
-     *
-     * @var array
-     */
-    protected $accept = null;
-
-    /**
      * @param Pool $pool
      */
     public function __construct(Pool $pool)
     {
         $this->pool = $pool;
     }
-
-    /**
-     * Return name of this model
-     *
-     * @param  boolean $underscore
-     * @param  boolean $singular
-     * @return string
-     */
-    abstract public function getModelName($underscore = false, $singular = false);
 
     // ---------------------------------------------------
     //  Internals, not overridable
@@ -146,7 +123,7 @@ abstract class Object implements LoadFromRow
      */
     public function validate(Validator &$validator)
     {
-        $this->triggerEvent('on_validate', [ &$validator ]);
+        $this->triggerEvent('on_validate', [&$validator]);
     }
 
     /**
@@ -194,35 +171,6 @@ abstract class Object implements LoadFromRow
         }
 
         return $field_values;
-    }
-
-    /**
-     * Set object attributes / properties. This function will take hash and set
-     * value of all fields that she finds in the hash
-     *
-     * @param array $attributes
-     */
-    public function setAttributes($attributes)
-    {
-        if (empty($attributes)) {
-            $attributes = [];
-        }
-
-        $this->triggerEvent('on_set_attributes', [ &$attributes ]);
-
-        foreach ($attributes as $k => $v) {
-            if (is_array($this->protect) && (in_array($k, $this->protect) || in_array($k, $this->protect))) {
-                continue; // field is in list of protected fields
-            }
-            if (is_array($this->accept) && !(in_array($k, $this->accept) || in_array($k, $this->protect))) {
-                continue; // not in list of acceptable fields
-            }
-            if ($this->fieldExists($k)) {
-                $this->setFieldValue($k, $attributes[$k]);
-            } else {
-                $this->setAttribute($k, $v);
-            }
-        }
     }
 
     /**
@@ -302,8 +250,6 @@ abstract class Object implements LoadFromRow
         } else {
             $this->update();
         }
-
-//        AngieApplication::cache()->removeByObject($this);
     }
 
     /**
@@ -314,23 +260,14 @@ abstract class Object implements LoadFromRow
     public function delete($bulk = false)
     {
         if ($this->isLoaded()) {
-//            $cache_id = $this->getCacheKey();
+            $this->pool->getConnection()->transact(function() use ($bulk) {
+                $this->triggerEvent('on_before_delete', [ $bulk ]);
 
-            $this->triggerEvent('on_before_delete', [ $bulk ]);
+                $this->pool->getConnection()->delete($this->table_name, $this->getWherePartById($this->getId()));
+                $this->is_new = true;
 
-//            Angie\Events::trigger('on_before_object_deleted', [ &$this, $bulk ]);
-
-            $this->pool->getConnection()->delete($this->table_name, $this->getWherePartById($this->getId()));
-
-//            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getId()));
-
-            $this->is_new = true;
-
-//            AngieApplication::cache()->remove($cache_id);
-
-            $this->triggerEvent('on_after_delete', [ $bulk ]);
-
-//            Angie\Events::trigger('on_object_deleted', [ &$this, $bulk ]);
+                $this->triggerEvent('on_after_delete', [ $bulk ]);
+            });
         }
     }
 
@@ -541,16 +478,6 @@ abstract class Object implements LoadFromRow
     }
 
     /**
-     * Calculate fields checksum
-     *
-     * @return string
-     */
-    public function getFieldsChecksum()
-    {
-        return md5(implode(' ', $this->values));
-    }
-
-    /**
      * Return value of specific field and typecast it...
      *
      * @param  string $field   Field value
@@ -596,7 +523,7 @@ abstract class Object implements LoadFromRow
      *
      * @param  string                   $field
      * @param  mixed                    $value
-     * @return $this
+     * @return mixed
      * @throws InvalidArgumentException
      */
     public function setFieldValue($field, $value)
@@ -634,7 +561,10 @@ abstract class Object implements LoadFromRow
                         $this->old_values[$field] = $old_value;
                     }
 
-                    $this->addModifiedField($field); // Remember that this file was modified
+                    // Remember that this field is modified
+                    if (!in_array($field, $this->modified_fields)) {
+                        $this->modified_fields[] = $field;
+                    }
                 }
 
                 $this->values[$field] = $value;
@@ -647,18 +577,6 @@ abstract class Object implements LoadFromRow
     }
 
     /**
-     * Add new modified field
-     *
-     * @param string $field Field that need to be added
-     */
-    public function addModifiedField($field)
-    {
-        if (!in_array($field, $this->modified_fields)) {
-            $this->modified_fields[] = $field;
-        }
-    }
-
-    /**
      * Set non-field value during DataManager::create() and DataManager::update() calls
      *
      * @param string $attribute
@@ -666,7 +584,7 @@ abstract class Object implements LoadFromRow
      */
     public function setAttribute($attribute, $value)
     {
-        $this->triggerEvent('on_set_attribute', [ $attribute, $value ]);
+        $this->triggerEvent('on_set_attribute', [$attribute, $value]);
     }
 
     // ---------------------------------------------------
@@ -743,24 +661,6 @@ abstract class Object implements LoadFromRow
         $this->primary_key_modified = false;
     }
 
-    /**
-     * Return cache key for this object)
-     *
-     * If we still don't have a lodaded object, we can pass a known ID to get the cache key
-     *
-     * @param  array   $subnamespace
-     * @param  integer $id
-     * @return array
-     */
-    public function getCacheKey($subnamespace = null, $id = null)
-    {
-        if ($id === null) {
-            return get_data_object_cache_key($this->getModelName(true), $this->getId(), $subnamespace);
-        } else {
-            return get_data_object_cache_key($this->getModelName(true), $id, $subnamespace);
-        }
-    }
-
     // ---------------------------------------------------
     //  Events
     // ---------------------------------------------------
@@ -821,10 +721,8 @@ abstract class Object implements LoadFromRow
      */
     public function jsonSerialize()
     {
-        $result = ['id' => $this->getId(), 'class' => get_class($this)];
-
-        $this->triggerEvent('on_json_serialize', [ &$result ]);
-
+        $result = ['id' => $this->getId(), 'type' => get_class($this)];
+        $this->triggerEvent('on_json_serialize', [&$result]);
         return $result;
     }
 }
