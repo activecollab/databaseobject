@@ -133,7 +133,9 @@ class Pool
     public function getEscapedTypeFields($type)
     {
         if (empty($this->types[$type]['escaped_fields'])) {
-            $this->types[$type]['escaped_fields'] = ;
+            $this->types[$type]['escaped_fields'] = implode(',', array_map(function($field_name) {
+                return $this->connection->escapeFieldName($field_name);
+            }, $this->getTypeFields($type)));
         }
 
         return $this->types[$type]['escaped_fields'];
