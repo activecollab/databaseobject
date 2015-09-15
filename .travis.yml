@@ -6,6 +6,8 @@ mysql:
   database: activecollab_database_object_test
   username: root
   encoding: utf8mb4
+before_install:
+  - composer self-update
 install: composer install --dev
 before_script:
   # create the database
