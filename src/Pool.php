@@ -118,12 +118,25 @@ class Pool
     private function getSelectOneByType($type)
     {
         if (empty($this->types[$type]['sql_select_by_ids'])) {
-            $this->types[$type]['sql_select_by_ids'] = 'SELECT ' . implode(',', array_map(function($field_name) {
-                return $this->connection->escapeFieldName($field_name);
-            }, $this->getTypeFields($type))) . ' FROM ' . $this->getTypeTable($type, true) . ' WHERE `id` IN ? ORDER BY `id`';
+            $this->types[$type]['sql_select_by_ids'] = 'SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true) . ' WHERE `id` IN ? ORDER BY `id`';
         }
 
         return $this->types[$type]['sql_select_by_ids'];
+    }
+
+    /**
+     * Return a list of escaped field names for the given type
+     *
+     * @param  string $type
+     * @return string
+     */
+    public function getEscapedTypeFields($type)
+    {
+        if (empty($this->types[$type]['escaped_fields'])) {
+            $this->types[$type]['escaped_fields'] = ;
+        }
+
+        return $this->types[$type]['escaped_fields'];
     }
 
     /**
