@@ -25,6 +25,16 @@ class Pool
     }
 
     /**
+     * Return database connection
+     *
+     * @return Connection
+     */
+    public function &getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Return true if object of the given type with the given ID exists
      *
      * @param  Object|string $type_or_sample_object

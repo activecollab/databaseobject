@@ -19,11 +19,6 @@ abstract class Object implements LoadFromRow
     protected $pool;
 
     /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
      * Name of the table
      *
      * @var string
@@ -73,13 +68,11 @@ abstract class Object implements LoadFromRow
     protected $accept = null;
 
     /**
-     * @param Pool       $pool
-     * @param Connection $connection
+     * @param Pool $pool
      */
-    public function __construct(Pool $pool, Connection $connection)
+    public function __construct(Pool $pool)
     {
         $this->pool = $pool;
-        $this->connection = $connection;
     }
 
     /**
@@ -327,7 +320,7 @@ abstract class Object implements LoadFromRow
 
 //            Angie\Events::trigger('on_before_object_deleted', [ &$this, $bulk ]);
 
-            $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
+            $this->pool->getConnection()->delete($this->table_name, $this->getWherePartById($this->getId()));
 
 //            DB::execute("DELETE FROM " . $this->getTableName() . " WHERE " . $this->getWherePartById($this->getId()));
 
@@ -685,7 +678,7 @@ abstract class Object implements LoadFromRow
      */
     private function insert()
     {
-        $last_insert_id = $this->connection->insert($this->table_name, $this->values);
+        $last_insert_id = $this->pool->getConnection()->insert($this->table_name, $this->values);
 
         if (empty($this->values[$this->auto_increment])) {
             $this->values[$this->auto_increment] = $last_insert_id;
@@ -712,10 +705,10 @@ abstract class Object implements LoadFromRow
                 if ($this->pool->exists($this, $this->getId())) {
                     throw new LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
-                    $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
+                    $this->pool->getConnection()->update($this->table_name, $updates, $this->getWherePartById($old_id));
                 }
             } else {
-                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
+                $this->pool->getConnection()->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
 
             $this->setAsLoaded();
@@ -734,7 +727,7 @@ abstract class Object implements LoadFromRow
             throw new InvalidArgumentException("Value '$id' is not a valid ID");
         }
 
-        return $this->connection->prepare('(`id` = ?)', $id);
+        return $this->pool->getConnection()->prepare('(`id` = ?)', $id);
     }
 
     /**
