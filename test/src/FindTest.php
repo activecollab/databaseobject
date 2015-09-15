@@ -3,6 +3,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseObject\Finder;
 use DateTime;
 
 /**
@@ -61,12 +62,23 @@ class FindTest extends TestCase
     }
 
     /**
+     * Test if find() method returns Finder instance
+     */
+    public function testFindReturnsFinder()
+    {
+        $finder = $this->pool->find(Writer::class);
+
+        $this->assertInstanceOf(Finder::class, $finder);
+        $this->assertEquals(Writer::class, $finder->getType());
+    }
+
+    /**
      * Test find all writers from the database
      */
     public function testFindAll()
     {
         /** @var Result $result */
-        $result = $this->pool->find(Writer::class);
+        $result = $this->pool->find(Writer::class)->all();
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertCount(3, $result);
@@ -74,5 +86,49 @@ class FindTest extends TestCase
         foreach ($result as $writer) {
             $this->assertInstanceOf(Writer::class, $writer);
         }
+    }
+
+    /**
+     * Test find first record
+     */
+    public function testFindFirst()
+    {
+        /** @var Writer $should_be_pushkin */
+        $should_be_pushkin = $this->pool->find(Writer::class)->orderBy('`birthday`')->first();
+
+        $this->assertInstanceOf(Writer::class, $should_be_pushkin);
+        $this->assertTrue($should_be_pushkin->isLoaded());
+        $this->assertEquals('Alexander Pushkin', $should_be_pushkin->getName());
+    }
+
+    /**
+     * Test find by conditions
+     */
+    public function testFindByConditions()
+    {
+        /** @var Writer $should_be_leo */
+        $should_be_leo = $this->pool->find(Writer::class)->where('`name` LIKE ?', '%Leo%')->first();
+
+        $this->assertInstanceOf(Writer::class, $should_be_leo);
+        $this->assertTrue($should_be_leo->isLoaded());
+        $this->assertEquals('Leo Tolstoy', $should_be_leo->getName());
+    }
+
+    /**
+     * Test limit and offset
+     */
+    public function testOffset()
+    {
+        $result = $this->pool->find(Writer::class)->orderBy('`birthday`')->limit(1, 1)->all();
+
+        $this->assertInstanceOf(Result::class, $result);
+        $this->assertCount(1, $result);
+
+        /** @var Writer $should_be_fyodor */
+        $should_be_fyodor = $result[0];
+
+        $this->assertInstanceOf(Writer::class, $should_be_fyodor);
+        $this->assertTrue($should_be_fyodor->isLoaded());
+        $this->assertEquals('Fyodor Dostoyevsky', $should_be_fyodor->getName());
     }
 }

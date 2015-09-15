@@ -88,16 +88,12 @@ class Pool
     /**
      * Find records by type
      *
-     * @param  string               $type
-     * @return Result|Object[]|null
+     * @param  string $type
+     * @return Finder
      */
     public function find($type)
     {
-        if (in_array('type', $this->getTypeFields($type))) {
-            return $this->connection->advancedExecute('SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true), null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD, 'type', [&$this]);
-        } else {
-            return $this->connection->advancedExecute('SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true), null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, $type, [&$this]);
-        }
+        return new Finder($this, $type);
     }
 
     /**
@@ -173,12 +169,52 @@ class Pool
     public function getEscapedTypeFields($type)
     {
         if (empty($this->types[$type]['escaped_fields'])) {
-            $this->types[$type]['escaped_fields'] = implode(',', array_map(function($field_name) {
-                return $this->connection->escapeFieldName($field_name);
+            $table_name = $this->getTypeTable($type, true);
+
+            $this->types[$type]['escaped_fields'] = implode(',', array_map(function($field_name) use ($table_name) {
+                return $table_name . '.' . $this->connection->escapeFieldName($field_name);
             }, $this->getTypeFields($type)));
         }
 
         return $this->types[$type]['escaped_fields'];
+    }
+
+    /**
+     * Return default order by for the given type
+     *
+     * @param  string   $type
+     * @return string[]
+     */
+    public function getTypeOrderBy($type)
+    {
+        if (isset($this->types[$type])) {
+            return $this->types[$type]['order_by'];
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
+    }
+
+    /**
+     * Return escaped list of fields that we can order by
+     *
+     * @param  string $type
+     * @return string
+     */
+    public function getEscapedTypeOrderBy($type)
+    {
+        if (empty($this->types[$type]['escaped_order_by'])) {
+            $table_name = $this->getTypeTable($type, true);
+
+            $this->types[$type]['escaped_order_by'] = implode(',', array_map(function($field_name) use ($table_name) {
+                if (substr($field_name, 0, 1) == '!') {
+                    return $table_name . '.' . $this->connection->escapeFieldName(substr($field_name, 1)) . ' DESC';
+                } else {
+                    return $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                }
+            }, $this->getTypeOrderBy($type)));
+        }
+
+        return $this->types[$type]['escaped_order_by'];
     }
 
     /**
@@ -220,6 +256,7 @@ class Pool
                     $this->types[$type] = [
                         'table_name' => $default_properties['table_name'],
                         'fields' => $default_properties['fields'],
+                        'order_by' => $default_properties['order_by'],
                     ];
                 } else {
                     throw new InvalidArgumentException("Type '$type' is not a subclass of '" . Object::class . "'");

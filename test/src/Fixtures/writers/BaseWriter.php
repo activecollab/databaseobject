@@ -38,9 +38,10 @@ abstract class BaseWriter extends Object
      */
     protected $auto_increment = 'id';
 
-    // ---------------------------------------------------
-    //  Fields
-    // ---------------------------------------------------
+    /**
+     * @var string[]
+     */
+    protected $order_by = ['!id'];
 
     /**
      * Return value of name field
