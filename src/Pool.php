@@ -3,7 +3,6 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Result\Result;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -23,16 +22,6 @@ class Pool
     public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-    }
-
-    /**
-     * Return database connection
-     *
-     * @return Connection
-     */
-    public function &getConnection()
-    {
-        return $this->connection;
     }
 
     /**
@@ -93,7 +82,7 @@ class Pool
      */
     public function find($type)
     {
-        return new Finder($this, $type);
+        return new Finder($this, $this->connection, $type);
     }
 
     /**

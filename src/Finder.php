@@ -15,6 +15,11 @@ class Finder
     private $pool;
 
     /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * @var string
      */
     private $type;
@@ -33,14 +38,16 @@ class Finder
      * @var integer|null
      */
     private $offset, $limit;
-
+    
     /**
-     * @param Pool $pool
-     * @param      $type
+     * @param Pool       $pool
+     * @param Connection $connection
+     * @param            $type
      */
-    public function __construct(Pool $pool, $type)
+    public function __construct(Pool $pool, Connection $connection, $type)
     {
         $this->pool = $pool;
+        $this->connection = $connection;
         $this->type = $type;
         $this->order_by = $this->pool->getEscapedTypeOrderBy($type);
     }
@@ -50,7 +57,7 @@ class Finder
      */
     public function &where()
     {
-        $this->conditions = $this->pool->getConnection()->prepareConditions(func_get_args());
+        $this->conditions = $this->connection->prepareConditions(func_get_args());
 
         return $this;
     }
@@ -126,7 +133,7 @@ class Finder
             $return_by_value = $this->type;
         }
 
-        return $this->pool->getConnection()->advancedExecute($select_sql, null, Connection::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool]);
+        return $this->connection->advancedExecute($select_sql, null, Connection::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool, &$this->connection]);
     }
 
     /**

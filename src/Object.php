@@ -2,6 +2,7 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use JsonSerializable;
@@ -17,6 +18,11 @@ abstract class Object implements LoadFromRow, JsonSerializable
      * @var Pool
      */
     protected $pool;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     /**
      * Name of the table
@@ -54,11 +60,13 @@ abstract class Object implements LoadFromRow, JsonSerializable
     protected $default_field_values = [];
 
     /**
-     * @param Pool $pool
+     * @param Pool       $pool
+     * @param Connection $connection
      */
-    public function __construct(Pool $pool)
+    public function __construct(Pool $pool, Connection $connection)
     {
         $this->pool = $pool;
+        $this->connection = $connection;
     }
 
     // ---------------------------------------------------
@@ -260,10 +268,10 @@ abstract class Object implements LoadFromRow, JsonSerializable
     public function delete($bulk = false)
     {
         if ($this->isLoaded()) {
-            $this->pool->getConnection()->transact(function() use ($bulk) {
+            $this->connection->transact(function() use ($bulk) {
                 $this->triggerEvent('on_before_delete', [ $bulk ]);
 
-                $this->pool->getConnection()->delete($this->table_name, $this->getWherePartById($this->getId()));
+                $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
                 $this->is_new = true;
 
                 $this->triggerEvent('on_after_delete', [ $bulk ]);
@@ -596,7 +604,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
      */
     private function insert()
     {
-        $last_insert_id = $this->pool->getConnection()->insert($this->table_name, $this->values);
+        $last_insert_id = $this->connection->insert($this->table_name, $this->values);
 
         if (empty($this->values[$this->auto_increment])) {
             $this->values[$this->auto_increment] = $last_insert_id;
@@ -623,10 +631,10 @@ abstract class Object implements LoadFromRow, JsonSerializable
                 if ($this->pool->exists(get_class($this), $this->getId())) {
                     throw new LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
-                    $this->pool->getConnection()->update($this->table_name, $updates, $this->getWherePartById($old_id));
+                    $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
                 }
             } else {
-                $this->pool->getConnection()->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
+                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
 
             $this->setAsLoaded();
@@ -645,7 +653,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
             throw new InvalidArgumentException("Value '$id' is not a valid ID");
         }
 
-        return $this->pool->getConnection()->prepare('(`id` = ?)', $id);
+        return $this->connection->prepare('(`id` = ?)', $id);
     }
 
     /**
