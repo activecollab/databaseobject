@@ -131,4 +131,27 @@ class FindTest extends TestCase
         $this->assertTrue($should_be_fyodor->isLoaded());
         $this->assertEquals('Fyodor Dostoyevsky', $should_be_fyodor->getName());
     }
+
+    /**
+     * Test if dependencies are properly set to hydrated objects so they are fully functional
+     */
+    public function testHydratedObjectsAreFullyFunctional()
+    {
+        /** @var Writer $leo */
+        $should_be_leo = $this->pool->find(Writer::class)->where('`name` = ?', 'Leo Tolstoy')->first();
+
+        $this->assertInstanceOf(Writer::class, $should_be_leo);
+        $this->assertTrue($should_be_leo->isLoaded());
+        $this->assertEquals('Leo Tolstoy', $should_be_leo->getName());
+
+        $should_be_leo->setName('Lev Nikolayevich Tolstoy');
+        $should_be_leo->save();
+
+        $should_be_leo = $this->pool->reload(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $should_be_leo);
+        $this->assertTrue($should_be_leo->isLoaded());
+
+        $this->assertEquals('Lev Nikolayevich Tolstoy', $should_be_leo->getName());
+    }
 }
