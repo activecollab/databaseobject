@@ -620,7 +620,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
             if ($this->primary_key_modified) {
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
-                if ($this->pool->exists($this, $this->getId())) {
+                if ($this->pool->exists(get_class($this), $this->getId())) {
                     throw new LogicException("Object #" . $this->getId() . " can't be overwritten");
                 } else {
                     $this->pool->getConnection()->update($this->table_name, $updates, $this->getWherePartById($old_id));

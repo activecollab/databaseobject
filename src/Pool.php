@@ -3,6 +3,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Result\Result;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -35,20 +36,6 @@ class Pool
     }
 
     /**
-     * Return true if object of the given type with the given ID exists
-     *
-     * @param  Object|string $type_or_sample_object
-     * @param  integer       $id
-     * @return bool
-     */
-    public function exists($type_or_sample_object, $id)
-    {
-        $type = $type_or_sample_object instanceof Object ? get_class($type_or_sample_object) : $type_or_sample_object;
-
-        return (boolean) $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . ' WHERE `id` = ?', $id);
-    }
-
-    /**
      * @param  string  $type
      * @param  integer $id
      * @return Object
@@ -68,6 +55,49 @@ class Pool
         }
 
         return null;
+    }
+
+    /**
+     * Return number of records of the given type that match the given conditions
+     *
+     * @param  string            $type
+     * @param  array|string|null $conditions
+     * @return integer
+     */
+    public function count($type, $conditions = null)
+    {
+        if ($conditions = $this->connection->prepareConditions($conditions)) {
+            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
+        } else {
+            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
+        }
+    }
+
+    /**
+     * Return true if object of the given type with the given ID exists
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return bool
+     */
+    public function exists($type, $id)
+    {
+        return (boolean) $this->count($type, ['`id` = ?', $id]);
+    }
+
+    /**
+     * Find records by type
+     *
+     * @param  string               $type
+     * @return Result|Object[]|null
+     */
+    public function find($type)
+    {
+        if (in_array('type', $this->getTypeFields($type))) {
+            return $this->connection->advancedExecute('SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true), null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_FIELD, 'type', [&$this]);
+        } else {
+            return $this->connection->advancedExecute('SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true), null, Connection::LOAD_ALL_ROWS, Connection::RETURN_OBJECT_BY_CLASS, $type, [&$this]);
+        }
     }
 
     /**
