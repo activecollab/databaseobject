@@ -117,6 +117,16 @@ class Finder
     }
 
     /**
+     * Return array of ID-s that match the given criteria
+     *
+     * @return integer[]
+     */
+    public function ids()
+    {
+        return $this->connection->executeFirstColumn($this->getSelectIdsSql());
+    }
+
+    /**
      * Prepare SQL and load one or more records
      *
      * @return mixed
@@ -160,9 +170,30 @@ class Finder
      *
      * @return string
      */
-    public function getSelectSql()
+    private function getSelectSql()
     {
-        $result = "SELECT " . $this->pool->getEscapedTypeFields($this->type) . " FROM " . $this->pool->getTypeTable($this->type, true);
+        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
+    }
+
+    /**
+     * Return select ID-s SQL
+     *
+     * @return string
+     */
+    private function getSelectIdsSql()
+    {
+        return $this->getSelectFieldsSql('`id`');
+    }
+
+    /**
+     * Construct SELECT query for the given fields based on set criteria
+     *
+     * @param  string $escaped_field_names
+     * @return string
+     */
+    private function getSelectFieldsSql($escaped_field_names)
+    {
+        $result = "SELECT $escaped_field_names FROM " . $this->pool->getTypeTable($this->type, true);
 
         if ($this->conditions) {
             $result .= " WHERE $this->conditions";

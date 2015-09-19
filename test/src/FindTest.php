@@ -102,6 +102,17 @@ class FindTest extends TestCase
     }
 
     /**
+     * Test find all ID-s
+     */
+    public function testFindAllIds()
+    {
+        $ids = $this->pool->find(Writer::class)->ids();
+
+        $this->assertInternalType('array', $ids);
+        $this->assertCount(3, $ids);
+    }
+
+    /**
      * Test find by conditions
      */
     public function testFindByConditions()
@@ -112,6 +123,18 @@ class FindTest extends TestCase
         $this->assertInstanceOf(Writer::class, $should_be_leo);
         $this->assertTrue($should_be_leo->isLoaded());
         $this->assertEquals('Leo Tolstoy', $should_be_leo->getName());
+    }
+
+    /**
+     * Test find ID-s by conditions
+     */
+    public function testFindIdsByCondition()
+    {
+        $ids = $this->pool->find(Writer::class)->where('`name` LIKE ?', '%Leo%')->ids();
+
+        $this->assertInternalType('array', $ids);
+        $this->assertCount(1, $ids);
+        $this->assertSame(1, $ids[0]);
     }
 
     /**
