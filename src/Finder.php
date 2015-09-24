@@ -1,7 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 
 /**
@@ -15,7 +15,7 @@ class Finder
     private $pool;
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
@@ -40,11 +40,11 @@ class Finder
     private $offset, $limit;
     
     /**
-     * @param Pool       $pool
-     * @param Connection $connection
-     * @param            $type
+     * @param PoolInterface       $pool
+     * @param ConnectionInterface $connection
+     * @param string              $type
      */
-    public function __construct(Pool $pool, Connection $connection, $type)
+    public function __construct(PoolInterface $pool, ConnectionInterface $connection, $type)
     {
         $this->pool = $pool;
         $this->connection = $connection;
@@ -136,14 +136,14 @@ class Finder
         $select_sql = $this->getSelectSql();
 
         if ($this->loadByTypeField()) {
-            $return_by = Connection::RETURN_OBJECT_BY_FIELD;
+            $return_by = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
             $return_by_value = 'type';
         } else {
-            $return_by = Connection::RETURN_OBJECT_BY_CLASS;
+            $return_by = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
             $return_by_value = $this->type;
         }
 
-        return $this->connection->advancedExecute($select_sql, null, Connection::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool, &$this->connection]);
+        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool, &$this->connection]);
     }
 
     /**

@@ -3,7 +3,10 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 
-class Validator
+/**
+ * @package ActiveCollab\DatabaseObject
+ */
+class Validator implements ValidatorInterface
 {
     private $errors = [];
 

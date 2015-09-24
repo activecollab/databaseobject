@@ -2,17 +2,15 @@
 
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseConnection\Connection;
-use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
-use JsonSerializable;
 use InvalidArgumentException;
 use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
-abstract class Object implements LoadFromRow, JsonSerializable
+abstract class Object implements ObjectInterface
 {
     /**
      * @var Pool
@@ -20,7 +18,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
     protected $pool;
 
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     protected $connection;
 
@@ -60,10 +58,10 @@ abstract class Object implements LoadFromRow, JsonSerializable
     protected $default_field_values = [];
 
     /**
-     * @param Pool       $pool
-     * @param Connection $connection
+     * @param PoolInterface       $pool
+     * @param ConnectionInterface $connection
      */
-    public function __construct(Pool $pool, Connection $connection)
+    public function __construct(PoolInterface $pool, ConnectionInterface $connection)
     {
         $this->pool = $pool;
         $this->connection = $connection;
@@ -127,9 +125,9 @@ abstract class Object implements LoadFromRow, JsonSerializable
      * ValidationErrors class that is used for error collection. If collection
      * is empty object is considered valid and save process will continue
      *
-     * @param Validator $validator
+     * @param ValidatorInterface $validator
      */
-    public function validate(Validator &$validator)
+    public function validate(ValidatorInterface &$validator)
     {
         $this->triggerEvent('on_validate', [&$validator]);
     }
@@ -145,7 +143,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
      */
     public function is(&$var)
     {
-        if ($var instanceof Object) {
+        if ($var instanceof ObjectInterface) {
             if ($this->isLoaded()) {
                 return $var->isLoaded() && get_class($this) == get_class($var) && $this->getId() == $var->getId();
             } else {
@@ -647,7 +645,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
      * @param  integer $id
      * @return string
      */
-    public function getWherePartById($id)
+    private function getWherePartById($id)
     {
         if (empty($id)) {
             throw new InvalidArgumentException("Value '$id' is not a valid ID");
@@ -663,7 +661,7 @@ abstract class Object implements LoadFromRow, JsonSerializable
      * anything (just loading data from database in fresh object using
      * setFieldValue function)
      */
-    public function resetModifiedFlags()
+    private function resetModifiedFlags()
     {
         $this->modified_fields = $this->old_values = [];
         $this->primary_key_modified = false;
@@ -706,10 +704,10 @@ abstract class Object implements LoadFromRow, JsonSerializable
     /**
      * Trigger an internal event
      *
-     * @param string $event
-     * @param array  $event_parameters
+     * @param string     $event
+     * @param array|null $event_parameters
      */
-    protected function triggerEvent($event, $event_parameters = null)
+    protected function triggerEvent($event, array $event_parameters = null)
     {
         if (isset($this->event_handlers[$event])) {
             if (empty($event_parameters)) {

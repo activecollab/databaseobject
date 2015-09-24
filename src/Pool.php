@@ -2,24 +2,24 @@
 
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use InvalidArgumentException;
 use ReflectionClass;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Pool
+class Pool implements PoolInterface
 {
     /**
-     * @var Connection
+     * @var ConnectionInterface
      */
     private $connection;
 
     /**
-     * @param Connection $connection
+     * @param ConnectionInterface $connection
      */
-    public function __construct(Connection $connection)
+    public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
     }
@@ -239,7 +239,7 @@ class Pool
             if (class_exists($type, true)) {
                 $reflection = new ReflectionClass($type);
 
-                if ($reflection->isSubclassOf(Object::class)) {
+                if ($reflection->implementsInterface(ObjectInterface::class)) {
                     $default_properties = $reflection->getDefaultProperties();
 
                     $this->types[$type] = [
@@ -248,7 +248,7 @@ class Pool
                         'order_by' => $default_properties['order_by'],
                     ];
                 } else {
-                    throw new InvalidArgumentException("Type '$type' is not a subclass of '" . Object::class . "'");
+                    throw new InvalidArgumentException("Type '$type' does not implement '" . ObjectInterface::class . "' interface");
                 }
             } else {
                 throw new InvalidArgumentException("Type '$type' is not defined");
