@@ -3,12 +3,13 @@
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Object;
+use ActiveCollab\DatabaseObject\ObjectInterface;
 use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
  */
-abstract class BaseWriter extends Object
+abstract class BaseWriter extends Object implements ObjectInterface
 {
     /**
      * Name of the table where records are stored

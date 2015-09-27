@@ -17,6 +17,13 @@ interface ValidatorInterface
     public function greaterThan($field_name);
 
     /**
+     * @param  string  $field_name
+     * @param  string  ...$context
+     * @return boolean
+     */
+    public function unique($field_name, ...$context);
+
+    /**
      * @return bool
      */
     public function hasErrors();

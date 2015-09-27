@@ -253,7 +253,7 @@ abstract class Object implements ObjectInterface
             }
         }
 
-        $validator = new Validator($this->values);
+        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $this->values);
 
         $this->validate($validator);
 
@@ -541,7 +541,7 @@ abstract class Object implements ObjectInterface
     /**
      * Return all field value
      *
-     * @param string $field
+     * @param  string $field
      * @return mixed
      */
     public function getOldFieldValue($field)
