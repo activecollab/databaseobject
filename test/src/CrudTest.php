@@ -2,6 +2,7 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use DateTime;
 
 /**
@@ -85,6 +86,29 @@ class CrudTest extends TestCase
         $this->assertSame(1, $tolstoy->getId());
         $this->assertSame('Leo Tolstoy', $tolstoy->getName());
         $this->assertSame('1828-09-09', $tolstoy->getBirthday());
+    }
+
+    /**
+     * Test if getById is subclassing aware
+     */
+    public function testSublassingAwareGetById()
+    {
+        /** @var Writer $tolstoy */
+        $tolstoy = $this->pool->getById(AwesomeWriter::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $tolstoy);
+        $this->assertTrue($tolstoy->isLoaded());
+        $this->assertSame(1, $tolstoy->getId());
+        $this->assertSame('Leo Tolstoy', $tolstoy->getName());
+        $this->assertSame('1828-09-09', $tolstoy->getBirthday());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testGetByIdThrowsAnExceptionOnUnregisteredType()
+    {
+        $this->pool->getById(DateTime::class, 1);
     }
 
     /**

@@ -34,16 +34,6 @@ class Pool implements PoolInterface
     {
         if ($this->isTypeRegistered($type)) {
             return new $type($this, $this->connection);
-        } else {
-            if (class_exists($type, true)) {
-                $reflection_class = new ReflectionClass($type);
-
-                foreach ($this->getRegisteredTypes() as $registered_type) {
-                    if ($reflection_class->isSubclassOf($registered_type)) {
-                        return new $type($this, $this->connection);
-                    }
-                }
-            }
         }
 
         throw new InvalidArgumentException("Can't produce an instance of '$type'");
@@ -56,19 +46,23 @@ class Pool implements PoolInterface
      */
     public function &getById($type, $id)
     {
-        $type_fields = $this->getTypeFields($type);
+        if ($registered_type = $this->getRegisteredType($type)) {
+            $type_fields = $this->getTypeFields($registered_type);
 
-        if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($type), [$id])) {
-            $object_class = isset($type_fields['type']) ? $type_fields['type'] : $type;
+            if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
+                $object_class = isset($type_fields['type']) ? $type_fields['type'] : $registered_type;
 
-            /** @var Object $object */
-            $object = new $object_class($this, $this->connection);
-            $object->loadFromRow($row);
+                /** @var Object $object */
+                $object = new $object_class($this, $this->connection);
+                $object->loadFromRow($row);
 
-            return $object;
+                return $object;
+            } else {
+                return null;
+            }
         }
 
-        return null;
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**
