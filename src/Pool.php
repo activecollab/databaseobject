@@ -50,7 +50,7 @@ class Pool implements PoolInterface
             $type_fields = $this->getTypeFields($registered_type);
 
             if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
-                $object_class = isset($type_fields['type']) ? $type_fields['type'] : $registered_type;
+                $object_class = isset($type_fields['type']) ? $type_fields['type'] : $type;
 
                 /** @var Object $object */
                 $object = new $object_class($this, $this->connection);
