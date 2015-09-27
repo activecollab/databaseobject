@@ -8,6 +8,14 @@ namespace ActiveCollab\DatabaseObject;
 interface PoolInterface
 {
     /**
+     * Produce new instance of $type
+     *
+     * @param  string            $type
+     * @return ObjectInterface[]
+     */
+    public function produce($type);
+
+    /**
      * @param  string  $type
      * @param  integer $id
      * @return Object

@@ -65,6 +65,16 @@ abstract class Object implements ObjectInterface
     {
         $this->pool = $pool;
         $this->connection = $connection;
+
+        if ($traits = $pool->getTraitNamesByType(get_class($this))) {
+            foreach ($traits as $trait) {
+                $trait_constructor = str_replace('\\', '', $trait);
+
+                if (method_exists($this, $trait_constructor)) {
+                    $this->$trait_constructor();
+                }
+            }
+        }
     }
 
     // ---------------------------------------------------

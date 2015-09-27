@@ -25,6 +25,31 @@ class Pool implements PoolInterface
     }
 
     /**
+     * Produce new instance of $type
+     *
+     * @param  string            $type
+     * @return ObjectInterface[]
+     */
+    public function produce($type)
+    {
+        if ($this->isTypeRegistered($type)) {
+            return new $type($this, $this->connection);
+        } else {
+            if (class_exists($type, true)) {
+                $reflection_class = new ReflectionClass($type);
+
+                foreach ($this->getRegisteredTypes() as $registered_type) {
+                    if ($reflection_class->isSubclassOf($registered_type)) {
+                        return new $type($this, $this->connection);
+                    }
+                }
+            }
+        }
+
+        throw new InvalidArgumentException("Can't produce an instance of '$type'");
+    }
+
+    /**
      * @param  string  $type
      * @param  integer $id
      * @return Object
