@@ -97,21 +97,26 @@ abstract class BaseWriter extends Object
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function setFieldValue($name, $value)
+    public function &setFieldValue($name, $value)
     {
         if ($value === null) {
-            return parent::setFieldValue($name, null);
+            parent::setFieldValue($name, null);
         } else {
             switch ($name) {
                 case 'id':
-                    return parent::setFieldValue($name, (integer) $value);
+                    parent::setFieldValue($name, (integer) $value);
+                    break;
                 case 'name':
-                    return parent::setFieldValue($name, (string) $value);
+                    parent::setFieldValue($name, (string) $value);
+                    break;
                 case 'birthday':
-                    return parent::setFieldValue($name, $value);
+                    parent::setFieldValue($name, $value);
+                    break;
                 default:
                     throw new InvalidArgumentException("'$name' is not a known field");
             }
         }
+
+        return $this;
     }
 }

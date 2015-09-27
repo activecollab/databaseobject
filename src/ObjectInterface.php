@@ -225,7 +225,7 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function setFieldValue($field, $value);
+    public function &setFieldValue($field, $value);
 
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls

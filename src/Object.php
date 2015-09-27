@@ -529,10 +529,10 @@ abstract class Object implements ObjectInterface
      *
      * @param  string                   $field
      * @param  mixed                    $value
-     * @return mixed
+     * @return $this
      * @throws InvalidArgumentException
      */
-    public function setFieldValue($field, $value)
+    public function &setFieldValue($field, $value)
     {
         if (in_array($field, $this->fields)) {
             if ($field === 'id') {
@@ -575,11 +575,11 @@ abstract class Object implements ObjectInterface
 
                 $this->values[$field] = $value;
             }
-
-            return $value;
         } else {
             throw new InvalidArgumentException("Field '$field' does not exist");
         }
+
+        return $this;
     }
 
     /**
