@@ -2,8 +2,10 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
+use ActiveCollab\DatabaseObject\Validator;
 use DateTime;
 
 /**
@@ -45,6 +47,18 @@ class TypeRegistrationTest extends TestCase
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
         $this->assertTrue($this->pool->isTypeRegistered('\\' . Writer::class));
+    }
+
+    /**
+     * Test if type registration is aware of subclassing
+     */
+    public function testRegisteredTypeIsSubclassingAware()
+    {
+        $this->pool->registerType(Writer::class);
+
+        $this->assertEquals(Writer::class, $this->pool->getRegisteredType(Writer::class));
+        $this->assertEquals(Writer::class, $this->pool->getRegisteredType(AwesomeWriter::class));
+        $this->assertNull($this->pool->getRegisteredType(Validator::class));
     }
 
     /**

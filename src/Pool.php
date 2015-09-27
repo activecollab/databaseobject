@@ -245,6 +245,49 @@ class Pool implements PoolInterface
     }
 
     /**
+     * Cached type to registered type map
+     *
+     * @var array
+     */
+    private $known_types = [];
+
+    /**
+     * Return registered type for the given $type. This function is subclassing aware
+     *
+     * @param  string      $type
+     * @return string|null
+     */
+    public function getRegisteredType($type)
+    {
+        $type = ltrim($type, '\\');
+
+        if (empty($this->known_types[$type])) {
+            if (isset($this->types[$type])) {
+                $this->known_types[$type] = $type;
+            } else {
+                if (class_exists($type, true)) {
+                    $reflection_class = new ReflectionClass($type);
+
+                    if ($reflection_class->implementsInterface(ObjectInterface::class)) {
+                        foreach ($this->types as $registered_type => $registered_type_properties) {
+                            if ($reflection_class->isSubclassOf($registered_type)) {
+                                $this->known_types[ $type ] = $registered_type;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                if (empty($this->known_types[ $type ])) {
+                    $this->known_types[ $type ] = null;
+                }
+            }
+        }
+
+        return $this->known_types[$type];
+    }
+
+    /**
      * Return true if $type is registered
      *
      * @param  string $type
@@ -252,7 +295,7 @@ class Pool implements PoolInterface
      */
     public function isTypeRegistered($type)
     {
-        return !empty($this->types[ltrim($type, '\\')]);
+        return (boolean) $this->getRegisteredType($type);
     }
 
     /**
