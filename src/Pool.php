@@ -74,11 +74,15 @@ class Pool implements PoolInterface
      */
     public function count($type, $conditions = null)
     {
-        if ($conditions = $this->connection->prepareConditions($conditions)) {
-            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
-        } else {
-            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
+        if ($this->isTypeRegistered($type)) {
+            if ($conditions = $this->connection->prepareConditions($conditions)) {
+                return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
+            } else {
+                return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
+            }
         }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**

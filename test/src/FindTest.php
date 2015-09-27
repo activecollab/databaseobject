@@ -54,6 +54,14 @@ class FindTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testCountThrowsAnExceptionOnUnregisteredType()
+    {
+        $this->pool->count(DateTime::class);
+    }
+
+    /**
      * Test count by the given conditions
      */
     public function testCountWithConditions()
