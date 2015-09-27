@@ -10,8 +10,8 @@ interface PoolInterface
     /**
      * Produce new instance of $type
      *
-     * @param  string            $type
-     * @return ObjectInterface[]
+     * @param  string          $type
+     * @return ObjectInterface
      */
     public function produce($type);
 
