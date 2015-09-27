@@ -261,11 +261,30 @@ abstract class Object implements ObjectInterface
             throw $validator->createException();
         }
 
+        $is_new = $this->isNew();
+
+        $modifications = [];
+
+        if (count($this->getModifiedFields())) {
+            foreach ($this->getModifiedFields() as $field) {
+                $old_value = $this->getOldFieldValue($field);
+                $new_value = $this->getFieldValue($field);
+
+                if ($old_value != $new_value) {
+                    $modifications[$field] = [$this->getOldFieldValue($field), $this->getFieldValue($field)];
+                }
+            }
+        }
+
+        $this->triggerEvent('on_before_save', [$is_new, $modifications]);
+
         if ($this->isNew()) {
             $this->insert();
         } else {
             $this->update();
         }
+
+        $this->triggerEvent('on_after_save', [$is_new, $modifications]);
     }
 
     /**
