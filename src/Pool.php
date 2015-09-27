@@ -242,6 +242,10 @@ class Pool implements PoolInterface
                 if ($reflection->implementsInterface(ObjectInterface::class)) {
                     $default_properties = $reflection->getDefaultProperties();
 
+                    if (empty($default_properties['order_by'])) {
+                        $default_properties['order_by'] = '';
+                    }
+
                     $this->types[$type] = [
                         'table_name' => $default_properties['table_name'],
                         'fields' => $default_properties['fields'],
