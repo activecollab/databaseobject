@@ -245,6 +245,10 @@ abstract class Object implements ObjectInterface
      */
     public function save()
     {
+        // ---------------------------------------------------
+        //  Populate defaults
+        // ---------------------------------------------------
+
         if ($this->isNew()) {
             foreach ($this->default_field_values as $field_name => $field_value) {
                 if (empty($this->values[$field_name]) && !array_key_exists($field_name, $this->values)) {
@@ -253,13 +257,9 @@ abstract class Object implements ObjectInterface
             }
         }
 
-        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $this->values);
-
-        $this->validate($validator);
-
-        if ($validator->hasErrors()) {
-            throw $validator->createException();
-        }
+        // ---------------------------------------------------
+        //  Trigger on before save
+        // ---------------------------------------------------
 
         $is_new = $this->isNew();
 
@@ -277,6 +277,22 @@ abstract class Object implements ObjectInterface
         }
 
         $this->triggerEvent('on_before_save', [$is_new, $modifications]);
+
+        // ---------------------------------------------------
+        //  Validate
+        // ---------------------------------------------------
+
+        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $this->values);
+
+        $this->validate($validator);
+
+        if ($validator->hasErrors()) {
+            throw $validator->createException();
+        }
+
+        // ---------------------------------------------------
+        //  Do save
+        // ---------------------------------------------------
 
         if ($this->isNew()) {
             $this->insert();
