@@ -44,6 +44,7 @@ class TypeRegistrationTest extends TestCase
         $this->assertFalse($this->pool->isTypeRegistered(Writer::class));
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
+        $this->assertTrue($this->pool->isTypeRegistered('\\' . Writer::class));
     }
 
     /**

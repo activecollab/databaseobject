@@ -227,7 +227,7 @@ class Pool implements PoolInterface
      */
     public function isTypeRegistered($type)
     {
-        return !empty($this->types[$type]);
+        return !empty($this->types[ltrim($type, '\\')]);
     }
 
     /**
@@ -236,6 +236,8 @@ class Pool implements PoolInterface
     public function registerType(...$types)
     {
         foreach ($types as $type) {
+            $type = ltrim($type, '\\');
+
             if (class_exists($type, true)) {
                 $reflection = new ReflectionClass($type);
 
