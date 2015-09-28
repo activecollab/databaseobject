@@ -241,9 +241,10 @@ abstract class Object implements ObjectInterface
     /**
      * Save object into database (insert or update)
      *
+     * @return $this
      * @throws ValidationException
      */
-    public function save()
+    public function &save()
     {
         // ---------------------------------------------------
         //  Populate defaults
@@ -301,14 +302,17 @@ abstract class Object implements ObjectInterface
         }
 
         $this->triggerEvent('on_after_save', [$is_new, $modifications]);
+
+        return $this;
     }
 
     /**
      * Delete specific object (and related objects if neccecery)
      *
-     * @param boolean $bulk
+     * @param  boolean $bulk
+     * @return $this
      */
-    public function delete($bulk = false)
+    public function &delete($bulk = false)
     {
         if ($this->isLoaded()) {
             $this->connection->transact(function() use ($bulk) {
@@ -320,6 +324,8 @@ abstract class Object implements ObjectInterface
                 $this->triggerEvent('on_after_delete', [ $bulk ]);
             });
         }
+
+        return $this;
     }
 
     /**
@@ -630,12 +636,15 @@ abstract class Object implements ObjectInterface
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls
      *
-     * @param string $attribute
-     * @param mixed  $value
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @return $this
      */
-    public function setAttribute($attribute, $value)
+    public function &setAttribute($attribute, $value)
     {
         $this->triggerEvent('on_set_attribute', [$attribute, $value]);
+
+        return $this;
     }
 
     // ---------------------------------------------------

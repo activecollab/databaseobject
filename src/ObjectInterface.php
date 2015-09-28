@@ -76,16 +76,18 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     /**
      * Save object into database (insert or update)
      *
+     * @return $this
      * @throws ValidationException
      */
-    public function save();
+    public function &save();
 
     /**
      * Delete specific object (and related objects if neccecery)
      *
-     * @param boolean $bulk
+     * @param  boolean $bulk
+     * @return $this
      */
-    public function delete($bulk = false);
+    public function &delete($bulk = false);
 
     /**
      * Create a copy of this object and optionally save it
@@ -230,8 +232,9 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls
      *
-     * @param string $attribute
-     * @param mixed  $value
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @return $this
      */
-    public function setAttribute($attribute, $value);
+    public function &setAttribute($attribute, $value);
 }
