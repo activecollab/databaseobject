@@ -18,8 +18,8 @@ class Writer extends BaseWriter
      */
     public function validate(ValidatorInterface &$validator)
     {
-        $validator->notEmpty('name');
-        $validator->notEmpty('birthday');
+        $validator->present('name');
+        $validator->present('birthday');
 
         parent::validate($validator);
     }

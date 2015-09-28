@@ -24,7 +24,7 @@ class UniqueValidatorTest extends TestCase
 
         $create_table = $this->connection->execute("CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
-            `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+            `name` varchar(191) COLLATE utf8mb4_unicode_ci,
             `birthday` date NOT NULL,
             PRIMARY KEY (`id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
@@ -47,6 +47,28 @@ class UniqueValidatorTest extends TestCase
         }
 
         parent::tearDown();
+    }
+
+    /**
+     * Test if theres no error thrown for NULL even though there are NULL records in the table
+     */
+    public function testNoErrorOnNull()
+    {
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (NULL, ?)', new DateTime('1828-09-09'));
+
+        $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) FROM `writers` WHERE `name` IS NULL'));
+
+        $validator = new Validator($this->connection, 'writers', null, null, ['name' => null]);
+
+        $is_unique = $validator->unique('name');
+
+        $this->assertTrue($is_unique);
+        $this->assertFalse($validator->hasErrors());
+
+        $name_errors = $validator->getFieldErrors('name');
+
+        $this->assertInternalType('array', $name_errors);
+        $this->assertCount(0, $name_errors);
     }
 
     /**

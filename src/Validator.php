@@ -56,12 +56,41 @@ class Validator implements ValidatorInterface
         $this->field_values = $field_values;
     }
 
-    public function notEmpty($field_name)
+    /**
+     * Check if value of $field_name is present
+     *
+     * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are consdiered
+     * to be present (because we check strlen(trim($value)).
+     *
+     * @param  string  $field_name
+     * @return boolean
+     */
+    public function present($field_name)
     {
-    }
+        if (empty($field_name)) {
+            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+        }
 
-    public function isEmpty($field_name)
-    {
+        if (array_key_exists($field_name, $this->field_values)) {
+            if (is_string($this->field_values[$field_name])) {
+                if (mb_strlen(trim($this->field_values[$field_name])) > 0) {
+                    return true;
+                } else {
+                    $this->addFieldError($field_name, "Value of '$field_name' is required");
+                    return false;
+                }
+            } else {
+                if (empty($this->field_values[$field_name])) {
+                    $this->addFieldError($field_name, "Value of '$field_name' is required");
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        } else {
+            $this->addFieldError($field_name, "Value of '$field_name' is required");
+            return false;
+        }
     }
 
     public function lowerThan($field_name)
@@ -73,6 +102,11 @@ class Validator implements ValidatorInterface
     }
 
     /**
+     * Check if value that we are trying to save is unique in the given context
+     *
+     * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
+     * raising an error
+     *
      * @param  string                   $field_name
      * @param  string                   ...$context
      * @return boolean
@@ -82,6 +116,10 @@ class Validator implements ValidatorInterface
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+        }
+
+        if (empty($context) && (!array_key_exists($field_name, $this->field_values) || $this->field_values[$field_name] === null)) {
+            return true; // NULL is always good for single column keys because MySQL does not check NULL for uniqueness
         }
 
         $field_names = [$field_name];
@@ -102,7 +140,14 @@ class Validator implements ValidatorInterface
         $conditions = [];
 
         foreach ($field_names as $v) {
-            $conditions[] = $this->connection->prepare("$v = ?", $this->field_values[$v]);
+            $escaped_field_name = $this->connection->escapeFieldName($v);
+
+            if ($this->field_values[$v] === null) {
+                $conditions[] = "$escaped_field_name IS NULL";
+            } else {
+                $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
+            }
+
         }
 
         $conditions = implode(' AND ', $conditions);
@@ -119,6 +164,15 @@ class Validator implements ValidatorInterface
         }
 
         return true;
+    }
+
+    public function presentAndUnique($field_name, ...$context)
+    {
+        if ($this->present($field_name)) {
+            return $this->unique($field_name, ...$context);
+        }
+
+        return false;
     }
 
     /**

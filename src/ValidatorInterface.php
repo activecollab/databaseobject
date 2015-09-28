@@ -8,7 +8,7 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
  */
 interface ValidatorInterface
 {
-    public function notEmpty($field_name);
+    public function present($field_name);
 
     public function isEmpty($field_name);
 
