@@ -5,15 +5,17 @@ namespace ActiveCollab\DatabaseObject\Exception;
 use ActiveCollab\DatabaseObject\ObjectInterface;
 use Exception;
 
+/**
+ * @package ActiveCollab\DatabaseObject\Exception
+ */
 class ValidationException extends Exception
 {
-    // Any field
     const ANY_FIELD = '-- any --';
 
     /**
      * Object instance
      *
-     * @var DataObject
+     * @var ObjectInterface
      */
     private $object;
 

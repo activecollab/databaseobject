@@ -8,10 +8,24 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
  */
 interface ValidatorInterface
 {
+    /**
+     * Check if value of $field_name is present
+     *
+     * @param  string  $field_name
+     * @return boolean
+     */
     public function present($field_name);
 
+    /**
+     * @param  string  $field_name
+     * @return boolean
+     */
     public function lowerThan($field_name);
 
+    /**
+     * @param  string  $field_name
+     * @return boolean
+     */
     public function greaterThan($field_name);
 
     /**
