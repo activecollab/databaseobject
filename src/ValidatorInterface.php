@@ -36,6 +36,15 @@ interface ValidatorInterface
     public function unique($field_name, ...$context);
 
     /**
+     * Field value needs to be present and unique
+     *
+     * @param  string $field_name
+     * @param  string ...$context
+     * @return bool
+     */
+    public function presentAndUnique($field_name, ...$context);
+
+    /**
      * @return bool
      */
     public function hasErrors();

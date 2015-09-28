@@ -175,6 +175,13 @@ class Validator implements ValidatorInterface
         return true;
     }
 
+    /**
+     * Field value needs to be present and unique
+     *
+     * @param  string $field_name
+     * @param  string ...$context
+     * @return bool
+     */
     public function presentAndUnique($field_name, ...$context)
     {
         if ($this->present($field_name)) {
