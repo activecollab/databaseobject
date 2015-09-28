@@ -10,8 +10,6 @@ interface ValidatorInterface
 {
     public function present($field_name);
 
-    public function isEmpty($field_name);
-
     public function lowerThan($field_name);
 
     public function greaterThan($field_name);

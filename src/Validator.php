@@ -76,21 +76,30 @@ class Validator implements ValidatorInterface
                 if (mb_strlen(trim($this->field_values[$field_name])) > 0) {
                     return true;
                 } else {
-                    $this->addFieldError($field_name, "Value of '$field_name' is required");
-                    return false;
+                    return $this->failPresenceValidation($field_name);
                 }
             } else {
                 if (empty($this->field_values[$field_name])) {
-                    $this->addFieldError($field_name, "Value of '$field_name' is required");
-                    return false;
+                    return $this->failPresenceValidation($field_name);
                 } else {
                     return true;
                 }
             }
         } else {
-            $this->addFieldError($field_name, "Value of '$field_name' is required");
-            return false;
+            return $this->failPresenceValidation($field_name);
         }
+    }
+
+    /**
+     * Fail presence validation
+     *
+     * @param  string $field_name
+     * @return bool
+     */
+    private function failPresenceValidation($field_name)
+    {
+        $this->addFieldError($field_name, "Value of '$field_name' is required");
+        return false;
     }
 
     public function lowerThan($field_name)
