@@ -110,9 +110,64 @@ class PoolProduceTest extends TestCase
         $this->assertEquals('Anton Chekhov', $object->getName());
     }
 
+    /**
+     * Test produce() and save() calls save object to the pool
+     */
     public function testProduceSavesToObjectPool()
     {
-        $this->assertFalse(true);
+        /** @var Writer $object */
+        $object = $this->pool->produce(Writer::class, [
+            'name' => 'Anton Chekhov',
+            'birthday' => new DateTime('1860-01-29'),
+        ]);
+
+        $this->assertInstanceOf(Writer::class, $object);
+    }
+
+    /**
+     * Test if produced object can be forgotten
+     */
+    public function testProducedObjectCanBeForgotten()
+    {
+        /** @var Writer $object */
+        $object = $this->pool->produce(Writer::class, [
+        'name' => 'Anton Chekhov',
+        'birthday' => new DateTime('1860-01-29'),
+        ]);
+
+        $this->assertInstanceOf(Writer::class, $object);
+        $this->assertTrue($this->pool->isInPool(Writer::class, $object->getId()));
+
+        $this->pool->forget(Writer::class, $object->getId());
+
+        $this->assertFalse($this->pool->isInPool(Writer::class, $object->getId()));
+    }
+
+    /**
+     * Test if updates to the object are reflected back to the pool
+     */
+    public function testProducedObjectUpdateIsSavedToPool()
+    {
+        /** @var Writer $object */
+        $object = $this->pool->produce(Writer::class, [
+            'name' => 'Anton Chekhov',
+            'birthday' => new DateTime('1860-01-29'),
+        ]);
+
+        $this->assertInstanceOf(Writer::class, $object);
+
+        $this->pool->forget(Writer::class, $object->getId());
+
+        $this->assertFalse($this->pool->isInPool(Writer::class, $object->getId()));
+
+        // Update instance that is no longer in the pool
+        $object->setName('Anton Pavlovich Chekhov');
+        $object->save();
+
+        /** @var Writer $object_from_pool */
+        $object_from_pool_second_take = $this->pool->getById(Writer::class, $object->getId());
+        $this->assertInstanceOf(Writer::class, $object_from_pool_second_take);
+        $this->assertEquals('Anton Pavlovich Chekhov', $object_from_pool_second_take->getName());
     }
 
     /**

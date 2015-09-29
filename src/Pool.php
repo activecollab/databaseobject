@@ -67,29 +67,133 @@ class Pool implements PoolInterface
     }
 
     /**
-     * @param  string  $type
-     * @param  integer $id
+     * Return object from object pool by the given type and ID
+     *
+     * @param  string                   $type
+     * @param  integer                  $id
+     * @param  boolean                  $use_cache
      * @return Object
+     * @throws InvalidArgumentException
      */
-    public function &getById($type, $id)
+    public function &getById($type, $id, $use_cache = true)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $type_fields = $this->getTypeFields($registered_type);
+            $id = (integer) $id;
 
-            if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
-                $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
+            if ($id < 1) {
+                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
+            }
 
-                /** @var Object $object */
-                $object = new $object_class($this, $this->connection);
-                $object->loadFromRow($row);
-
-                return $object;
+            if (isset($this->objects_pool[$registered_type][$id]) && $use_cache) {
+                return $this->objects_pool[$registered_type][$id];
             } else {
-                return null;
+                $type_fields = $this->getTypeFields($registered_type);
+
+                if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
+                    $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
+
+                    /** @var ObjectInterface $object */
+                    $object = new $object_class($this, $this->connection);
+                    $object->loadFromRow($row);
+
+                    $this->addToObjectPool($registered_type, $object);
+
+                    return $object;
+                } else {
+                    return null;
+                }
             }
         }
 
         throw new InvalidArgumentException("Type '$type' is not registered");
+    }
+
+    /**
+     * Reload an object of the give type with the given ID
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return Object
+     */
+    public function &reload($type, $id)
+    {
+        return $this->getById($type, $id, false);
+    }
+
+    /**
+     * Check if object #ID of $type is in the pool
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return boolean
+     */
+    public function isInPool($type, $id)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            $id = (integer)$id;
+
+            if ($id < 1) {
+                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
+            }
+
+            return isset($this->objects_pool[$type][$id]);
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
+    }
+
+    /**
+     * Add object to the object pool
+     *
+     * @param string          $registered_type
+     * @param ObjectInterface $object
+     */
+    private function addToObjectPool($registered_type, ObjectInterface &$object)
+    {
+        if (empty($this->objects_pool[$registered_type])) {
+            $this->objects_pool[$registered_type] = [];
+        }
+
+        $this->objects_pool[$registered_type][$object->getId()] = $object;
+    }
+
+    /**
+     * Add object to the pool
+     *
+     * @param ObjectInterface $object
+     */
+    public function remember(ObjectInterface &$object)
+    {
+        if ($object->isLoaded()) {
+            if ($registered_type = $this->getRegisteredType(get_class($object))) {
+                $this->addToObjectPool($registered_type, $object);
+            } else {
+                throw new InvalidArgumentException("Type '" . get_class($object) . "' is not registered");
+            }
+        } else {
+            throw new InvalidArgumentException('Object needs to be saved in the database to be remembered');
+        }
+    }
+
+    /**
+     * @param string $type
+     * @param int    $id
+     */
+    public function forget($type, $id)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            $id = (integer)$id;
+
+            if ($id < 1) {
+                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
+            }
+
+            if (isset($this->objects_pool[$type][$id])) {
+                unset($this->objects_pool[$type][$id]);
+            }
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
     }
 
     /**
@@ -133,18 +237,6 @@ class Pool implements PoolInterface
     public function find($type)
     {
         return new Finder($this, $this->connection, $type);
-    }
-
-    /**
-     * Reload an object of the give type with the given ID
-     *
-     * @param  string  $type
-     * @param  integer $id
-     * @return Object
-     */
-    public function &reload($type, $id)
-    {
-        return $this->getById($type, $id);
     }
 
     /**

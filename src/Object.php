@@ -308,6 +308,8 @@ abstract class Object implements ObjectInterface
 
         $this->triggerEvent('on_after_save', [$is_new, $modifications]);
 
+        $this->pool->remember($this);
+
         return $this;
     }
 

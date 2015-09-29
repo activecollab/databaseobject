@@ -18,9 +18,43 @@ interface PoolInterface
     /**
      * @param  string  $type
      * @param  integer $id
+     * @param  boolean $use_cache
      * @return Object
      */
-    public function &getById($type, $id);
+    public function &getById($type, $id, $use_cache = true);
+
+    /**
+     * Reload an object of the give type with the given ID
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return Object
+     */
+    public function &reload($type, $id);
+
+    /**
+     * Check if object #ID of $type is in the pool
+     *
+     * @param  string  $type
+     * @param  integer $id
+     * @return boolean
+     */
+    public function isInPool($type, $id);
+
+    /**
+     * Add object to the pool
+     *
+     * @param ObjectInterface $object
+     */
+    public function remember(ObjectInterface &$object);
+
+    /**
+     * Forget object if it is loaded in memory
+     *
+     * @param string  $type
+     * @param integer $id
+     */
+    public function forget($type, $id);
 
     /**
      * Return number of records of the given type that match the given conditions
@@ -47,15 +81,6 @@ interface PoolInterface
      * @return Finder
      */
     public function find($type);
-
-    /**
-     * Reload an object of the give type with the given ID
-     *
-     * @param  string  $type
-     * @param  integer $id
-     * @return Object
-     */
-    public function &reload($type, $id);
 
     /**
      * Return table name by type
