@@ -17,6 +17,11 @@ class Pool implements PoolInterface
     private $connection;
 
     /**
+     * @var ObjectInterface[]
+     */
+    private $objects_pool = [];
+
+    /**
      * @param ConnectionInterface $connection
      */
     public function __construct(ConnectionInterface $connection)
@@ -28,12 +33,34 @@ class Pool implements PoolInterface
      * Produce new instance of $type
      *
      * @param  string          $type
+     * @param  array|null      $attributes
+     * @param  boolean         $save
      * @return ObjectInterface
      */
-    public function produce($type)
+    public function produce($type, array $attributes = null, $save = true)
     {
-        if ($this->isTypeRegistered($type)) {
-            return new $type($this, $this->connection);
+        if ($registered_type = $this->getRegisteredType($type)) {
+
+            /** @var Object $object */
+            $object = new $type($this, $this->connection);
+
+            if ($attributes) {
+                foreach ($attributes as $k => $v) {
+                    if ($object->fieldExists($k)) {
+                        $object->setFieldValue($k, $v);
+                    } else {
+                        $object->setAttribute($k, $v);
+                    }
+                }
+            }
+
+            if ($save) {
+                $object->save();
+
+                $this->objects_pool[$registered_type][$object->getId()] = $object;
+            }
+
+            return $object;
         }
 
         throw new InvalidArgumentException("Can't produce an instance of '$type'");
