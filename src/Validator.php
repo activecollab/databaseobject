@@ -240,6 +240,26 @@ class Validator implements ValidatorInterface
      */
     public function createException()
     {
-        return new ValidationException();
+        $message = 'Validation failed';
+
+        $first_messages = [];
+        $counter = 0;
+
+        foreach ($this->errors as $field => $error_messages) {
+            foreach ($error_messages as $error_message) {
+                $first_messages[] = $error_message;
+                $counter++;
+
+                if ($counter > 3) {
+                    break 2;
+                }
+            }
+        }
+
+        if (!empty($first_messages)) {
+            $message .= ': ' . implode(', ', $first_messages);
+        }
+
+        return new ValidationException($message);
     }
 }
