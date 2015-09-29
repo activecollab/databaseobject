@@ -44,6 +44,11 @@ abstract class Object implements ObjectInterface
     protected $auto_increment = 'id';
 
     /**
+     * @var string[]
+     */
+    protected $order_by = ['id'];
+
+    /**
      * Array of field names
      *
      * @var array
