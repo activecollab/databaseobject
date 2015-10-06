@@ -277,6 +277,27 @@ class Pool implements PoolInterface
     }
 
     /**
+     * Get a particular type property, and make it (using $callback) if it is not set already
+     *
+     * @param  string   $type
+     * @param  string   $property
+     * @param  callable $callback
+     * @return mixed
+     */
+    public function getTypeProperty($type, $property, callable $callback)
+    {
+        if (isset($this->types[$type])) {
+            if (!array_key_exists($property, $this->types[$type])) {
+                $this->types[$type][$property] = call_user_func($callback);
+            }
+
+            return $this->types[$type][$property];
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
+    }
+
+    /**
      * Return select by ID-s query for the given type
      *
      * @param  string $type
@@ -299,15 +320,13 @@ class Pool implements PoolInterface
      */
     public function getEscapedTypeFields($type)
     {
-        if (empty($this->types[$type]['escaped_fields'])) {
+        return $this->getTypeProperty($type, 'escaped_fields', function() use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            $this->types[$type]['escaped_fields'] = implode(',', array_map(function($field_name) use ($table_name) {
+            return implode(',', array_map(function($field_name) use ($table_name) {
                 return $table_name . '.' . $this->connection->escapeFieldName($field_name);
             }, $this->getTypeFields($type)));
-        }
-
-        return $this->types[$type]['escaped_fields'];
+        });
     }
 
     /**
@@ -333,19 +352,17 @@ class Pool implements PoolInterface
      */
     public function getEscapedTypeOrderBy($type)
     {
-        if (empty($this->types[$type]['escaped_order_by'])) {
+        return $this->getTypeProperty($type, 'escaped_order_by', function() use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            $this->types[$type]['escaped_order_by'] = implode(',', array_map(function($field_name) use ($table_name) {
+            return implode(',', array_map(function($field_name) use ($table_name) {
                 if (substr($field_name, 0, 1) == '!') {
                     return $table_name . '.' . $this->connection->escapeFieldName(substr($field_name, 1)) . ' DESC';
                 } else {
                     return $table_name . '.' . $this->connection->escapeFieldName($field_name);
                 }
             }, $this->getTypeOrderBy($type)));
-        }
-
-        return $this->types[$type]['escaped_order_by'];
+        });
     }
 
     /**
@@ -450,6 +467,9 @@ class Pool implements PoolInterface
     /**
      * Return trait names by object
      *
+     * Note: $type does not need to be directly registered, because we need to support subclasses, which call can have
+     * different traits impelemnted!
+     *
      * @param  string $type
      * @return array
      */
@@ -458,7 +478,7 @@ class Pool implements PoolInterface
         if (empty($this->types[$type]['traits'])) {
             $this->types[$type]['traits'] = [];
 
-            $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[$type]['traits']);
+            $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[ $type ]['traits']);
         }
 
         return $this->types[$type]['traits'];

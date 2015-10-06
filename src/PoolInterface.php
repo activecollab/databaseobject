@@ -100,6 +100,16 @@ interface PoolInterface
     public function getTypeFields($type);
 
     /**
+     * Get a particular type property, and make it (using $callback) if it is not set already
+     *
+     * @param  string   $type
+     * @param  string   $property
+     * @param  callable $callback
+     * @return mixed
+     */
+    public function getTypeProperty($type, $property, callable $callback);
+
+    /**
      * Return a list of escaped field names for the given type
      *
      * @param  string $type

@@ -88,6 +88,22 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
+     * Test return type property
+     */
+    public function testGetTypeProperty()
+    {
+        $this->pool->registerType(Writer::class);
+
+        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function() {
+            return 1;
+        }));
+
+        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function() {
+            return 2345; // This callback should never be executed because we already have the value set in previous call
+        }));
+    }
+
+    /**
      * Get trait names by type
      */
     public function testTraitNamesByType()
