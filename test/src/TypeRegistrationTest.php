@@ -104,6 +104,22 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
+     * Test if type properties are set for registered type, even when called for subtypes
+     */
+    public function testGetTypePropertySetsPropetyForTheRegisteredType()
+    {
+        $this->pool->registerType(Writer::class);
+
+        $this->assertEquals(123, $this->pool->getTypeProperty(AwesomeWriter::class, 'should_be_set_for_writer', function() {
+            return 123;
+        }));
+
+        $this->assertEquals(123, $this->pool->getTypeProperty(Writer::class, 'should_be_set_for_writer', function() {
+            return 987;
+        }));
+    }
+
+    /**
      * Get trait names by type
      */
     public function testTraitNamesByType()

@@ -286,12 +286,12 @@ class Pool implements PoolInterface
      */
     public function getTypeProperty($type, $property, callable $callback)
     {
-        if (isset($this->types[$type])) {
-            if (!array_key_exists($property, $this->types[$type])) {
-                $this->types[$type][$property] = call_user_func($callback);
+        if ($registered_type = $this->getRegisteredType($type)) {
+            if (!array_key_exists($property, $this->types[$registered_type])) {
+                $this->types[$registered_type][$property] = call_user_func($callback, $registered_type, $property);
             }
 
-            return $this->types[$type][$property];
+            return $this->types[$registered_type][$property];
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
@@ -412,8 +412,8 @@ class Pool implements PoolInterface
                     }
                 }
 
-                if (empty($this->known_types[ $type ])) {
-                    $this->known_types[ $type ] = null;
+                if (empty($this->known_types[$type])) {
+                    $this->known_types[$type] = null;
                 }
             }
         }
