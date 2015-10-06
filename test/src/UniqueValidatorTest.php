@@ -178,4 +178,40 @@ class UniqueValidatorTest extends TestCase
         $this->assertInternalType('array', $name_errors);
         $this->assertCount(1, $name_errors);
     }
+
+    /**
+     * Test unique where filter does not throw an error when conditions are not met
+     */
+    public function testNoErrorWhenUniqueWhereIsNotMatched()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
+
+        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateTime('1800-01-01') ]);
+
+        $this->assertTrue($is_unique);
+        $this->assertFalse($validator->hasErrors());
+
+        $name_errors = $validator->getFieldErrors('name');
+
+        $this->assertInternalType('array', $name_errors);
+        $this->assertCount(0, $name_errors);
+    }
+
+    /**
+     * Test unique where filter properly reports an error when conditions are met
+     */
+    public function testErrorWhenUniqueWhereIsMatched()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
+
+        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateTime('1900-01-01') ]);
+
+        $this->assertFalse($is_unique);
+        $this->assertTrue($validator->hasErrors());
+
+        $name_errors = $validator->getFieldErrors('name');
+
+        $this->assertInternalType('array', $name_errors);
+        $this->assertCount(1, $name_errors);
+    }
 }

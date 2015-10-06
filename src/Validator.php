@@ -123,6 +123,23 @@ class Validator implements ValidatorInterface
      */
     public function unique($field_name, ...$context)
     {
+        return $this->uniqueWhere($field_name, '', ...$context);
+    }
+
+    /**
+     * Check if value that we are trying to save is unique in the given context
+     *
+     * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
+     * raising an error
+     *
+     * @param  string                   $field_name
+     * @param  array|string             $where
+     * @param  string                   ...$context
+     * @return boolean
+     * @throws InvalidArgumentException
+     */
+    public function uniqueWhere($field_name, $where, ...$context)
+    {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
         }
@@ -147,6 +164,10 @@ class Validator implements ValidatorInterface
         $table_name = $this->connection->escapeTableName($this->table_name);
 
         $conditions = [];
+
+        if ($where) {
+            $conditions[] = $this->connection->prepareConditions($where);
+        }
 
         foreach ($field_names as $v) {
             $escaped_field_name = $this->connection->escapeFieldName($v);
@@ -186,6 +207,23 @@ class Validator implements ValidatorInterface
     {
         if ($this->present($field_name)) {
             return $this->unique($field_name, ...$context);
+        }
+
+        return false;
+    }
+
+    /**
+     * Field value needs to be present and unique
+     *
+     * @param  string       $field_name
+     * @param  array|string $where
+     * @param  string       ...$context
+     * @return bool
+     */
+    public function presentAndUniqueWhere($field_name, $where, ...$context)
+    {
+        if ($this->present($field_name)) {
+            return $this->uniqueWhere($field_name, $where, ...$context);
         }
 
         return false;
