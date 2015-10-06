@@ -11,9 +11,11 @@ interface PoolInterface
      * Produce new instance of $type
      *
      * @param  string          $type
+     * @param  array|null      $attributes
+     * @param  boolean         $save
      * @return ObjectInterface
      */
-    public function produce($type);
+    public function produce($type, array $attributes = null, $save = true);
 
     /**
      * @param  string  $type
