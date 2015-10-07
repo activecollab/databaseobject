@@ -98,6 +98,21 @@ class ValidationException extends Exception
     }
 
     /**
+     * Set errors
+     *
+     * Key is field name, value is array of error messages for the given field
+     *
+     * @param  array $errors
+     * @return $this
+     */
+    public function &setErrors(array $errors)
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    /**
      * Return field errors
      *
      * @param  string $field

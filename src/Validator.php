@@ -298,6 +298,6 @@ class Validator implements ValidatorInterface
             $message .= ': ' . implode(', ', $first_messages);
         }
 
-        return new ValidationException($message);
+        return (new ValidationException($message))->setErrors($this->errors);
     }
 }
