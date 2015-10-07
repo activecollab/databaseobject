@@ -22,7 +22,7 @@ abstract class User extends Object
      *
      * @var array
      */
-    protected $fields = ['id', 'first_name', 'last_name', 'email', 'password'];
+    protected $fields = ['id', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
 
     /**
      * List of default field values
@@ -104,6 +104,29 @@ abstract class User extends Object
     }
 
     /**
+     * Return value of homepage_url field
+     *
+     * @return string
+     */
+    public function getHomepageUrl()
+    {
+        return $this->getFieldValue('homepage_url');
+    }
+
+    /**
+     * Set value of homepage_url field
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function &setHomepageUrl($value)
+    {
+        $this->setFieldValue('homepage_url', $value);
+
+        return $this;
+    }
+
+    /**
      * Return value of password field
      *
      * @return string
@@ -145,6 +168,7 @@ abstract class User extends Object
                 case 'first_name':
                 case 'last_name':
                 case 'email':
+                case 'homepage_url':
                 case 'password':
                     return parent::setFieldValue($name, (string) $value);
                 default:

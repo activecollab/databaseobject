@@ -259,6 +259,35 @@ class Validator implements ValidatorInterface
     }
 
     /**
+     * Validate URL value
+     *
+     * @param  string     $field_name
+     * @param  bool|false $allow_null
+     * @return bool
+     */
+    public function url($field_name, $allow_null = false)
+    {
+        if (array_key_exists($field_name, $this->field_values)) {
+            if ($this->field_values[$field_name] === null) {
+                if ($allow_null) {
+                    return true;
+                } else {
+                    return $this->failPresenceValidation($field_name);
+                }
+            }
+
+            if (filter_var($this->field_values[$field_name], FILTER_VALIDATE_URL)) {
+                return true;
+            } else {
+                $this->addFieldError($field_name, "Value of '$field_name' is not a valid URL");
+                return false;
+            }
+        } else {
+            return $this->failPresenceValidation($field_name);
+        }
+    }
+
+    /**
      * Return array of validation messages, indexed by field name
      *
      * @return array
