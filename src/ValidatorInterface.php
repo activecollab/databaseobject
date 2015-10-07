@@ -64,6 +64,15 @@ interface ValidatorInterface
     public function presentAndUniqueWhere($field_name, $where, ...$context);
 
     /**
+     * Validate email address value
+     *
+     * @param  string     $field_name
+     * @param  bool|false $allow_null
+     * @return bool
+     */
+    public function email($field_name, $allow_null = false);
+
+    /**
      * @return bool
      */
     public function hasErrors();
