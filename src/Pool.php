@@ -236,7 +236,11 @@ class Pool implements PoolInterface
      */
     public function find($type)
     {
-        return new Finder($this, $this->connection, $type);
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return new Finder($this, $this->connection, $type);
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
     }
 
     /**
