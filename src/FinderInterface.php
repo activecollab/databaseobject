@@ -8,9 +8,13 @@ namespace ActiveCollab\DatabaseObject;
 interface FinderInterface
 {
     /**
+     * Set finder conditions
+     *
+     * @param  string $pattern
+     * @param  mixed  ...$arguments
      * @return $this
      */
-    public function &where();
+    public function &where($pattern, ...$arguments);
 
     /**
      * @param  string $order_by
@@ -24,6 +28,13 @@ interface FinderInterface
      * @return $this
      */
     public function &limit($offset, $limit);
+
+    /**
+     * Return number of records that match the given criteria
+     *
+     * @return integer
+     */
+    public function count();
 
     /**
      * Return all records that match the given criteria

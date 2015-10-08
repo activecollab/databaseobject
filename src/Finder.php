@@ -3,6 +3,7 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -53,11 +54,25 @@ class Finder
     }
 
     /**
+     * Set finder conditions
+     *
+     * @param  string $pattern
+     * @param  mixed  ...$arguments
      * @return $this
      */
-    public function &where()
+    public function &where($pattern, ...$arguments)
     {
-        $this->conditions = $this->connection->prepareConditions(func_get_args());
+        if (!is_string($pattern)) {
+            throw new InvalidArgumentException('Conditions pattern needs to be string');
+        }
+
+        $conditions_to_prepare = [$pattern];
+
+        if (!empty($arguments)) {
+            $conditions_to_prepare = array_merge($conditions_to_prepare, $arguments);
+        }
+
+        $this->conditions = $this->connection->prepareConditions($conditions_to_prepare);
 
         return $this;
     }
@@ -84,6 +99,22 @@ class Finder
         $this->limit = $limit;
 
         return $this;
+    }
+
+    /**
+     * Return number of records that match the given criteria
+     *
+     * @return integer
+     */
+    public function count()
+    {
+        $sql = "SELECT COUNT(`id`) AS 'row_count' FROM " . $this->getEscapedTableName();
+
+        if ($this->conditions) {
+            $sql .= " WHERE $this->conditions";
+        }
+
+        return $this->connection->executeFirstCell($sql);
     }
 
     /**
@@ -193,7 +224,7 @@ class Finder
      */
     private function getSelectFieldsSql($escaped_field_names)
     {
-        $result = "SELECT $escaped_field_names FROM " . $this->pool->getTypeTable($this->type, true);
+        $result = "SELECT $escaped_field_names FROM " . $this->getEscapedTableName();
 
         if ($this->conditions) {
             $result .= " WHERE $this->conditions";
@@ -216,5 +247,22 @@ class Finder
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @var string
+     */
+    private $escaped_table_name;
+
+    /**
+     * @return string
+     */
+    private function getEscapedTableName()
+    {
+        if (empty($this->escaped_table_name)) {
+            $this->escaped_table_name = $this->pool->getTypeTable($this->type, true);
+        }
+
+        return $this->escaped_table_name;
     }
 }

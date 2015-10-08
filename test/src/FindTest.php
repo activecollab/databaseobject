@@ -121,6 +121,14 @@ class FindTest extends TestCase
     }
 
     /**
+     * Test count using finder object
+     */
+    public function testCountUsingFinder()
+    {
+        $this->assertEquals(3, $this->pool->find(Writer::class)->count());
+    }
+
+    /**
      * Test find by conditions
      */
     public function testFindByConditions()
@@ -131,6 +139,22 @@ class FindTest extends TestCase
         $this->assertInstanceOf(Writer::class, $should_be_leo);
         $this->assertTrue($should_be_leo->isLoaded());
         $this->assertEquals('Leo Tolstoy', $should_be_leo->getName());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testConditionsPatternNeedsToBeString()
+    {
+        $this->pool->find(Writer::class)->where(['`name` LIKE ?', '%Leo%']);
+    }
+
+    /**
+     * Test count using finder object with conditions
+     */
+    public function testCountUsingFinderByConditions()
+    {
+        $this->assertEquals(1, $this->pool->find(Writer::class)->where('`name` LIKE ?', '%Leo%')->count());
     }
 
     /**
