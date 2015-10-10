@@ -5,7 +5,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -32,7 +32,7 @@ class ValidatorTest extends TestCase
 
         $this->assertTrue($create_table);
 
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateValue('1828-09-09'), 'Alexander Pushkin', new DateValue('1799-06-06'), 'Fyodor Dostoyevsky', new DateValue('1821-11-11'));
 
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));

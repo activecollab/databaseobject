@@ -4,7 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Validator;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -50,7 +50,7 @@ class PoolProduceTest extends TestCase
     {
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
 
         $this->assertInstanceOf(Writer::class, $object);
@@ -63,7 +63,7 @@ class PoolProduceTest extends TestCase
     {
         $object = $this->pool->produce(AwesomeWriter::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
 
         $this->assertInstanceOf(Writer::class, $object);
@@ -78,7 +78,7 @@ class PoolProduceTest extends TestCase
         /** @var Writer $object */
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
         $this->assertInstanceOf(Writer::class, $object);
         $this->assertEquals('Anton Chekhov', $object->getName());
@@ -91,7 +91,7 @@ class PoolProduceTest extends TestCase
     {
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
         $this->assertInstanceOf(Writer::class, $object);
         $this->assertTrue($object->isLoaded());
@@ -118,7 +118,7 @@ class PoolProduceTest extends TestCase
         /** @var Writer $object */
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
 
         $this->assertInstanceOf(Writer::class, $object);
@@ -131,8 +131,8 @@ class PoolProduceTest extends TestCase
     {
         /** @var Writer $object */
         $object = $this->pool->produce(Writer::class, [
-        'name' => 'Anton Chekhov',
-        'birthday' => new DateTime('1860-01-29'),
+            'name' => 'Anton Chekhov',
+            'birthday' => new DateValue('1860-01-29'),
         ]);
 
         $this->assertInstanceOf(Writer::class, $object);
@@ -151,7 +151,7 @@ class PoolProduceTest extends TestCase
         /** @var Writer $object */
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
-            'birthday' => new DateTime('1860-01-29'),
+            'birthday' => new DateValue('1860-01-29'),
         ]);
 
         $this->assertInstanceOf(Writer::class, $object);

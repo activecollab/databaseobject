@@ -4,7 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseObject\Finder;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -29,7 +29,7 @@ class FindTest extends TestCase
 
         $this->assertTrue($create_table);
 
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateValue('1828-09-09'), 'Alexander Pushkin', new DateValue('1799-06-06'), 'Fyodor Dostoyevsky', new DateValue('1821-11-11'));
 
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
@@ -58,7 +58,7 @@ class FindTest extends TestCase
      */
     public function testCountThrowsAnExceptionOnUnregisteredType()
     {
-        $this->pool->count(DateTime::class);
+        $this->pool->count(DateValue::class);
     }
 
     /**
@@ -66,7 +66,7 @@ class FindTest extends TestCase
      */
     public function testCountWithConditions()
     {
-        $this->assertEquals(2, $this->pool->count(Writer::class, ['birthday > ?', new DateTime('1800-01-01')]));
+        $this->assertEquals(2, $this->pool->count(Writer::class, ['birthday > ?', new DateValue('1800-01-01')]));
     }
 
     /**

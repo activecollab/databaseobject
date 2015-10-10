@@ -4,7 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -31,7 +31,7 @@ class UniqueValidatorTest extends TestCase
 
         $this->assertTrue($create_table);
 
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateValue('1828-09-09'), 'Alexander Pushkin', new DateValue('1799-06-06'), 'Fyodor Dostoyevsky', new DateValue('1821-11-11'));
 
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
@@ -54,7 +54,7 @@ class UniqueValidatorTest extends TestCase
      */
     public function testNoErrorOnNull()
     {
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (NULL, ?)', new DateTime('1828-09-09'));
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (NULL, ?)', new DateValue('1828-09-09'));
 
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) FROM `writers` WHERE `name` IS NULL'));
 
@@ -186,7 +186,7 @@ class UniqueValidatorTest extends TestCase
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
 
-        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateTime('1800-01-01') ]);
+        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateValue('1800-01-01') ]);
 
         $this->assertTrue($is_unique);
         $this->assertFalse($validator->hasErrors());
@@ -204,7 +204,7 @@ class UniqueValidatorTest extends TestCase
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
 
-        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateTime('1900-01-01') ]);
+        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateValue('1900-01-01') ]);
 
         $this->assertFalse($is_unique);
         $this->assertTrue($validator->hasErrors());

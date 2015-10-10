@@ -6,7 +6,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
 use ActiveCollab\DatabaseObject\Validator;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -35,7 +35,7 @@ class TypeRegistrationTest extends TestCase
      */
     public function testExceptionWhenRegisteringInvalidClass()
     {
-        $this->pool->registerType(DateTime::class);
+        $this->pool->registerType(DateValue::class);
     }
 
     /**

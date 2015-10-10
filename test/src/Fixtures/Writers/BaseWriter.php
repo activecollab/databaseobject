@@ -4,6 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Object;
 use ActiveCollab\DatabaseObject\ObjectInterface;
+use ActiveCollab\DateValue\DateValueInterface;
 use InvalidArgumentException;
 
 /**
@@ -70,7 +71,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     /**
      * Return value of birthday field
      *
-     * @return \DateTime
+     * @return DateValueInterface
      */
     public function getBirthday()
     {
@@ -80,7 +81,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     /**
      * Set value of birthday field
      *
-     * @param  \DateTime $value
+     * @param  DateValueInterface $value
      * @return $this
      */
     public function &setBirthday($value)

@@ -3,7 +3,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
-use DateTime;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -28,7 +28,7 @@ class CrudTest extends TestCase
 
         $this->assertTrue($create_table);
 
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateTime('1828-09-09'), 'Alexander Pushkin', new DateTime('1799-06-06'), 'Fyodor Dostoyevsky', new DateTime('1821-11-11'));
+        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateValue('1828-09-09'), 'Alexander Pushkin', new DateValue('1799-06-06'), 'Fyodor Dostoyevsky', new DateValue('1821-11-11'));
 
         $this->pool->registerType(Writer::class);
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
@@ -108,7 +108,7 @@ class CrudTest extends TestCase
      */
     public function testGetByIdThrowsAnExceptionOnUnregisteredType()
     {
-        $this->pool->getById(DateTime::class, 1);
+        $this->pool->getById(DateValue::class, 1);
     }
 
     /**
@@ -119,7 +119,7 @@ class CrudTest extends TestCase
         $chekhov = new Writer($this->pool, $this->connection);
 
         $chekhov->setName('Anton Chekhov');
-        $chekhov->setBirthday(new DateTime('1860-01-29'));
+        $chekhov->setBirthday(new DateValue('1860-01-29'));
 
         $chekhov->save();
 
@@ -159,7 +159,7 @@ class CrudTest extends TestCase
         $chekhov = new Writer($this->pool, $this->connection);
 
         $chekhov->setName('Anton Chekhov');
-        $chekhov->setBirthday(new DateTime('1860-01-29'));
+        $chekhov->setBirthday(new DateValue('1860-01-29'));
 
         $chekhov->save();
 
@@ -188,7 +188,7 @@ class CrudTest extends TestCase
         $chekhov = new Writer($this->pool, $this->connection);
 
         $chekhov->setName('Anton Chekhov');
-        $chekhov->setBirthday(new DateTime('1860-01-29'));
+        $chekhov->setBirthday(new DateValue('1860-01-29'));
 
         $chekhov->save();
 
