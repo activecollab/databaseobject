@@ -112,7 +112,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
                     parent::setFieldValue($name, (string) $value);
                     break;
                 case 'birthday':
-                    parent::setFieldValue($name, $value);
+                    parent::setFieldValue($name, $this->getDateValueInstaceFrom($value));
                     break;
                 default:
                     throw new InvalidArgumentException("'$name' is not a known field");

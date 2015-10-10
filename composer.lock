@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "76b20957355c4b9e4d9d23ebc969fba3d8c41b7e"
+                "reference": "0904a3042ac1b8eea2f4cca66f71372bc94bb420"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/76b20957355c4b9e4d9d23ebc969fba3d8c41b7e",
-                "reference": "76b20957355c4b9e4d9d23ebc969fba3d8c41b7e",
+                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/0904a3042ac1b8eea2f4cca66f71372bc94bb420",
+                "reference": "0904a3042ac1b8eea2f4cca66f71372bc94bb420",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "time": "2015-10-10 13:14:11"
+            "time": "2015-10-10 13:19:43"
         },
         {
             "name": "activecollab/datevalue",

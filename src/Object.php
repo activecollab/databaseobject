@@ -4,6 +4,9 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
+use ActiveCollab\DateValue\DateTimeValue;
+use ActiveCollab\DateValue\DateValue;
+use DateTime;
 use InvalidArgumentException;
 use LogicException;
 
@@ -652,6 +655,40 @@ abstract class Object implements ObjectInterface
         $this->triggerEvent('on_set_attribute', [$attribute, $value]);
 
         return $this;
+    }
+
+    /**
+     * Use input $value and return a valid DateValue instance
+     *
+     * @param  mixed          $value
+     * @return DateValue|null
+     */
+    protected function getDateValueInstaceFrom($value)
+    {
+        if ($value === null) {
+            return null;
+        } elseif ($value instanceof DateTime) {
+            return new DateValue($value->format('Y-m-d'));
+        } else {
+            return new DateValue($value);
+        }
+    }
+
+    /**
+     * Use input $value and return a valid DateTimeValue instance
+     *
+     * @param  mixed              $value
+     * @return DateTimeValue|null
+     */
+    protected function getDateTimeValueInstanceFrom($value)
+    {
+        if ($value === null) {
+            return null;
+        } elseif ($value instanceof DateTime) {
+            return new DateTimeValue($value->format('Y-m-d H:i:s'), 'UTC');
+        } else {
+            return new DateTimeValue($value, 'UTC');
+        }
     }
 
     // ---------------------------------------------------

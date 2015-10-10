@@ -85,7 +85,7 @@ class CrudTest extends TestCase
         $this->assertTrue($tolstoy->isLoaded());
         $this->assertSame(1, $tolstoy->getId());
         $this->assertSame('Leo Tolstoy', $tolstoy->getName());
-        $this->assertSame('1828-09-09', $tolstoy->getBirthday());
+        $this->assertSame('1828-09-09', $tolstoy->getBirthday()->format('Y-m-d'));
     }
 
     /**
@@ -100,7 +100,7 @@ class CrudTest extends TestCase
         $this->assertTrue($tolstoy->isLoaded());
         $this->assertSame(1, $tolstoy->getId());
         $this->assertSame('Leo Tolstoy', $tolstoy->getName());
-        $this->assertSame('1828-09-09', $tolstoy->getBirthday());
+        $this->assertSame('1828-09-09', $tolstoy->getBirthday()->format('Y-m-d'));
     }
 
     /**
