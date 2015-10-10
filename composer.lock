@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "e8ffc82c571bab8b4d3a68f4e4d0033e2b48f745"
+                "reference": "76b20957355c4b9e4d9d23ebc969fba3d8c41b7e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/e8ffc82c571bab8b4d3a68f4e4d0033e2b48f745",
-                "reference": "e8ffc82c571bab8b4d3a68f4e4d0033e2b48f745",
+                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/76b20957355c4b9e4d9d23ebc969fba3d8c41b7e",
+                "reference": "76b20957355c4b9e4d9d23ebc969fba3d8c41b7e",
                 "shasum": ""
             },
             "require": {
@@ -52,7 +52,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "time": "2015-10-10 12:55:15"
+            "time": "2015-10-10 13:14:11"
         },
         {
             "name": "activecollab/datevalue",
@@ -60,12 +60,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/datevalue.git",
-                "reference": "b9b790021ab899bba22c26deaac3550ed74fb8b2"
+                "reference": "ad728d079dd99788d771f47bf0000fbd7ca9c2e7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/b9b790021ab899bba22c26deaac3550ed74fb8b2",
-                "reference": "b9b790021ab899bba22c26deaac3550ed74fb8b2",
+                "url": "https://api.github.com/repos/activecollab/datevalue/zipball/ad728d079dd99788d771f47bf0000fbd7ca9c2e7",
+                "reference": "ad728d079dd99788d771f47bf0000fbd7ca9c2e7",
                 "shasum": ""
             },
             "require": {
@@ -99,7 +99,7 @@
                 "date",
                 "datetime"
             ],
-            "time": "2015-10-10 12:43:25"
+            "time": "2015-10-10 13:10:03"
         },
         {
             "name": "nesbot/carbon",
