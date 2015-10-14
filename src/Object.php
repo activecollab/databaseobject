@@ -425,7 +425,7 @@ abstract class Object implements ObjectInterface
      *
      * @return boolean
      */
-    private function isLoading()
+    protected function isLoading()
     {
         return $this->is_loading;
     }
