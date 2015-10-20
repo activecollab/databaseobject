@@ -96,11 +96,11 @@ class Pool implements PoolInterface
                     $object = new $object_class($this, $this->connection);
                     $object->loadFromRow($row);
 
-                    return $this->addToObjectPool($registered_type, $object);
+                    return $this->addToObjectPool($registered_type, $id, $object);
                 } else {
                     $object = null;
 
-                    return $this->addToObjectPool($registered_type, $object);
+                    return $this->addToObjectPool($registered_type, $id, $object);
                 }
             }
         }
@@ -146,18 +146,19 @@ class Pool implements PoolInterface
      * Add object to the object pool
      *
      * @param  string               $registered_type
-     * @param  ObjectInterface|null $object
+     * @param  integer              $id
+     * @param  ObjectInterface|null $value_to_store
      * @return ObjectInterface
      */
-    private function &addToObjectPool($registered_type, ObjectInterface &$object = null)
+    private function &addToObjectPool($registered_type, $id, &$value_to_store)
     {
         if (empty($this->objects_pool[$registered_type])) {
             $this->objects_pool[$registered_type] = [];
         }
 
-        $this->objects_pool[$registered_type][$object->getId()] = $object;
+        $this->objects_pool[$registered_type][$id] = $value_to_store;
 
-        return $this->objects_pool[$registered_type][$object->getId()];
+        return $this->objects_pool[$registered_type][$id];
     }
 
     /**
@@ -169,7 +170,7 @@ class Pool implements PoolInterface
     {
         if ($object->isLoaded()) {
             if ($registered_type = $this->getRegisteredType(get_class($object))) {
-                $this->addToObjectPool($registered_type, $object);
+                $this->addToObjectPool($registered_type, $object->getId(), $object);
             } else {
                 throw new InvalidArgumentException("Type '" . get_class($object) . "' is not registered");
             }

@@ -89,6 +89,15 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test if Pool::getById() properly returns NULL when record was not found
+     */
+    public function testGetByIdForNonExistingRecord()
+    {
+        $this->assertFalse($this->pool->exists(Writer::class, 890));
+        $this->assertNull($this->pool->getById(Writer::class, 890));
+    }
+
+    /**
      * Test if getById is subclassing aware
      */
     public function testSublassingAwareGetById()
