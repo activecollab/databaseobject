@@ -96,11 +96,11 @@ class Pool implements PoolInterface
                     $object = new $object_class($this, $this->connection);
                     $object->loadFromRow($row);
 
-                    $this->addToObjectPool($registered_type, $object);
-
-                    return $object;
+                    return $this->addToObjectPool($registered_type, $object);
                 } else {
-                    return null;
+                    $object = null;
+
+                    return $this->addToObjectPool($registered_type, $object);
                 }
             }
         }
@@ -145,16 +145,19 @@ class Pool implements PoolInterface
     /**
      * Add object to the object pool
      *
-     * @param string          $registered_type
-     * @param ObjectInterface $object
+     * @param  string               $registered_type
+     * @param  ObjectInterface|null $object
+     * @return ObjectInterface
      */
-    private function addToObjectPool($registered_type, ObjectInterface &$object)
+    private function &addToObjectPool($registered_type, ObjectInterface &$object = null)
     {
         if (empty($this->objects_pool[$registered_type])) {
             $this->objects_pool[$registered_type] = [];
         }
 
         $this->objects_pool[$registered_type][$object->getId()] = $object;
+
+        return $this->objects_pool[$registered_type][$object->getId()];
     }
 
     /**
