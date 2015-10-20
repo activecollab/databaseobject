@@ -18,12 +18,24 @@ interface PoolInterface
     public function produce($type, array $attributes = null, $save = true);
 
     /**
+     * Return object from object pool by the given type and ID; if object is not found, return NULL.
+     *
+     * @param  string      $type
+     * @param  integer     $id
+     * @param  boolean     $use_cache
+     * @return Object|null
+     */
+    public function &getById($type, $id, $use_cache = true);
+
+    /**
+     * Return object from object pool by the given type and ID; if object is not found, raise an exception.
+     *
      * @param  string  $type
      * @param  integer $id
      * @param  boolean $use_cache
      * @return Object
      */
-    public function &getById($type, $id, $use_cache = true);
+    public function &mustGetById($type, $id, $use_cache = true);
 
     /**
      * Reload an object of the give type with the given ID

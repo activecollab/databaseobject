@@ -98,6 +98,17 @@ class CrudTest extends TestCase
     }
 
     /**
+     * Test if Pool::mustGetById() throws an exception when record was not found
+     *
+     * @expectedException \ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException
+     */
+    public function testMustGetByIdThrowsAnException()
+    {
+        $this->assertFalse($this->pool->exists(Writer::class, 890));
+        $this->assertNull($this->pool->mustGetById(Writer::class, 890));
+    }
+
+    /**
      * Test if getById is subclassing aware
      */
     public function testSublassingAwareGetById()

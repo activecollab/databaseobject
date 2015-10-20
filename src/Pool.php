@@ -3,6 +3,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
 use InvalidArgumentException;
 use ReflectionClass;
 
@@ -67,7 +68,7 @@ class Pool implements PoolInterface
     }
 
     /**
-     * Return object from object pool by the given type and ID
+     * Return object from object pool by the given type and ID; if object is not found, return NULL.
      *
      * @param  string                   $type
      * @param  integer                  $id
@@ -106,6 +107,27 @@ class Pool implements PoolInterface
         }
 
         throw new InvalidArgumentException("Type '$type' is not registered");
+    }
+
+    /**
+     * Return object from object pool by the given type and ID; if object is not found, raise an exception.
+     *
+     * @param  string                   $type
+     * @param  integer                  $id
+     * @param  boolean                  $use_cache
+     * @return Object
+     * @throws ObjectNotFoundException
+     * @throws InvalidArgumentException
+     */
+    public function &mustGetById($type, $id, $use_cache = true)
+    {
+        $result = $this->getById($type, $id, $use_cache);
+
+        if (empty($result)) {
+            throw new ObjectNotFoundException($type, $id);
+        }
+
+        return $result;
     }
 
     /**
