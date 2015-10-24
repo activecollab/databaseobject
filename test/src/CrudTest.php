@@ -238,4 +238,26 @@ class CrudTest extends TestCase
 
         $this->assertFalse($this->pool->exists(Writer::class, 1));
     }
+
+    /**
+     * Test set attributes when we have on_set_attribute event handler specified
+     */
+    public function testSetAttributeWithEventHandler()
+    {
+        $writer = new Writer($this->pool, $this->connection);
+        $this->assertNull($writer->custom_attribute_value);
+        $writer->setAttribute('custom_attribute', 13.5);
+        $this->assertSame(13.5, $writer->custom_attribute_value);
+    }
+
+    /**
+     * Test set attributes when we find attribute setter
+     */
+    public function testSetAttributeWithSetter()
+    {
+        $writer = new Writer($this->pool, $this->connection);
+        $this->assertNull($writer->getCustomFieldValue());
+        $writer->setAttribute('custom_field_value', 12);
+        $this->assertSame(12, $writer->getCustomFieldValue());
+    }
 }
