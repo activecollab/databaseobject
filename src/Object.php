@@ -7,6 +7,7 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use DateTime;
+use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use LogicException;
 
@@ -652,7 +653,13 @@ abstract class Object implements ObjectInterface
      */
     public function &setAttribute($attribute, $value)
     {
-        $this->triggerEvent('on_set_attribute', [$attribute, $value]);
+        $setter = 'set' . Inflector::classify($attribute);
+
+        if (method_exists($this, $setter)) {
+            $this->$setter($value);
+        } else {
+            $this->triggerEvent('on_set_attribute', [$attribute, $value]);
+        }
 
         return $this;
     }
