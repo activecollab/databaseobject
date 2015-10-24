@@ -260,4 +260,13 @@ class CrudTest extends TestCase
         $writer->setAttribute('custom_field_value', 12);
         $this->assertSame(12, $writer->getCustomFieldValue());
     }
+
+    /**
+     * Test that there will be no exception if we try to set an unknown attribute
+     */
+    public function testUnknownAttributeDoesNotProduceAnError()
+    {
+        $writer = new Writer($this->pool, $this->connection);
+        $writer->setAttribute('unknown_attribute', 12);
+    }
 }
