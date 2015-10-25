@@ -49,6 +49,9 @@ class PresenceValidatorTest extends TestCase
         parent::tearDown();
     }
 
+    /**
+     * Test validation pass
+     */
     public function testPass()
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Is present!']);
@@ -64,6 +67,9 @@ class PresenceValidatorTest extends TestCase
         $this->assertCount(0, $name_errors);
     }
 
+    /**
+     * Test validation failure
+     */
     public function testFail()
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => '']);
@@ -79,6 +85,9 @@ class PresenceValidatorTest extends TestCase
         $this->assertCount(1, $name_errors);
     }
 
+    /**
+     * Test fail because there is no value
+     */
     public function testFailBecauseTheresNoValue()
     {
         $validator = new Validator($this->connection, 'writers', null, null, []);
@@ -94,6 +103,9 @@ class PresenceValidatorTest extends TestCase
         $this->assertCount(1, $name_errors);
     }
 
+    /**
+     * Test type check
+     */
     public function testTypeCheck()
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => '0']);

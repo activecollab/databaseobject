@@ -4,8 +4,10 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
-use InvalidArgumentException;
 use ReflectionClass;
+use LogicException;
+use InvalidArgumentException;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -38,33 +40,90 @@ class Pool implements PoolInterface
      * @param  boolean         $save
      * @return ObjectInterface
      */
-    public function produce($type, array $attributes = null, $save = true)
+    public function &produce($type, array $attributes = null, $save = true)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
+            $object = $this->getProducerForRegisteredType($registered_type)->produce($type, $attributes, $save);
 
-            /** @var Object $object */
-            $object = new $type($this, $this->connection);
-
-            if ($attributes) {
-                foreach ($attributes as $k => $v) {
-                    if ($object->fieldExists($k)) {
-                        $object->setFieldValue($k, $v);
-                    } else {
-                        $object->setAttribute($k, $v);
-                    }
+            if ($object instanceof ObjectInterface) {
+                if ($object->isLoaded()) {
+                    $this->objects_pool[$registered_type][$object->getId()] = $object;
                 }
+
+                return $object;
+            } else {
+                throw new RuntimeException("Failed to produce an instance of '$type'");
             }
-
-            if ($save) {
-                $object->save();
-
-                $this->objects_pool[$registered_type][$object->getId()] = $object;
-            }
-
-            return $object;
         }
 
         throw new InvalidArgumentException("Can't produce an instance of '$type'");
+    }
+
+    /**
+     * @var ProducerInterface
+     */
+    private $default_producer;
+
+    /**
+     * @var ProducerInterface[]
+     */
+    private $producers = [];
+
+    /**
+     * Return producer for registered type
+     *
+     * @param  string            $registered_type
+     * @return ProducerInterface
+     */
+    protected function &getProducerForRegisteredType($registered_type)
+    {
+        if (empty($this->producers[$registered_type])) {
+            if (empty($this->default_producer)) {
+                $this->default_producer = new Producer($this->connection, $this);
+            }
+
+            return $this->default_producer;
+        } else {
+            return $this->producers[$registered_type];
+        }
+    }
+
+    /**
+     * Register producer instance for the given type
+     *
+     * @param string            $type
+     * @param ProducerInterface $producer
+     */
+    public function registerProducer($type, ProducerInterface $producer)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            if (empty($this->producers[$registered_type])) {
+                $this->producers[$registered_type] = $producer;
+            } else {
+                throw new LogicException("Producer for '$type' is already registered");
+            }
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
+    }
+
+    /**
+     * Register producerby providing a producer class name
+     *
+     * @param string $type
+     * @param string $producer_class
+     */
+    public function registerProducerByClass($type, $producer_class)
+    {
+        if (class_exists($producer_class)) {
+            $producer_class_reflection = new ReflectionClass($producer_class);
+
+            if ($producer_class_reflection->implementsInterface(ProducerInterface::class)) {
+                $this->registerProducer($type, new $producer_class($this->connection, $this));
+            } else {
+                throw new InvalidArgumentException("Class '$producer_class' does not implement '" . ProducerInterface::class . "' interface");
+            }
+        }
     }
 
     /**

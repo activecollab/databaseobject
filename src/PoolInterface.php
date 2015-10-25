@@ -18,6 +18,22 @@ interface PoolInterface
     public function produce($type, array $attributes = null, $save = true);
 
     /**
+     * Register producer instance for the given type
+     *
+     * @param string            $type
+     * @param ProducerInterface $producer
+     */
+    public function registerProducer($type, ProducerInterface $producer);
+
+    /**
+     * Register producerby providing a producer class name
+     *
+     * @param string $type
+     * @param string $producer_class
+     */
+    public function registerProducerByClass($type, $producer_class);
+
+    /**
      * Return object from object pool by the given type and ID; if object is not found, return NULL.
      *
      * @param  string      $type
