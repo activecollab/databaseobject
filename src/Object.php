@@ -232,19 +232,19 @@ abstract class Object implements ObjectInterface
      */
     public function loadFromRow(array $row)
     {
-        if ($row && is_array($row)) {
-            $this->startLoading();
-
-            foreach ($row as $k => $v) {
-                if ($this->fieldExists($k)) {
-                    $this->setFieldValue($k, $v);
-                }
-            }
-
-            $this->doneLoading();
-        } else {
+        if (empty($row)) {
             throw new InvalidArgumentException('$row is expected to be loaded database row');
         }
+
+        $this->startLoading();
+
+        foreach ($row as $k => $v) {
+            if ($this->fieldExists($k)) {
+                $this->setFieldValue($k, $v);
+            }
+        }
+
+        $this->doneLoading();
     }
 
     /**
