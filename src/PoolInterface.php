@@ -167,6 +167,14 @@ interface PoolInterface
     public function getRegisteredTypes();
 
     /**
+     * Return registered type for the given $type. This function is subclassing aware
+     *
+     * @param  string      $type
+     * @return string|null
+     */
+    public function getRegisteredType($type);
+
+    /**
      * Return true if $type is registered
      *
      * @param  string $type
