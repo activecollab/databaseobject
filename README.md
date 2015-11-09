@@ -8,4 +8,3 @@
 
 1. Relationships
 2. Caching
-3. Collections and Etagging
