@@ -7,6 +7,7 @@ use ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\ObjectInterface;
+use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 
 /**
@@ -129,7 +130,7 @@ class Type extends Collection
      */
     public function getTimestampHash($timestamp_field)
     {
-        $table_name = $this->pool->getTypeTable($this->registered_type);
+        $table_name = $this->getTableName();
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
         if ($this->count() > 0) {
@@ -179,7 +180,7 @@ class Type extends Collection
     }
 
     /**
-     * @var int[]
+     * @var integer[]
      */
     private $ids = false;
 
@@ -191,7 +192,7 @@ class Type extends Collection
     public function executeIds()
     {
         if ($this->ids === false) {
-            $this->ids = DB::executeFirstColumn($this->getSelectSql(false));
+            $this->ids = $this->connection->executeFirstColumn($this->getSelectSql(false));
 
             if (empty($this->ids)) {
                 $this->ids = [];
@@ -250,21 +251,10 @@ class Type extends Collection
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
         if ($join_expression = $this->getJoinExpression()) {
-            return (integer)DB::executeFirstCell("SELECT COUNT($table_name.id) FROM $table_name $join_expression $conditions");
+            return (integer) $this->connection->executeFirstCell("SELECT COUNT($table_name.id) FROM $table_name $join_expression $conditions");
         } else {
-            return DB::executeFirstCell("SELECT COUNT(id) AS 'row_count' FROM $table_name $conditions");
+            return $this->connection->executeFirstCell("SELECT COUNT(id) AS 'row_count' FROM $table_name $conditions");
         }
-    }
-
-    /**
-     * Return true if model field exists
-     *
-     * @param  string $field_name
-     * @return boolean
-     */
-    public function modelFieldExist($field_name)
-    {
-        return call_user_func("{$this->model_name}::fieldExists", $field_name);
     }
 
     /**
@@ -282,7 +272,7 @@ class Type extends Collection
     public function getTableName()
     {
         if (empty($this->table_name)) {
-            $this->table_name = call_user_func("{$this->model_name}::getTableName");
+            $this->table_name = $this->pool->getTypeTable($this->registered_type);
         }
 
         return $this->table_name;
@@ -303,7 +293,7 @@ class Type extends Collection
     public function getOrderBy()
     {
         if ($this->order_by === false) {
-            $this->order_by = call_user_func("{$this->model_name}::getDefaultOrderBy");
+            $this->order_by = $this->pool->getTypeOrderBy($this->registered_type);
         }
 
         return $this->order_by;
@@ -313,15 +303,17 @@ class Type extends Collection
      * Set how system should order records in this collection
      *
      * @param  string $value
-     * @throws InvalidParamError
+     * @return $this
      */
-    public function setOrderBy($value)
+    public function &setOrderBy($value)
     {
         if ($value === null || $value) {
             $this->order_by = $value;
         } else {
-            throw new InvalidParamError('value', $value, '$value can be NULL or a valid order by value');
+            throw new InvalidArgumentException('$value can be NULL or a valid order by value');
         }
+
+        return $this;
     }
 
     /**
@@ -345,23 +337,15 @@ class Type extends Collection
      * Set collection conditions
      *
      * @param  string|array $conditions
-     * @throws InvalidParamError
+     * @return $this
      */
-    public function setConditions($conditions)
+    public function &setConditions($conditions)
     {
         if ($conditions) {
-            if (is_string($conditions)) {
-                $this->conditions = DB::prepareConditions(func_get_args());
-
-                return;
-            } elseif (is_array($conditions)) {
-                $this->conditions = DB::prepareConditions($conditions);
-
-                return;
-            }
+            $this->connection = $this->connection->prepareConditions($conditions);
         }
 
-        throw new InvalidParamError('conditions', $conditions, 'Arugment is expected to be a valid conditions array of conditions pattern');
+        return $this;
     }
 
     // ---------------------------------------------------
@@ -395,8 +379,9 @@ class Type extends Collection
      *
      * @param string            $table_name_without_prefix
      * @param array|string|null $join_field
+     * @return $this
      */
-    public function setJoinTable($table_name_without_prefix, $join_field = null)
+    public function &setJoinTable($table_name_without_prefix, $join_field = null)
     {
         $this->join_table = $table_name_without_prefix;
 
@@ -407,10 +392,16 @@ class Type extends Collection
                 if (is_string($join_field) && $join_field) {
                     $this->join_with_field = $join_field;
                 } else {
-                    $this->join_with_field = Inflector::singularize(Inflector::underscore($this->model_name)) . '_id';
+                    if (($pos = strrpos($this->registered_type, '\\')) !== false) {
+                        $this->join_with_field = Inflector::singularize(Inflector::tableize(substr($this->registered_type, $pos + 1))) . '_id';
+                    } else {
+                        $this->join_with_field = Inflector::singularize(Inflector::tableize($this->registered_type)) . '_id';
+                    }
                 }
             }
         }
+
+        return $this;
     }
 
     /**
@@ -418,7 +409,14 @@ class Type extends Collection
      *
      * @var string
      */
-    private $join_field = 'id', $join_with_field;
+    private $join_field = 'id';
+
+    /**
+     * Join with field name
+     *
+     * @var string
+     */
+    private $join_with_field;
 
     /**
      * Return join field name
