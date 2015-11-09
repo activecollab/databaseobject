@@ -2,14 +2,23 @@
 
 namespace ActiveCollab\DatabaseObject\Collection;
 
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseObject\PoolInterface;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\ObjectInterface;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Collection
  */
 class Type extends Collection
 {
+    /**
+     * @var ConnectionInterface
+     */
+    private $connection;
+
     /**
      * @var PoolInterface
      */
@@ -18,19 +27,30 @@ class Type extends Collection
     /**
      * @var string
      */
+    private $registered_type;
+
+    /**
+     * @var string
+     */
     private $type;
 
     /**
-     * @param PoolInterface $pool
+     * @param ConnectionInterface $connection
+     * @param PoolInterface       $pool
+     * @param string              $type
      */
-    public function __construct(PoolInterface &$pool, $type)
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, $type)
     {
-        $this->pool = $pool;
+        $registered_type = $this->pool->getRegisteredType($type);
 
-        if ($registered_type = $this->pool->getRegisteredType($type)) {
-            $this->type = $type;
+        if (empty($registered_type)) {
+            throw new InvalidArgumentException("Type '$type' is not registered");
         }
 
+        $this->connection = $connection;
+        $this->pool = $pool;
+        $this->registered_type = $registered_type;
+        $this->type = $type;
     }
 
     // ---------------------------------------------------
@@ -57,16 +77,16 @@ class Type extends Collection
     /**
      * Return collection etag
      *
-     * @param  IUser   $user
+     * @param  string  $visitor_identifier
      * @param  boolean $use_cache
      * @return string
      */
-    public function getEtag(IUser $user, $use_cache = true)
+    public function getEtag($visitor_identifier, $use_cache = true)
     {
         $timestamp_field = $this->getTimestampField();
 
         if ($timestamp_field && ($this->tag === false || !$use_cache)) {
-            $this->tag = $this->prepareTagFromBits($user->getEmail(), $this->getTimestampHash($timestamp_field));
+            $this->tag = $this->prepareTagFromBits($visitor_identifier, $this->getTimestampHash($timestamp_field));
         }
 
         return $this->tag;
@@ -87,10 +107,12 @@ class Type extends Collection
     public function getTimestampField()
     {
         if ($this->timestamp_field === null) {
-            if ($this->modelFieldExist('updated_on')) {
-                $this->timestamp_field = 'updated_on';
-            } elseif ($this->modelFieldExist('created_on')) {
-                $this->timestamp_field = 'created_on';
+            $fields = $this->pool->getTypeFields($this->registered_type);
+
+            if (in_array('updated_at', $fields)) {
+                $this->timestamp_field = 'updated_at';
+            } elseif (in_array('created_at', $fields)) {
+                $this->timestamp_field = 'created_at';
             } else {
                 $this->timestamp_field = false;
             }
@@ -107,14 +129,14 @@ class Type extends Collection
      */
     public function getTimestampHash($timestamp_field)
     {
-        $table_name = $this->getTableName();
+        $table_name = $this->pool->getTypeTable($this->registered_type);
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
         if ($this->count() > 0) {
             if ($join_expression = $this->getJoinExpression()) {
-                return sha1(DB::executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY $table_name.id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $join_expression $conditions"));
+                return sha1($this->connection->executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY $table_name.id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $join_expression $conditions"));
             } else {
-                return sha1(DB::executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $conditions"));
+                return sha1($this->connection->executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $conditions"));
             }
 
         }
@@ -129,7 +151,7 @@ class Type extends Collection
     /**
      * Run the query and return DB result
      *
-     * @return DbResult|DataObject[]
+     * @return ResultInterface|ObjectInterface[]
      */
     public function execute()
     {
@@ -142,7 +164,7 @@ class Type extends Collection
 
                 // Don't escape more than 1000 ID-s using DB::escape(), let MySQL do the dirty work instead of PHP
                 if ($ids_count <= 1000) {
-                    $escaped_ids = DB::escape($ids);
+                    $escaped_ids = $this->connection->escapeValue($ids);
 
                     return call_user_func("{$this->model_name}::findBySQL", DB::prepare('SELECT * FROM ' . $this->getTableName() . " WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)"));
                 } else {
