@@ -34,6 +34,13 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
     public function execute();
 
     /**
+     * Return ID-s of matching records
+     *
+     * @return array
+     */
+    public function executeIds();
+
+    /**
      * Return number of records that match conditions set by the collection
      *
      * @return integer

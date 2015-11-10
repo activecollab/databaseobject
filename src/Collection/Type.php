@@ -169,24 +169,24 @@ abstract class Type extends Collection
     {
         if (is_callable($this->pre_execute_callback)) {
             $ids = $this->executeIds();
-            $ids_count = count($ids);
 
-            if ($ids_count) {
+            if ($ids_count = count($ids)) {
                 call_user_func($this->pre_execute_callback, $ids);
 
-                // Don't escape more than 1000 ID-s using DB::escape(), let MySQL do the dirty work instead of PHP
-                if ($ids_count <= 1000) {
+                if ($ids_count > 1000) {
+                    $sql = $this->getSelectSql(); // Don't escape more than 1000 ID-s using DB::escape(), let MySQL do the dirty work instead of PHP
+                } else {
                     $escaped_ids = $this->connection->escapeValue($ids);
 
-                    return call_user_func("{$this->model_name}::findBySQL", DB::prepare('SELECT * FROM ' . $this->getTableName() . " WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)"));
-                } else {
-                    return call_user_func("{$this->model_name}::findBySQL", $this->getSelectSql());
+                    $sql = 'SELECT * FROM ' . $this->getTableName() . " WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)";
                 }
+
+                return $this->pool->findBySql($this->getType(), $sql);
             }
 
             return null;
         } else {
-            return call_user_func("{$this->model_name}::findBySQL", $this->getSelectSql());
+            return $this->pool->findBySql($this->getType(), $this->getSelectSql());
         }
     }
 
@@ -304,7 +304,7 @@ abstract class Type extends Collection
     public function getOrderBy()
     {
         if ($this->order_by === false) {
-            $this->order_by = $this->pool->getTypeOrderBy($this->getRegisteredType());
+            $this->order_by = $this->pool->getEscapedTypeOrderBy($this->getRegisteredType());
         }
 
         return $this->order_by;
@@ -316,7 +316,7 @@ abstract class Type extends Collection
      * @param  string $value
      * @return $this
      */
-    public function &setOrderBy($value)
+    public function &orderBy($value)
     {
         if ($value === null || $value) {
             $this->order_by = $value;
@@ -347,13 +347,19 @@ abstract class Type extends Collection
     /**
      * Set collection conditions
      *
-     * @param  string|array $conditions
+     * @param  mixed ...$arguments
      * @return $this
      */
-    public function &setConditions($conditions)
+    public function &where()
     {
-        if ($conditions) {
-            $this->connection = $this->connection->prepareConditions($conditions);
+        $number_of_arguments = func_num_args();
+
+        if ($number_of_arguments === 1) {
+            $this->conditions = $this->connection->prepareConditions(func_get_arg(0));
+        } elseif ($number_of_arguments > 1) {
+            $this->conditions = $this->connection->prepareConditions(func_get_args());
+        } else {
+            throw new InvalidArgumentException('At least one argument expected');
         }
 
         return $this;

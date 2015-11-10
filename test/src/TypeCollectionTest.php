@@ -4,6 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersCollection;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 
 /**
  * Test data object collection
@@ -13,90 +14,122 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersColle
 class TypeCollectionTest extends WritersTypeTestCase
 {
     /**
-     * Test is manager properly prepares collection
+     * Test if collection reads settings from type
      */
-    function testPrepare()
+    function testTypeCollectionReadsSettingsFromType()
     {
-//        $collection = TestDataObjects::prepareCollection('testing', $this->owner);
-
         $collection = new WritersCollection($this->connection, $this->pool);
 
         $this->assertEquals($collection->getTableName(), 'writers');
         $this->assertEquals($collection->getTimestampField(), 'updated_at');
-        $this->assertEquals($collection->getOrderBy(), 'name');
+        $this->assertEquals($collection->getOrderBy(), '`writers`.`id` DESC');
     }
 
-//    /**
-//     * Test if we can properly set collection conditions
-//     */
-//    function testSetConditions()
-//    {
-//        $collection = TestDataObjects::prepareCollection('testing_all', $this->owner);
-//
-//        $collection->setConditions('type = "File"');
-//        $this->assertEquals($collection->getConditions(), 'type = "File"');
-//
-//        $collection->setConditions('type = ?', 'File');
-//        $this->assertEquals($collection->getConditions(), "type = 'File'");
-//
-//        $collection->setConditions(['type = ?', 'File']);
-//        $this->assertEquals($collection->getConditions(), "type = 'File'");
-//
-//        try {
-//            $collection->setConditions(123);
-//            $this->fail('Invalid param exception');
-//        } catch (InvalidParamError $e) {
-//            $this->pass('InvalidParamError exception caught');
-//        } // try
-//    }
-//
-//    /**
-//     * Test set order by
-//     */
-//    function testSetOrderBy()
-//    {
-//        $collection = TestDataObjects::prepareCollection('testing', $this->owner);
-//
-//        $this->assertEquals($collection->getOrderBy(), 'name');
-//
-//        $collection->setOrderBy('created_on DESC');
-//
-//        $this->assertEquals($collection->getOrderBy(), 'created_on DESC');
-//    }
-//
-//    /**
-//     * Test data fetching
-//     */
-//    function testFetching()
-//    {
-//        list($object1, $object2, $object3, $object4, $object5) = TestDataObjects::createMany([
-//        ['type' => 'TestDataObject', 'name' => 'Object #1'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #2'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #3'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #4'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #5'],
-//        ]);
-//
-//        $this->assertTrue($object1->isLoaded() && $object1->getId() === 1);
-//        $this->assertTrue($object2->isLoaded() && $object2->getId() === 2);
-//        $this->assertTrue($object3->isLoaded() && $object3->getId() === 3);
-//        $this->assertTrue($object4->isLoaded() && $object4->getId() === 4);
-//        $this->assertTrue($object5->isLoaded() && $object5->getId() === 5);
-//
-//        $collection = TestDataObjects::prepareCollection('testing_fetch', $this->owner);
-//        $collection->setOrderBy('id');
-//
-//        $result = $collection->execute();
-//
-//        $this->assertIsA($result, 'DBResult');
-//        $this->assertEquals($result->count(), 5);
-//        $this->assertEquals($result->getRowAt(0)->getId(), 1);
-//        $this->assertEquals($result->getRowAt(1)->getId(), 2);
-//        $this->assertEquals($result->getRowAt(2)->getId(), 3);
-//        $this->assertEquals($result->getRowAt(3)->getId(), 4);
-//        $this->assertEquals($result->getRowAt(4)->getId(), 5);
-//    }
-//
+    /**
+     * Test set conditions from string
+     */
+    public function testSetConditionsFromString()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->where('type = "File"');
+        $this->assertEquals($collection->getConditions(), 'type = "File"');
+    }
+
+    /**
+     * Test set conditions from array
+     */
+    public function testSetConditionsFromArray()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->where(['type = ?', 'File']);
+        $this->assertEquals($collection->getConditions(), "type = 'File'");
+    }
+
+    /**
+     * Test set conditions from array of arguments
+     */
+    public function testSetConditionsFromArrayOfArguments()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->where('type = ?', 'File');
+        $this->assertEquals($collection->getConditions(), "type = 'File'");
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyListOfArgumentsThrowsAnException()
+    {
+        (new WritersCollection($this->connection, $this->pool))->where();
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidConditionsTypeThrowsAnException()
+    {
+        (new WritersCollection($this->connection, $this->pool))->where(123);
+    }
+
+    /**
+     * Test set order by
+     */
+    public function testSetOrderBy()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection->orderBy('`writers`.`created_at` DESC');
+
+        $this->assertEquals($collection->getOrderBy(), '`writers`.`created_at` DESC');
+    }
+
+    /**
+     * Test if execute IDs returns a correct result
+     */
+    public function testExecuteIds()
+    {
+        $this->assertEquals([3, 2, 1], (new WritersCollection($this->connection, $this->pool))->executeIds());
+    }
+
+    /**
+     * Test execute collection
+     */
+    public function testExecute()
+    {
+        $writers = (new WritersCollection($this->connection, $this->pool))->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(3, $writers);
+
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[0]->getName());
+        $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
+        $this->assertEquals('Leo Tolstoy', $writers[2]->getName());
+    }
+
+    public function testExecuteWithConditions()
+    {
+        $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(2, $writers);
+
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[0]->getName());
+        $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
+    }
+
+    public function testExecuteWithConditionsAndOrder()
+    {
+        $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->orderBy('`name`')->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(2, $writers);
+
+        $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[1]->getName());
+    }
+
 //    /**
 //     * Test collection join
 //     */
