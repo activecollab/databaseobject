@@ -113,6 +113,16 @@ interface PoolInterface
     public function find($type);
 
     /**
+     * Return result by a prepared SQL statement
+     *
+     * @param  string                 $type
+     * @param  string                 $sql
+     * @param  mixed                  $arguments
+     * @return ObjectInterface[]|null
+     */
+    public function findBySql($type, $sql, ...$arguments);
+
+    /**
      * Return table name by type
      *
      * @param  string  $type
