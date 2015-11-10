@@ -3,6 +3,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
 use ReflectionClass;
 use LogicException;
@@ -331,10 +332,10 @@ class Pool implements PoolInterface
     /**
      * Return result by a prepared SQL statement
      *
-     * @param  string                 $type
-     * @param  string                 $sql
-     * @param  mixed                  $arguments
-     * @return ObjectInterface[]|null
+     * @param  string                                 $type
+     * @param  string                                 $sql
+     * @param  mixed                                  $arguments
+     * @return ResultInterface|ObjectInterface[]|null
      */
     public function findBySql($type, $sql, ...$arguments)
     {

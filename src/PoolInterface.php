@@ -2,6 +2,8 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+
 /**
  * @package ActiveCollab\DatabaseObject
  */
@@ -115,10 +117,10 @@ interface PoolInterface
     /**
      * Return result by a prepared SQL statement
      *
-     * @param  string                 $type
-     * @param  string                 $sql
-     * @param  mixed                  $arguments
-     * @return ObjectInterface[]|null
+     * @param  string                                 $type
+     * @param  string                                 $sql
+     * @param  mixed                                  $arguments
+     * @return ResultInterface|ObjectInterface[]|null
      */
     public function findBySql($type, $sql, ...$arguments);
 
