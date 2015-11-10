@@ -1,7 +1,9 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseObject\Finder;
 use ActiveCollab\DateValue\DateValue;
@@ -9,42 +11,8 @@ use ActiveCollab\DateValue\DateValue;
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
-class FindTest extends TestCase
+class FindTest extends WritersTypeTestCase
 {
-    /**
-     * Set up test environment
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->connection->execute('DROP TABLE IF EXISTS `writers`');
-
-        $create_table = $this->connection->execute("CREATE TABLE `writers` (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-            `birthday` date NOT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
-
-        $this->assertTrue($create_table);
-
-        $this->connection->execute('INSERT INTO `writers` (`name`, `birthday`) VALUES (?, ?), (?, ?), (?, ?)', 'Leo Tolstoy', new DateValue('1828-09-09'), 'Alexander Pushkin', new DateValue('1799-06-06'), 'Fyodor Dostoyevsky', new DateValue('1821-11-11'));
-
-        $this->pool->registerType(Writer::class);
-        $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
-    }
-
-    /**
-     * Tear down test environment
-     */
-    public function tearDown()
-    {
-        $this->connection->execute('DROP TABLE IF EXISTS `writers`');
-
-        parent::tearDown();
-    }
-
     /**
      * Test count all
      */
@@ -208,5 +176,60 @@ class FindTest extends TestCase
         $this->assertTrue($should_be_leo->isLoaded());
 
         $this->assertEquals('Lev Nikolayevich Tolstoy', $should_be_leo->getName());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFindBySqlRequiresType()
+    {
+        $this->pool->findBySql('', 'SELECT * FROM `writers` ORDER BY `name`');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFindBySqlRequiresRegisteredType()
+    {
+        $this->pool->findBySql(DateValue::class, 'SELECT * FROM `writers` ORDER BY `name`');
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testFindBySqlRequiresSqlStatement()
+    {
+        $this->pool->findBySql(Writer::class, '');
+    }
+
+    /**
+     * Test if find by SQL properly loads data
+     */
+    public function testFindBySql()
+    {
+        /** @var Writer[] $writers */
+        $writers = $this->pool->findBySql(Writer::class, 'SELECT * FROM `writers` ORDER BY `name`');
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(3, $writers);
+
+        $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[1]->getName());
+        $this->assertEquals('Leo Tolstoy', $writers[2]->getName());
+    }
+
+    /**
+     * Test if find by SQL properly accepts and escapes arguments
+     */
+    public function testFindBySqlWithArguments()
+    {
+        /** @var Writer[] $writers */
+        $writers = $this->pool->findBySql(Writer::class, 'SELECT * FROM `writers` WHERE `name` LIKE ? OR `name` LIKE ? ORDER BY `name`', 'Alexander%', 'Leo%');
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(2, $writers);
+
+        $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
+        $this->assertEquals('Leo Tolstoy', $writers[1]->getName());
     }
 }

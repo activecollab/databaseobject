@@ -24,7 +24,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
      *
      * @var array
      */
-    protected $fields = ['id', 'name', 'birthday'];
+    protected $fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
 
     /**
      * List of default field values
@@ -92,6 +92,52 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
+     * Return value of created_at field
+     *
+     * @return \ActiveCollab\DateValue\DateTimeValueInterface|null
+     */
+    public function getCreatedAt()
+    {
+        return $this->getFieldValue('created_at');
+    }
+
+    /**
+     * Set value of created_at  field
+     *
+     * @param  \ActiveCollab\DateValue\DateTimeValueInterface|null $value
+     * @return $this
+     */
+    public function &setCreatedAt($value)
+    {
+        $this->setFieldValue('created_at', $value);
+
+        return $this;
+    }
+
+    /**
+     * Return value of updated_at field
+     *
+     * @return \ActiveCollab\DateValue\DateTimeValueInterface|null
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getFieldValue('updated_at');
+    }
+
+    /**
+     * Set value of updated_at  field
+     *
+     * @param  \ActiveCollab\DateValue\DateTimeValueInterface|null $value
+     * @return $this
+     */
+    public function &setUpdatedAt($value)
+    {
+        $this->setFieldValue('updated_at', $value);
+
+        return $this;
+    }
+
+    /**
      * Set value of specific field
      *
      * @param  string                   $name
@@ -114,6 +160,9 @@ abstract class BaseWriter extends Object implements ObjectInterface
                 case 'birthday':
                     parent::setFieldValue($name, $this->getDateValueInstaceFrom($value));
                     break;
+                case 'created_at':
+                case 'updated_at':
+                    return parent::setFieldValue($name, $this->getDateTimeValueInstanceFrom($value));
                 default:
                     throw new InvalidArgumentException("'$name' is not a known field");
             }

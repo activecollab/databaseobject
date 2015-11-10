@@ -329,6 +329,39 @@ class Pool implements PoolInterface
     }
 
     /**
+     * Return result by a prepared SQL statement
+     *
+     * @param  string                 $type
+     * @param  string                 $sql
+     * @param  mixed                  $arguments
+     * @return ObjectInterface[]|null
+     */
+    public function findBySql($type, $sql, ...$arguments)
+    {
+        if (empty($type)) {
+            throw new InvalidArgumentException('Type is required');
+        }
+
+        if (empty($sql)) {
+            throw new InvalidArgumentException('SQL statement is required');
+        }
+
+        if ($registered_type = $this->getRegisteredType($type)) {
+            if (in_array('type', $this->getTypeFields($type))) {
+                $return_by = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
+                $return_by_value = 'type';
+            } else {
+                $return_by = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
+                $return_by_value = $type;
+            }
+
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this, &$this->connection]);
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
+    }
+
+    /**
      * Return table name by type
      *
      * @param  string  $type
