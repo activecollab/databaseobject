@@ -100,7 +100,7 @@ abstract class Collection implements CollectionInterface
      * @param  integer $items_per_page
      * @return $this
      */
-    public function &setPagination($current_page = 1, $items_per_page = 100)
+    public function &pagination($current_page = 1, $items_per_page = 100)
     {
         $this->current_page = (int)$current_page;
 

@@ -68,5 +68,5 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
      * @param  integer $items_per_page
      * @return $this
      */
-    public function &setPagination($current_page = 1, $items_per_page = 100);
+    public function &pagination($current_page = 1, $items_per_page = 100);
 }

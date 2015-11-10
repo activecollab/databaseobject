@@ -108,6 +108,9 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('Leo Tolstoy', $writers[2]->getName());
     }
 
+    /**
+     * Test execution with conditions
+     */
     public function testExecuteWithConditions()
     {
         $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->execute();
@@ -119,6 +122,9 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
     }
 
+    /**
+     * Test execution with conditions and order by set
+     */
     public function testExecuteWithConditionsAndOrder()
     {
         $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->orderBy('`name`')->execute();
@@ -128,6 +134,41 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
         $this->assertEquals('Fyodor Dostoyevsky', $writers[1]->getName());
+    }
+
+    /**
+     * Test paginated execution
+     */
+    public function testExecutePaginated()
+    {
+        //  Page 1
+        $collection = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+
+        $this->assertEquals(1, $collection->getCurrentPage());
+        $this->assertEquals(2, $collection->getItemsPerPage());
+        $this->assertEquals(3, $collection->count());
+
+        $writers = $collection->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(2, $writers);
+
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[0]->getName());
+        $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
+
+        //  Page 2
+        $collection = (new WritersCollection($this->connection, $this->pool))->pagination(2, 2);
+
+        $this->assertEquals(2, $collection->getCurrentPage());
+        $this->assertEquals(2, $collection->getItemsPerPage());
+        $this->assertEquals(3, $collection->count());
+
+        $writers = $collection->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(1, $writers);
+
+        $this->assertEquals('Leo Tolstoy', $writers[0]->getName());
     }
 
 //    /**
