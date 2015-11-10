@@ -1,9 +1,9 @@
 <?php
-namespace ActiveCollab\DatabaseObject\Test;
+namespace ActiveCollab\DatabaseObject\Test\Base;
 
+use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseObject\Pool;
 use mysqli;
-use ActiveCollab\DatabaseConnection\Connection;
 
 /**
  * @package ActiveCollab\JobsQueue\Test

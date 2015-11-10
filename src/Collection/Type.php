@@ -13,7 +13,7 @@ use InvalidArgumentException;
 /**
  * @package ActiveCollab\DatabaseObject\Collection
  */
-class Type extends Collection
+abstract class Type extends Collection
 {
     /**
      * @var ConnectionInterface
@@ -26,32 +26,43 @@ class Type extends Collection
     private $pool;
 
     /**
+     * @param ConnectionInterface $connection
+     * @param PoolInterface       $pool
+     */
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool)
+    {
+        $this->connection = $connection;
+        $this->pool = $pool;
+    }
+
+    /**
      * @var string
      */
     private $registered_type;
 
     /**
-     * @var string
+     * Return type that this collection works with
+     *
+     * @return string
      */
-    private $type;
+    abstract public function getType();
 
     /**
-     * @param ConnectionInterface $connection
-     * @param PoolInterface       $pool
-     * @param string              $type
+     * Return registered type
+     *
+     * @return string
      */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, $type)
+    protected function getRegisteredType()
     {
-        $registered_type = $this->pool->getRegisteredType($type);
+        if (empty($this->registered_type)) {
+            $this->registered_type = $this->pool->getRegisteredType($this->getType());
 
-        if (empty($registered_type)) {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+            if (empty($this->registered_type)) {
+                throw new InvalidArgumentException("Type '" . $this->getType() . "' is not registered");
+            }
         }
 
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->registered_type = $registered_type;
-        $this->type = $type;
+        return $this->registered_type;
     }
 
     // ---------------------------------------------------
@@ -108,7 +119,7 @@ class Type extends Collection
     public function getTimestampField()
     {
         if ($this->timestamp_field === null) {
-            $fields = $this->pool->getTypeFields($this->registered_type);
+            $fields = $this->pool->getTypeFields($this->getRegisteredType());
 
             if (in_array('updated_at', $fields)) {
                 $this->timestamp_field = 'updated_at';
@@ -272,7 +283,7 @@ class Type extends Collection
     public function getTableName()
     {
         if (empty($this->table_name)) {
-            $this->table_name = $this->pool->getTypeTable($this->registered_type);
+            $this->table_name = $this->pool->getTypeTable($this->getRegisteredType());
         }
 
         return $this->table_name;
@@ -293,7 +304,7 @@ class Type extends Collection
     public function getOrderBy()
     {
         if ($this->order_by === false) {
-            $this->order_by = $this->pool->getTypeOrderBy($this->registered_type);
+            $this->order_by = $this->pool->getTypeOrderBy($this->getRegisteredType());
         }
 
         return $this->order_by;
@@ -392,10 +403,12 @@ class Type extends Collection
                 if (is_string($join_field) && $join_field) {
                     $this->join_with_field = $join_field;
                 } else {
-                    if (($pos = strrpos($this->registered_type, '\\')) !== false) {
-                        $this->join_with_field = Inflector::singularize(Inflector::tableize(substr($this->registered_type, $pos + 1))) . '_id';
+                    $registered_type = $this->getRegisteredType();
+
+                    if (($pos = strrpos($registered_type, '\\')) !== false) {
+                        $this->join_with_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
                     } else {
-                        $this->join_with_field = Inflector::singularize(Inflector::tableize($this->registered_type)) . '_id';
+                        $this->join_with_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
                     }
                 }
             }
