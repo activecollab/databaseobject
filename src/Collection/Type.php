@@ -33,6 +33,8 @@ abstract class Type extends Collection
     {
         $this->connection = $connection;
         $this->pool = $pool;
+
+        parent::__construct();
     }
 
     /**

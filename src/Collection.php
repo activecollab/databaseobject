@@ -14,6 +14,21 @@ abstract class Collection implements CollectionInterface
     use EtagInterfaceImplementation;
 
     /**
+     * Construct the collection instance
+     */
+    public function __construct()
+    {
+        $this->configure();
+    }
+
+    /**
+     * Pre-configure the collection when it is created
+     */
+    protected function configure()
+    {
+    }
+
+    /**
      * @var string
      */
     private $application_identifier = 'APPv1.0';
