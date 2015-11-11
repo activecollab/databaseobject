@@ -3,8 +3,9 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersCollection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersCollection;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
 /**
  * Test data object collection
@@ -13,6 +14,18 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
  */
 class TypeCollectionTest extends WritersTypeTestCase
 {
+    /**
+     * Tear down test environment
+     */
+    public function tearDown()
+    {
+        if ($this->connection->tableExists('favorite_writers')) {
+            $this->connection->dropTable('favorite_writers');
+        }
+
+        parent::tearDown();
+    }
+
     /**
      * Test if collection reads settings from type
      */
@@ -170,114 +183,95 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $this->assertEquals('Leo Tolstoy', $writers[0]->getName());
     }
+    
+    public function testJoin() 
+    {
+        $create_table = $this->connection->execute("CREATE TABLE `favorite_writers` (
+            `user_id` int UNSIGNED NOT NULL DEFAULT '0',
+            `writer_id` int UNSIGNED NOT NULL DEFAULT '0',
+            PRIMARY KEY (`user_id`, `writer_id`)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
 
-//    /**
-//     * Test collection join
-//     */
-//    function testJoin()
-//    {
-//        DB::execute("CREATE TABLE test_data_object_join_table (
-//        test_data_object_id int(10) unsigned NOT NULL,
-//        user_id int(10) unsigned NOT NULL,
-//        PRIMARY KEY  (test_data_object_id, user_id)
-//      ) ENGINE=InnoDB DEFAULT CHARSET=utf8;");
-//
-//        $this->assertTrue(DB::tableExists('test_data_object_join_table'));
-//
-//        list($object1, $object2, $object3) = TestDataObjects::createMany([
-//        ['type' => 'TestDataObject', 'name' => 'Object #1'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #2'],
-//        ['type' => 'TestDataObject', 'name' => 'Object #3'],
-//        ]);
-//
-//        if ($object1 instanceof TestDataObject || $object2 instanceof TestDataObject && $object3 instanceof TestDataObject) {
-//            $this->assertTrue($object1->isLoaded() && $object1->getId() === 1);
-//            $this->assertTrue($object2->isLoaded() && $object2->getId() === 2);
-//            $this->assertTrue($object3->isLoaded() && $object3->getId() === 3);
-//        } else {
-//            $this->fail('Failed to create object instances');
-//        }
-//
-//        DB::execute("INSERT INTO test_data_object_join_table (test_data_object_id, user_id) VALUES (1, 1), (2, 2), (3, 1)");
-//
-//        $this->assertEquals((integer)DB::executeFirstCell("SELECT COUNT(*) FROM test_data_object_join_table"), 3);
-//
-//        $collection = TestDataObjects::prepareCollection('testing_join', $this->owner);
-//        $collection->setJoinTable('test_data_object_join_table');
-//
-//        $this->assertEquals($collection->getJoinTable(), 'test_data_object_join_table');
-//        $this->assertEquals($collection->getJoinField(), 'id');
-//        $this->assertEquals($collection->getJoinWithField(), 'test_data_object_id');
-//
-//        $this->assertEquals($collection->count(), 3);
-//
-//        $collection->setConditions("test_data_object_join_table.user_id = ?", 1);
-//
-//        $this->assertEquals($collection->count(), 2);
-//
-//        $result = $collection->execute();
-//
-//        if ($result instanceof DBResult) {
-//            $this->assertEquals($result->count(), 2);
-//            $this->assertEquals($result->getRowAt(0)->getId(), 1);
-//            $this->assertEquals($result->getRowAt(1)->getId(), 3);
-//        } else {
-//            $this->fail('Invalid collection execution result. DBResult instance expected');
-//        }
-//    }
-//
-//    /**
-//     * Test etag signing
-//     */
-//    function testEtagSigning()
-//    {
-//        $logged_user = new Owner(1);
-//
-//        $this->assertTrue($logged_user->isLoaded());
-//
-//        $yesterday = DateTimeValue::makeFromString('-1 day');
-//        $yesterday_string = $yesterday->toMySQL();
-//        $today_string = DateTimeValue::now()->toMySQL();
-//
-//        $test_object_1 = new TestDataObject();
-//        $test_object_1->setName('Test object #1');
-//        $test_object_1->setCreatedOn($yesterday);
-//        $test_object_1->setUpdatedOn($yesterday);
-//        $test_object_1->save();
-//
-//        $this->assertTrue($test_object_1->isLoaded());
-//        $this->assertEquals($test_object_1->getId(), 1);
-//        $this->assertEquals($test_object_1->getCreatedOn()->toMySQL(), $yesterday_string);
-//        $this->assertEquals($test_object_1->getUpdatedOn()->toMySQL(), $yesterday_string);
-//
-//        $test_object_2 = new TestDataObject();
-//        $test_object_2->setName('Test object #2');
-//        $test_object_2->setCreatedOn($yesterday);
-//        $test_object_2->setUpdatedOn($yesterday);
-//        $test_object_2->save();
-//
-//        $this->assertTrue($test_object_2->isLoaded());
-//        $this->assertEquals($test_object_2->getId(), 2);
-//        $this->assertEquals($test_object_2->getCreatedOn()->toMySQL(), $yesterday_string);
-//        $this->assertEquals($test_object_2->getUpdatedOn()->toMySQL(), $yesterday_string);
-//
-//        $collection = TestDataObjects::prepareCollection('testing_etag', $this->owner);
-//        $this->assertIsA($collection, 'DataObjectCollection');
-//
-//        $etag = $collection->getTag($logged_user);
-//
-//        $this->assertEquals($etag, '"current,collection,TestDataObjects,testing_etag,' . $logged_user->getEmail() . ',' . sha1("$yesterday_string,$yesterday_string") . '"');
-//
-//        $test_object_2->setName('Updated name');
-//        $test_object_2->save();
-//
-//        // Tag changed in the background, so we have an invalid value cached
-//        $this->assertNotEquals($collection->getTag($logged_user), 'current,collection,TestDataObjects,testing_etag,' . $logged_user->getEmail() . ',' . sha1("$yesterday_string,$today_string"));
-//
-//        // On refresh, we have a valid value ($use_cache false for getTag() method)
-//        $this->assertEquals($collection->getTag($logged_user, false), '"current,collection,TestDataObjects,testing_etag,' . $logged_user->getEmail() . ',' . sha1("$yesterday_string,$today_string") . '"');
-//
-//        $this->assertFalse($collection->validateTag('"current,collection,TestDataObjects,testing_etag,' . $logged_user->getEmail() . ',' . sha1("$yesterday_string,$yesterday_string") . '"', $logged_user, false));
-//        $this->assertTrue($collection->validateTag('"current,collection,TestDataObjects,testing_etag,' . $logged_user->getEmail() . ',' . sha1("$yesterday_string,$today_string") . '"', $logged_user, false));
-//    }
+        $this->assertTrue($create_table);
+
+        // Peter is user #1 and he likes Tolstoy and Dostoyevsky (#1 and #3)
+        // John is user #2 and he likes only Pushkin (#2
+        // Oliver is user #3 and he is not into Russian classics
+        $this->connection->execute('INSERT INTO `favorite_writers` (`user_id`, `writer_id`) VALUES (1, 1), (1, 3), (2, 2)');
+
+        $this->assertEquals(3, $this->connection->count('favorite_writers', null, '*'));
+
+        // Peter's favorite writers
+        $collection = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 1)->orderBy('`name`');
+
+        $this->assertEquals('favorite_writers', $collection->getJoinTable());
+        $this->assertEquals('id', $collection->getJoinField());
+        $this->assertEquals('writer_id', $collection->getJoinWithField());
+
+        $writers = $collection->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(2, $writers);
+
+        $this->assertEquals('Fyodor Dostoyevsky', $writers[0]->getName());
+        $this->assertEquals('Leo Tolstoy', $writers[1]->getName());
+
+        // John's favorite writers
+        $writers = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 2)->orderBy('`name`')->execute();
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(1, $writers);
+
+        $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
+
+        // Oliver's favorite writes
+        $writers = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 3)->orderBy('`name`')->execute();
+
+        $this->assertNull($writers);
+    }
+
+    /**
+     * Test if timestamp hash is properly loaded from the timestamp fields
+     */
+    public function testTimestampHash()
+    {
+        $this->connection->execute('UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?', date('Y-m-d H:i:s', time() + 1), 2);
+        $this->connection->execute('UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?', date('Y-m-d H:i:s', time() + 2), 3);
+
+        $collection = (new WritersCollection($this->connection, $this->pool))->orderBy('`writers`.`id`');
+
+        $updated_on_timestamps = [];
+
+        /** @var Writer $writer */
+        foreach ($collection->execute() as $writer) {
+            $updated_on_timestamps[] = $writer->getUpdatedAt()->format('Y-m-d H:i:s');
+        }
+
+        $this->assertCount(3, $updated_on_timestamps);
+        $this->assertCount(3, array_unique($updated_on_timestamps));
+
+        $this->assertEquals($collection->getTimestampHash('updated_at'), sha1(implode(',', $updated_on_timestamps)));
+    }
+
+    /**
+     * Test if etag format is properly set
+     */
+    public function testEtagFormat()
+    {
+        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0');
+
+        $etag = $collection->getEtag('ilija.studen@activecollab.com');
+
+        $this->assertNotEmpty($etag);
+
+        $etag_bits = explode(',', trim($etag, '"'));
+
+        $this->assertCount(5, $etag_bits);
+
+        $this->assertEquals('MyApp v1.0', $etag_bits[0]);
+        $this->assertEquals('collection', $etag_bits[1]);
+        $this->assertEquals(WritersCollection::class, $etag_bits[2]);
+        $this->assertEquals('ilija.studen@activecollab.com', $etag_bits[3]);
+        $this->assertEquals($collection->getTimestampHash('updated_at'), $etag_bits[4]);
+    }
 }

@@ -22,7 +22,7 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
      * Set application identifier
      *
      * @param  string $value
-     * @return string
+     * @return $this
      */
     public function &setApplicationIdentifier($value);
 
