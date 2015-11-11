@@ -73,6 +73,16 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
+     * Test table name for class that extends registered type
+     */
+    public function testTableNameForClassThatExtendsRegisteredType()
+    {
+        $this->pool->registerType(Writer::class);
+        $this->assertEquals('writers', $this->pool->getTypeTable(AwesomeWriter::class));
+        $this->assertEquals($this->connection->escapeTableName('writers'), $this->pool->getTypeTable(Writer::class, true));
+    }
+
+    /**
      * Test fields for registered type
      */
     public function testFieldsForRegisteredTypes()
@@ -86,6 +96,42 @@ class TypeRegistrationTest extends TestCase
         $this->assertContains('id', $fileds);
         $this->assertContains('name', $fileds);
         $this->assertContains('birthday', $fileds);
+    }
+
+    /**
+     * Test if we can get fields for class that extends registered type
+     */
+    public function testFieldsForClassThatExtendsRegisteredType()
+    {
+        $this->pool->registerType(Writer::class);
+
+        $fileds = $this->pool->getTypeFields(AwesomeWriter::class);
+
+        $this->assertInternalType('array', $fileds);
+
+        $this->assertContains('id', $fileds);
+        $this->assertContains('name', $fileds);
+        $this->assertContains('birthday', $fileds);
+    }
+
+    /**
+     * Test order by for registered type
+     */
+    public function testOrderByForRegisteredType()
+    {
+        $this->pool->registerType(Writer::class);
+        $this->assertEquals(['!id'], $this->pool->getTypeOrderBy(Writer::class));
+        $this->assertEquals('`writers`.`id` DESC', $this->pool->getEscapedTypeOrderBy(Writer::class));
+    }
+
+    /**
+     * Test order by for class that extends registered type
+     */
+    public function testOrderByForClassThatExtendsRegisteredType()
+    {
+        $this->pool->registerType(Writer::class);
+        $this->assertEquals(['!id'], $this->pool->getTypeOrderBy(AwesomeWriter::class));
+        $this->assertEquals('`writers`.`id` DESC', $this->pool->getEscapedTypeOrderBy(AwesomeWriter::class));
     }
 
     /**

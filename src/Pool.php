@@ -371,15 +371,15 @@ class Pool implements PoolInterface
      */
     public function getTypeTable($type, $escaped = false)
     {
-        if (isset($this->types[$type])) {
+        if ($registered_type = $this->getRegisteredType($type)) {
             if ($escaped) {
-                if (empty($this->types[$type]['escaped_table_name'])) {
-                    $this->types[$type]['escaped_table_name'] = $this->connection->escapeTableName($this->types[$type]['table_name']);
+                if (empty($this->types[$registered_type]['escaped_table_name'])) {
+                    $this->types[$registered_type]['escaped_table_name'] = $this->connection->escapeTableName($this->types[$registered_type]['table_name']);
                 }
 
-                return $this->types[$type]['escaped_table_name'];
+                return $this->types[$registered_type]['escaped_table_name'];
             } else {
-                return $this->types[$type]['table_name'];
+                return $this->types[$registered_type]['table_name'];
             }
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
@@ -392,11 +392,11 @@ class Pool implements PoolInterface
      */
     public function getTypeFields($type)
     {
-        if (isset($this->types[$type])) {
-            return $this->types[$type]['fields'];
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return $this->types[$registered_type]['fields'];
         }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**
@@ -460,8 +460,8 @@ class Pool implements PoolInterface
      */
     public function getTypeOrderBy($type)
     {
-        if (isset($this->types[$type])) {
-            return $this->types[$type]['order_by'];
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return $this->types[$registered_type]['order_by'];
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
