@@ -1,6 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
 /**

@@ -2,6 +2,8 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Test\Base\TestCase;
+
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */

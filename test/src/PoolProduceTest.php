@@ -1,6 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Validator;
@@ -9,40 +10,8 @@ use ActiveCollab\DateValue\DateValue;
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
-class PoolProduceTest extends TestCase
+class PoolProduceTest extends WritersTypeTestCase
 {
-    /**
-     * Set up test environment
-     */
-    public function setUp()
-    {
-        parent::setUp();
-
-        $this->connection->execute('DROP TABLE IF EXISTS `writers`');
-
-        $create_table = $this->connection->execute("CREATE TABLE `writers` (
-            `id` int(11) NOT NULL AUTO_INCREMENT,
-            `name` varchar(191) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
-            `birthday` date NOT NULL,
-            PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
-
-        $this->assertTrue($create_table);
-
-        $this->pool->registerType(Writer::class);
-        $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
-    }
-
-    /**
-     * Tear down test environment
-     */
-    public function tearDown()
-    {
-        $this->connection->execute('DROP TABLE IF EXISTS `writers`');
-
-        parent::tearDown();
-    }
-
     /**
      * Test if pool can produce an instance of registered type
      */
