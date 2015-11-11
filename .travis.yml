@@ -7,9 +7,6 @@ mysql:
   username: root
   encoding: utf8mb4
 before_install:
-  - composer self-update
-install: composer install --dev
-before_script:
   # INSTALL MYSQL 5.6
   # (https://github.com/piwik/piwik/commit/20bd2e1c24e5d673dce3feb256204ad48c29f160)
   # TODO: Remove when mysql 5.6 is provided by travis.
@@ -28,5 +25,8 @@ before_script:
   - mysql --version
   - mysql -e "SELECT VERSION();"
   # /END MYSQL 5.6
+  - composer self-update
+install: composer install --dev
+before_script:
   - mysql -e 'create database activecollab_database_object_test'
 script: phpunit -c test/phpunit.xml
