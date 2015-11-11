@@ -6,5 +6,4 @@
 
 ## To Do
 
-1. Relationships
-2. Caching
+1. Caching
