@@ -195,6 +195,14 @@ interface PoolInterface
     public function isTypeRegistered($type);
 
     /**
+     * Return true if $type is polymorph (has type column that is used to figure out a class of individual record)
+     *
+     * @param  string $type
+     * @return bool
+     */
+    public function isTypePolymorph($type);
+
+    /**
      * @param string[] $types
      */
     public function registerType(...$types);

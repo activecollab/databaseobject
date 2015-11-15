@@ -22,17 +22,41 @@ abstract class User extends Object
      *
      * @var array
      */
-    protected $fields = ['id', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
+    protected $fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
 
     /**
      * List of default field values
      *
      * @var array
      */
-     protected $default_field_values = [
-       'first_name' => '',
-       'last_name' => '',
-     ];
+    protected $default_field_values = [
+        'type' => 'ActiveCollab\DatabaseObject\Test\Fixtures\Users\User',
+        'first_name' => '',
+        'last_name' => '',
+    ];
+
+    /**
+     * Return value of type field
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->getFieldValue('type');
+    }
+
+    /**
+     * Set value of type field
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function &setType($value)
+    {
+        $this->setFieldValue('type', $value);
+
+        return $this;
+    }
 
     /**
      * Return value of first_name field
@@ -165,6 +189,7 @@ abstract class User extends Object
             switch ($name) {
                 case 'id':
                     return parent::setFieldValue($name, (integer) $value);
+                case 'type':
                 case 'first_name':
                 case 'last_name':
                 case 'email':

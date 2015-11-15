@@ -2,6 +2,7 @@
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
@@ -112,6 +113,19 @@ class TypeRegistrationTest extends TestCase
         $this->assertContains('id', $fileds);
         $this->assertContains('name', $fileds);
         $this->assertContains('birthday', $fileds);
+    }
+
+    /**
+     * Test is type polymorph check
+     */
+    public function testIsTypePolymorph()
+    {
+        $this->pool->registerType(Writer::class);
+        $this->pool->registerType(User::class);
+
+        $this->assertFalse($this->pool->isTypePolymorph(Writer::class));
+        $this->assertFalse($this->pool->isTypePolymorph(AwesomeWriter::class));
+        $this->assertTrue($this->pool->isTypePolymorph(User::class));
     }
 
     /**
