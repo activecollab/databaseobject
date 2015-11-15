@@ -13,13 +13,13 @@ DatabaseObject library is a set of classes that make work with database just a b
 
 ## CRUD
 
-When pool works with an entire table, it uses following methods:
+If you wish to work with entire tables, use CRUD methods provided by `ConnectionInterface`:
 
-1. `PoolInterface::insert()` - insert one or more rows
-2. `PoolInterface::update()` - update a set of rows that match the given conditions, if any
-3. `PoolInterface::delete()` - drop a set of rows taht match the given conditions, if any
+1. `ConnectionInterface::insert()` - insert one or more rows
+2. `ConnectionInterface::update()` - update a set of rows that match the given conditions, if any
+3. `ConnectionInterface::delete()` - drop a set of rows taht match the given conditions, if any
 
-When pool works with an individual object instance, it uses following methods:
+When you need to work with individual instances, `PoolInterface` provides following handy methods:
 
 1. `PoolInterface::produce()` - create a new record based on the given parameters,
 2. `PoolInterface::modify()` - change the given object with a set of parameters,
