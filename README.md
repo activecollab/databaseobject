@@ -25,6 +25,10 @@ When you need to work with individual instances, `PoolInterface` provides follow
 2. `PoolInterface::modify()` - change the given object with a set of parameters,
 3. `PoolInterface::scrap()` - trash or permanently delete the given object.
 
+## Scrap
+
+Recently we added `ScrapInterface`. This interface should be implemented by models which support object trashing, instead of instant deletion.
+
 ## To Do
 
 1. Caching
