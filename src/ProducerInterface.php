@@ -2,8 +2,6 @@
 
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseObject\ObjectInterface;
-
 /**
  * @package ActiveCollab\DatabaseObject
  */

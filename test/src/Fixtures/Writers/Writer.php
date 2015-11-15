@@ -4,6 +4,7 @@ namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\PoolInterface;
+use ActiveCollab\DatabaseObject\ScrapInterface;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
@@ -11,7 +12,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
 /**
  * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
  */
-class Writer extends BaseWriter
+class Writer extends BaseWriter implements ScrapInterface
 {
     use Russian, ClassicWriter;
 
@@ -19,6 +20,21 @@ class Writer extends BaseWriter
      * @var mixed
      */
     public $custom_attribute_value;
+
+    /**
+     * @var bool
+     */
+    public $modified_using_custom_producer = false;
+
+    /**
+     * @var bool
+     */
+    public $is_scrapped = false;
+
+    /**
+     * @var bool
+     */
+    public $scrapped_using_custom_producer = false;
 
     /**
      * @param PoolInterface       $pool
@@ -72,5 +88,18 @@ class Writer extends BaseWriter
         $validator->present('birthday');
 
         parent::validate($validator);
+    }
+
+    /**
+     * Scrap the object, instead of permanently deleting it
+     *
+     * @param  bool|false $bulk
+     * @return $this
+     */
+    public function &scrap($bulk = false)
+    {
+        $this->is_scrapped = true;
+
+        return $this;
     }
 }

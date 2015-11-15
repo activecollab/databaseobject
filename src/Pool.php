@@ -61,6 +61,65 @@ class Pool implements PoolInterface
     }
 
     /**
+     * Update an instance
+     *
+     * @param  ObjectInterface $instance
+     * @param  array|null      $attributes
+     * @param  boolean         $save
+     * @return ObjectInterface
+     */
+    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    {
+        if ($instance->isNew()) {
+            throw new RuntimeException('Only objects that are saved to database can be modified');
+        }
+
+        $instance_type = get_class($instance);
+
+        if ($registered_type = $this->getRegisteredType($instance_type)) {
+            $instance = $this->getProducerForRegisteredType($registered_type)->modify($instance, $attributes, $save);
+
+            if ($instance instanceof ObjectInterface) {
+                $this->objects_pool[$registered_type][$instance->getId()] = $instance;
+            }
+
+            return $instance;
+        }
+
+        throw new InvalidArgumentException("Type '$instance_type' is not registered");
+    }
+
+    /**
+     * Scrap an instance (move it to trash, if object supports, or delete it)
+     *
+     * @param  ObjectInterface $instance
+     * @param  boolean         $force_delete
+     * @return ObjectInterface
+     */
+    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    {
+        if ($instance->isNew()) {
+            throw new RuntimeException('Only objects that are saved to database can be modified');
+        }
+
+        $instance_type = get_class($instance);
+
+        if ($registered_type = $this->getRegisteredType($instance_type)) {
+            $instance_id = $instance->getId();
+
+            $instance = $this->getProducerForRegisteredType($registered_type)->scrap($instance, $force_delete);
+
+            if ($instance->isNew() && !empty($this->objects_pool[$registered_type][$instance_id])) {
+                unset($this->objects_pool[$registered_type][$instance_id]);
+            }
+
+            return $instance;
+        }
+
+        throw new InvalidArgumentException("Type '$instance_type' is not registered");
+    }
+
+    /**
      * @var ProducerInterface
      */
     private $default_producer;

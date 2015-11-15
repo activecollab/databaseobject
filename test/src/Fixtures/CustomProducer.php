@@ -29,4 +29,41 @@ class CustomProducer extends Producer
 
         return $object;
     }
+
+    /**
+     * Update an instance
+     *
+     * @param  ObjectInterface $instance
+     * @param  array|null      $attributes
+     * @param  boolean         $save
+     * @return ObjectInterface
+     */
+    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    {
+        $instance = parent::modify($instance, $attributes, $save);
+
+        if ($instance instanceof Writer) {
+            $instance->modified_using_custom_producer = true;
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Scrap an instance (move it to trash, if object can be trashed, or delete it)
+     *
+     * @param  ObjectInterface $instance
+     * @param  boolean         $force_delete
+     * @return ObjectInterface
+     */
+    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    {
+        $instance = parent::scrap($instance, $force_delete);
+
+        if ($instance instanceof Writer) {
+            $instance->scrapped_using_custom_producer = true;
+        }
+
+        return $instance;
+    }
 }

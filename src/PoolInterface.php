@@ -7,18 +7,8 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-interface PoolInterface
+interface PoolInterface extends ProducerInterface
 {
-    /**
-     * Produce new instance of $type
-     *
-     * @param  string          $type
-     * @param  array|null      $attributes
-     * @param  boolean         $save
-     * @return ObjectInterface
-     */
-    public function produce($type, array $attributes = null, $save = true);
-
     /**
      * Register producer instance for the given type
      *
