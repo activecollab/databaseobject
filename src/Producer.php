@@ -58,4 +58,47 @@ class Producer implements ProducerInterface
 
         return $object;
     }
+
+    /**
+     * Update an instance
+     *
+     * @param  ObjectInterface $instance
+     * @param  array|null      $attributes
+     * @param  boolean         $save
+     * @return ObjectInterface
+     */
+    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    {
+        if ($attributes) {
+            foreach ($attributes as $k => $v) {
+                if ($instance->fieldExists($k)) {
+                    $instance->setFieldValue($k, $v);
+                } else {
+                    $instance->setAttribute($k, $v);
+                }
+            }
+        }
+
+        if ($save) {
+            $instance->save();
+        }
+
+        return $instance;
+    }
+
+    /**
+     * Scrap an instance (move it to trash, if object can be trashed, or delete it)
+     *
+     * @param  ObjectInterface $instance
+     * @param  boolean         $force_delete
+     * @return ObjectInterface
+     */
+    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    {
+        if (!$force_delete && $instance instanceof ScrapInterface) {
+            return $instance->scrap();
+        } else {
+            return $instance->delete();
+        }
+    }
 }
