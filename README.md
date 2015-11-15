@@ -27,7 +27,7 @@ When you need to work with individual instances, `PoolInterface` provides follow
 
 ## Scrap
 
-Recently we added `ScrapInterface`. This interface should be implemented by models which support object trashing, instead of instant deletion.
+Recently we added `ScrapInterface`. This interface should be implemented by models which support object trashing, instead of instant deletion. When `PoolInterface::scrap()` method is called, objects that implement `ScrapInterface` will be scrapped (marked as deleted or trashed, depending on a particular implementation), instead of being permanently deleted.
 
 ## To Do
 
