@@ -5,6 +5,7 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\Etag\EtagInterface;
 use ActiveCollab\Etag\EtagInterface\Implementation as EtagInterfaceImplementation;
+use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -78,6 +79,47 @@ abstract class Collection implements CollectionInterface
         return '"' . implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $visitor_identifier, $hash]) . '"';
     }
 
+    // ---------------------------------------------------
+    //  Pagination
+    // ---------------------------------------------------
+
+    /**
+     * Set pagination configuration
+     *
+     * @param  integer $current_page
+     * @param  integer $items_per_page
+     * @return $this
+     */
+    public function &pagination($current_page = 1, $items_per_page = 100)
+    {
+        $this->is_paginated = true;
+
+        $this->currentPage($current_page);
+
+        $this->items_per_page = (int)$items_per_page;
+
+        if ($this->items_per_page < 1) {
+            $this->items_per_page = 100;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @var bool
+     */
+    private $is_paginated = false;
+
+    /**
+     * Return true if collection is paginated
+     *
+     * @return boolean
+     */
+    public function isPaginated()
+    {
+        return $this->is_paginated;
+    }
+
     /**
      * @var integer|null
      */
@@ -87,6 +129,27 @@ abstract class Collection implements CollectionInterface
      * @var integer|null
      */
     private $items_per_page = null;
+
+    /**
+     * Set current page
+     *
+     * @param  integer $value
+     * @return $this
+     */
+    public function &currentPage($value)
+    {
+        if (!$this->is_paginated) {
+            throw new LogicException('Page can be set only for paginated collections');
+        }
+
+        $this->current_page = (int) $value;
+
+        if ($this->current_page < 1) {
+            $this->current_page = 1;
+        }
+
+        return $this;
+    }
 
     /**
      * Return current page #
@@ -106,30 +169,6 @@ abstract class Collection implements CollectionInterface
     public function getItemsPerPage()
     {
         return $this->items_per_page;
-    }
-
-    /**
-     * Set pagination configuration
-     *
-     * @param  integer $current_page
-     * @param  integer $items_per_page
-     * @return $this
-     */
-    public function &pagination($current_page = 1, $items_per_page = 100)
-    {
-        $this->current_page = (int)$current_page;
-
-        if ($this->current_page < 1) {
-            $this->current_page = 1;
-        }
-
-        $this->items_per_page = (int)$items_per_page;
-
-        if ($this->items_per_page < 1) {
-            $this->items_per_page = 100;
-        }
-
-        return $this;
     }
 
     /**

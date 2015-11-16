@@ -48,6 +48,30 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
     public function count();
 
     /**
+     * Set pagination configuration
+     *
+     * @param  integer $current_page
+     * @param  integer $items_per_page
+     * @return $this
+     */
+    public function &pagination($current_page = 1, $items_per_page = 100);
+
+    /**
+     * Return true if collection is paginated
+     *
+     * @return boolean
+     */
+    public function isPaginated();
+
+    /**
+     * Set current page
+     *
+     * @param  integer $value
+     * @return $this
+     */
+    public function &currentPage($value);
+
+    /**
      * Return current page #
      *
      * @return integer|null
@@ -60,13 +84,4 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
      * @return integer|null
      */
     public function getItemsPerPage();
-
-    /**
-     * Set pagination configuration
-     *
-     * @param  integer $current_page
-     * @param  integer $items_per_page
-     * @return $this
-     */
-    public function &pagination($current_page = 1, $items_per_page = 100);
 }

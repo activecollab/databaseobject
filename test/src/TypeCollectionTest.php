@@ -150,6 +150,38 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
+     * Test is pagianted call
+     */
+    public function testIsPaginated()
+    {
+        $not_paginated = new WritersCollection($this->connection, $this->pool);
+        $this->assertFalse($not_paginated->isPaginated());
+
+        $paginated = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+        $this->assertTrue($paginated->isPaginated());
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testSetCurrentPageForNonPaginatedCollectionThrowsAnError()
+    {
+        (new WritersCollection($this->connection, $this->pool))->currentPage(1);
+    }
+
+    /**
+     * Test if we can change current page for paginated collection
+     */
+    public function testSetCurrentPageForPaginatedCollection()
+    {
+        $paginated = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+        $this->assertEquals(1, $paginated->getCurrentPage());
+
+        $paginated->currentPage(18);
+        $this->assertEquals(18, $paginated->getCurrentPage());
+    }
+
+    /**
      * Test paginated execution
      */
     public function testExecutePaginated()
@@ -183,7 +215,10 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $this->assertEquals('Leo Tolstoy', $writers[0]->getName());
     }
-    
+
+    /**
+     * Test if we can set conditions so they are joined with another table
+     */
     public function testJoin() 
     {
         $create_table = $this->connection->execute("CREATE TABLE `favorite_writers` (
