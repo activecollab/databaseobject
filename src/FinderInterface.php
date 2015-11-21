@@ -8,6 +8,11 @@ namespace ActiveCollab\DatabaseObject;
 interface FinderInterface
 {
     /**
+     * @return string
+     */
+    public function getType();
+
+    /**
      * Set finder conditions
      *
      * @param  string $pattern
@@ -63,9 +68,4 @@ interface FinderInterface
      * @return mixed
      */
     public function execute();
-
-    /**
-     * @return string
-     */
-    public function getType();
 }
