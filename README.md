@@ -31,17 +31,19 @@ Recently we added `ScrapInterface`. This interface should be implemented by mode
 
 ## Finder
 
-Finder can join a table, either by type:
+Finder can join a table, either by table name:
 
 ```php
-$this->pool->find(Writers::class)->join(WriterGroup::class)->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
+$pool->find(Writer::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
 ```
 
-or directly by table name:
+or by related type:
 
 ```php
-$this->pool->find(Writers::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
+$pool->find(Writer::class)->join(WriterGroup::class)->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
 ```
+
+Note that in the second case, `WriterGroup` type needs to be registered in the pool.
 
 ## To Do
 
