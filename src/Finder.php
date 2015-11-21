@@ -38,7 +38,12 @@ class Finder
     /**
      * @var integer|null
      */
-    private $offset, $limit;
+    private $offset;
+
+    /**
+     * @var integer|null
+     */
+    private $limit;
     
     /**
      * @param PoolInterface       $pool
@@ -52,6 +57,18 @@ class Finder
         $this->type = $type;
         $this->order_by = $this->pool->getEscapedTypeOrderBy($type);
     }
+
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    // ---------------------------------------------------
+    //  Configuration
+    // ---------------------------------------------------
 
     /**
      * Set finder conditions
@@ -100,6 +117,10 @@ class Finder
 
         return $this;
     }
+
+    // ---------------------------------------------------
+    //  Execution
+    // ---------------------------------------------------
 
     /**
      * Return number of records that match the given criteria
@@ -177,6 +198,10 @@ class Finder
         return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool, &$this->connection]);
     }
 
+    // ---------------------------------------------------
+    //  Utilities
+    // ---------------------------------------------------
+
     /**
      * @var boolean
      */
@@ -239,14 +264,6 @@ class Finder
         }
 
         return $result;
-    }
-
-    /**
-     * @return string
-     */
-    public function getType()
-    {
-        return $this->type;
     }
 
     /**
