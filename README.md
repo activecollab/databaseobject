@@ -29,6 +29,20 @@ When you need to work with individual instances, `PoolInterface` provides follow
 
 Recently we added `ScrapInterface`. This interface should be implemented by models which support object trashing, instead of instant deletion. When `PoolInterface::scrap()` method is called, objects that implement `ScrapInterface` will be scrapped (marked as deleted or trashed, depending on a particular implementation), instead of being permanently deleted.
 
+## Finder
+
+Finder can join a table, either by type:
+
+```php
+$this->pool->find(Writers::class)->join(WriterGroup::class)->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
+```
+
+or directly by table name:
+
+```php
+$this->pool->find(Writers::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', $group_id)->ids();
+```
+
 ## To Do
 
 1. Caching
