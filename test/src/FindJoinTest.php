@@ -56,8 +56,8 @@ class FindJoinTest extends WritersTypeTestCase
     public function testCount()
     {
         $this->assertEquals(3, $this->pool->find(Writer::class)->count());
-        $this->assertEquals(2, $this->pool->find(Writer::class)->joinTable('writer_groups')->where('writer_groups.group_id = ?', 1)->count());
-        $this->assertEquals(1, $this->pool->find(Writer::class)->joinTable('writer_groups')->where('writer_groups.group_id = ?', 2)->count());
+        $this->assertEquals(2, $this->pool->find(Writer::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 1)->count());
+        $this->assertEquals(1, $this->pool->find(Writer::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 2)->count());
     }
 
     /**
@@ -72,13 +72,13 @@ class FindJoinTest extends WritersTypeTestCase
         $this->assertCount(3, $result);
 
         /** @var Result $result */
-        $result = $this->pool->find(Writer::class)->joinTable('writer_groups')->where('writer_groups.group_id = ?', 1)->all();
+        $result = $this->pool->find(Writer::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 1)->all();
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertCount(2, $result);
 
         /** @var Result $result */
-        $result = $this->pool->find(Writer::class)->joinTable('writer_groups')->where('writer_groups.group_id = ?', 2)->all();
+        $result = $this->pool->find(Writer::class)->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 2)->all();
 
         $this->assertInstanceOf(Result::class, $result);
         $this->assertCount(1, $result);
@@ -97,14 +97,14 @@ class FindJoinTest extends WritersTypeTestCase
         $this->assertEquals('Leo Tolstoy', $should_be_tolstoy->getName());
 
         /** @var Writer $should_be_tolstoy */
-        $should_be_tolstoy = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('writer_groups.group_id = ?', 1)->first();
+        $should_be_tolstoy = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 1)->first();
 
         $this->assertInstanceOf(Writer::class, $should_be_tolstoy);
         $this->assertTrue($should_be_tolstoy->isLoaded());
         $this->assertEquals('Leo Tolstoy', $should_be_tolstoy->getName());
 
         /** @var Writer $should_be_dostoyevsky */
-        $should_be_dostoyevsky = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('writer_groups.group_id = ?', 2)->first();
+        $should_be_dostoyevsky = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 2)->first();
 
         $this->assertInstanceOf(Writer::class, $should_be_dostoyevsky);
         $this->assertTrue($should_be_dostoyevsky->isLoaded());
@@ -116,19 +116,19 @@ class FindJoinTest extends WritersTypeTestCase
      */
     public function testFindAllIds()
     {
-        $ids = $this->pool->find(Writer::class)->orderBy('id')->ids();
+        $ids = $this->pool->find(Writer::class)->orderBy('`id`')->ids();
 
         $this->assertInternalType('array', $ids);
         $this->assertCount(3, $ids);
         $this->assertEquals([1, 2, 3], $ids);
 
-        $ids = $this->pool->find(Writer::class)->orderBy('id')->joinTable('writer_groups')->where('writer_groups.group_id = ?', 1)->ids();
+        $ids = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 1)->ids();
 
         $this->assertInternalType('array', $ids);
         $this->assertCount(2, $ids);
         $this->assertEquals([1, 2], $ids);
 
-        $ids = $this->pool->find(Writer::class)->orderBy('id')->joinTable('writer_groups')->where('writer_groups.group_id = ?', 2)->ids();
+        $ids = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 2)->ids();
 
         $this->assertInternalType('array', $ids);
         $this->assertCount(1, $ids);
