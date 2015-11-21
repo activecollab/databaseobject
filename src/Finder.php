@@ -3,6 +3,7 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 
 /**
@@ -44,6 +45,11 @@ class Finder
      * @var integer|null
      */
     private $limit;
+
+    /**
+     * @var string
+     */
+    private $join;
     
     /**
      * @param PoolInterface       $pool
@@ -118,6 +124,45 @@ class Finder
         return $this;
     }
 
+    /**
+     * @param  string $type
+     * @param  string $field_name
+     * @return $this
+     */
+    public function &join($type, $field_name = null)
+    {
+        return $this->joinTable($this->pool->getTypeTable($type), $field_name);
+    }
+
+    /**
+     * @param  string $table_name
+     * @param  string $field_name
+     * @return $this
+     */
+    public function &joinTable($table_name, $field_name = null)
+    {
+        $join_table = $this->connection->escapeTableName($table_name);
+        $join_field = $this->connection->escapeFieldname($field_name ? $field_name : $this->getJoinFieldNameFromType());
+
+        $this->join = "LEFT JOIN $join_table ON {$this->getEscapedTableName()}.`id` = $join_table.$join_field";
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    private function getJoinFieldNameFromType()
+    {
+        if (($pos = strrpos($this->getType(), '\\')) === false) {
+            $type = $this->getType();
+        } else {
+            $type = substr($this->getType(), $pos + 1);
+        }
+
+        return Inflector::tableize($type) . '_id';
+    }
+
     // ---------------------------------------------------
     //  Execution
     // ---------------------------------------------------
@@ -130,6 +175,10 @@ class Finder
     public function count()
     {
         $sql = "SELECT COUNT(`id`) AS 'row_count' FROM " . $this->getEscapedTableName();
+
+        if ($this->join) {
+            $sql .= " $this->join";
+        }
 
         if ($this->conditions) {
             $sql .= " WHERE $this->conditions";
@@ -250,6 +299,10 @@ class Finder
     private function getSelectFieldsSql($escaped_field_names)
     {
         $result = "SELECT $escaped_field_names FROM " . $this->getEscapedTableName();
+
+        if ($this->join) {
+            $result .= " $this->join";
+        }
 
         if ($this->conditions) {
             $result .= " WHERE $this->conditions";

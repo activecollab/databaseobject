@@ -12,6 +12,10 @@ interface FinderInterface
      */
     public function getType();
 
+    // ---------------------------------------------------
+    //  Configuration
+    // ---------------------------------------------------
+
     /**
      * Set finder conditions
      *
@@ -33,6 +37,24 @@ interface FinderInterface
      * @return $this
      */
     public function &limit($offset, $limit);
+
+    /**
+     * @param  string $type
+     * @param  string $field_name
+     * @return $this
+     */
+    public function &join($type, $field_name = null);
+
+    /**
+     * @param  string $table_name
+     * @param  string $field_name
+     * @return $this
+     */
+    public function &joinTable($table_name, $field_name = null);
+
+    // ---------------------------------------------------
+    //  Execution
+    // ---------------------------------------------------
 
     /**
      * Return number of records that match the given criteria
