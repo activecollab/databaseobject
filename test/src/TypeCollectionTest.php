@@ -249,6 +249,43 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
+     * Confirm that join is turned off by default
+     */
+    public function testJoinIsTurnedOffByDefault()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $this->assertNull($collection->getJoinTable());
+        $this->assertNull($collection->getJoinField());
+    }
+
+    /**
+     * Test if join field is set based on table name
+     */
+    public function testJoinFieldBasedOnTableName()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->setJoinTable('writes_books');
+
+        $this->assertEquals('writes_books', $collection->getJoinTable());
+        $this->assertEquals('writer_id', $collection->getJoinField());
+    }
+
+    /**
+     * Test if join field can be specified
+     */
+    public function testJoinFieldSpecified()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->setJoinTable('writes_books', 'awesome_writer_id');
+
+        $this->assertEquals('writes_books', $collection->getJoinTable());
+        $this->assertEquals('awesome_writer_id', $collection->getJoinField());
+    }
+
+    /**
      * Test if we can set conditions so they are joined with another table
      */
     public function testJoin() 
@@ -272,8 +309,7 @@ class TypeCollectionTest extends WritersTypeTestCase
         $collection = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 1)->orderBy('`name`');
 
         $this->assertEquals('favorite_writers', $collection->getJoinTable());
-        $this->assertEquals('id', $collection->getJoinField());
-        $this->assertEquals('writer_id', $collection->getJoinWithField());
+        $this->assertEquals('writer_id', $collection->getJoinField());
 
         $writers = $collection->execute();
 

@@ -429,20 +429,16 @@ abstract class Type extends Collection
     {
         $this->join_table = $table_name;
 
-        if (empty($this->join_with_field)) {
-            if (is_array($join_field) && count($join_field) === 2) {
-                list ($this->join_field, $this->join_with_field) = $join_field;
+        if (empty($this->join_field)) {
+            if (is_string($join_field) && $join_field) {
+                $this->join_field = $join_field;
             } else {
-                if (is_string($join_field) && $join_field) {
-                    $this->join_with_field = $join_field;
-                } else {
-                    $registered_type = $this->getRegisteredType();
+                $registered_type = $this->getRegisteredType();
 
-                    if (($pos = strrpos($registered_type, '\\')) !== false) {
-                        $this->join_with_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
-                    } else {
-                        $this->join_with_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
-                    }
+                if (($pos = strrpos($registered_type, '\\')) !== false) {
+                    $this->join_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
+                } else {
+                    $this->join_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
                 }
             }
         }
@@ -451,18 +447,11 @@ abstract class Type extends Collection
     }
 
     /**
-     * Join field name
-     *
-     * @var string
-     */
-    private $join_field = 'id';
-
-    /**
      * Join with field name
      *
      * @var string
      */
-    private $join_with_field;
+    private $join_field;
 
     /**
      * Return join field name
@@ -485,34 +474,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return join field name
-     *
-     * @return string
-     */
-    public function getJoinWithField()
-    {
-        return $this->join_with_field;
-    }
-
-    /**
-     * Set join field name
-     *
-     * @param string $value
-     */
-    public function setJoinWithField($value)
-    {
-        $this->join_with_field = $value;
-    }
-
-    /**
      * Return join expression
      *
      * @return string|null
      */
     private function getJoinExpression()
     {
-        if ($this->join_table && $this->join_field && $this->join_with_field) {
-            return "LEFT JOIN $this->join_table ON " . $this->getTableName() . ".$this->join_field = $this->join_table.$this->join_with_field";
+        if ($this->join_table && $this->join_field) {
+            return "LEFT JOIN $this->join_table ON " . $this->getTableName() . ".`id` = $this->join_table.$this->join_field";
         }
 
         return null;
