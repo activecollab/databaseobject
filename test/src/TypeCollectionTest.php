@@ -333,12 +333,36 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $etag_bits = explode(',', trim($etag, '"'));
 
-        $this->assertCount(5, $etag_bits);
+        $this->assertCount(6, $etag_bits);
 
         $this->assertEquals('MyApp v1.0', $etag_bits[0]);
         $this->assertEquals('collection', $etag_bits[1]);
         $this->assertEquals(WritersCollection::class, $etag_bits[2]);
-        $this->assertEquals('ilija.studen@activecollab.com', $etag_bits[3]);
-        $this->assertEquals($collection->getTimestampHash('updated_at'), $etag_bits[4]);
+        $this->assertEquals('na', $etag_bits[3]);
+        $this->assertEquals('ilija.studen@activecollab.com', $etag_bits[4]);
+        $this->assertEquals($collection->getTimestampHash('updated_at'), $etag_bits[5]);
+    }
+
+    /**
+     * Test if additional identifier can be specified
+     */
+    public function testEtagCanIncludeAdditionalIdenfitier()
+    {
+        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0')->setAdditionalIdenfitifier('addidf');
+
+        $etag = $collection->getEtag('ilija.studen@activecollab.com');
+
+        $this->assertNotEmpty($etag);
+
+        $etag_bits = explode(',', trim($etag, '"'));
+
+        $this->assertCount(6, $etag_bits);
+
+        $this->assertEquals('MyApp v1.0', $etag_bits[0]);
+        $this->assertEquals('collection', $etag_bits[1]);
+        $this->assertEquals(WritersCollection::class, $etag_bits[2]);
+        $this->assertEquals('addidf', $etag_bits[3]);
+        $this->assertEquals('ilija.studen@activecollab.com', $etag_bits[4]);
+        $this->assertEquals($collection->getTimestampHash('updated_at'), $etag_bits[5]);
     }
 }

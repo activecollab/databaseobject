@@ -40,4 +40,28 @@ class Collection extends Type
 
         return $this;
     }
+
+    /**
+     * @var string
+     */
+    private $additional_identifier = 'na';
+
+    /**
+     * @return string
+     */
+    protected function getAdditionalIdentifier()
+    {
+        return $this->additional_identifier;
+    }
+
+    /**
+     * @param  string $value
+     * @return $this
+     */
+    public function &setAdditionalIdenfitifier($value)
+    {
+        $this->additional_identifier = $value;
+
+        return $this;
+    }
 }

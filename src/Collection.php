@@ -70,6 +70,19 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
+     * Prepare collection tag from bits of information
+     *
+     * @param  string $additional_identifier
+     * @param  string $visitor_identifier
+     * @param  string $hash
+     * @return string
+     */
+    protected function prepareTagFromBits($additional_identifier, $visitor_identifier, $hash)
+    {
+        return '"' . implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $additional_identifier, $visitor_identifier, $hash]) . '"';
+    }
+
+    /**
      * Return true if this object can be tagged and cached on client side
      *
      * @return bool|null
@@ -77,18 +90,6 @@ abstract class Collection implements CollectionInterface
     public function canBeTagged()
     {
         return true;
-    }
-
-    /**
-     * Prepare collection tag from bits of information
-     *
-     * @param  string $visitor_identifier
-     * @param  string $hash
-     * @return string
-     */
-    protected function prepareTagFromBits($visitor_identifier, $hash)
-    {
-        return '"' . implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $visitor_identifier, $hash]) . '"';
     }
 
     // ---------------------------------------------------

@@ -101,10 +101,18 @@ abstract class Type extends Collection
         $timestamp_field = $this->getTimestampField();
 
         if ($timestamp_field && ($this->tag === false || !$use_cache)) {
-            $this->tag = $this->prepareTagFromBits($visitor_identifier, $this->getTimestampHash($timestamp_field));
+            $this->tag = $this->prepareTagFromBits($this->getAdditionalIdentifier(), $visitor_identifier, $this->getTimestampHash($timestamp_field));
         }
 
         return $this->tag;
+    }
+
+    /**
+     * @return string
+     */
+    protected function getAdditionalIdentifier()
+    {
+        return 'na';
     }
 
     /**
