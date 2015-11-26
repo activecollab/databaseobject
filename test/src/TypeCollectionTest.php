@@ -99,6 +99,38 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
+     * @expectedException \LogicException
+     */
+    public function testCoundShouldNotWorkWhenCollectionIsNotReady()
+    {
+        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->executeIds();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testExecuteShouldNotWorkWhenCollectionIsNotReady()
+    {
+        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->execute();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testExecuteIdsShouldNotWorkWhenCollectionIsNotReady()
+    {
+        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->executeIds();
+    }
+
+    /**
+     * @expectedException \LogicException
+     */
+    public function testGetTagShouldNotWorkWhenCollectionIsNotReady()
+    {
+        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->getEtag('ilija.studen@activecollab.com');
+    }
+
+    /**
      * Test if execute IDs returns a correct result
      */
     public function testExecuteIds()

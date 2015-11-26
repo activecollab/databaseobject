@@ -9,6 +9,7 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\ObjectInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
+use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Collection
@@ -143,6 +144,10 @@ abstract class Type extends Collection
      */
     public function getTimestampHash($timestamp_field)
     {
+        if (!$this->isReady()) {
+            throw new LogicException('Collection is not ready');
+        }
+
         $table_name = $this->getTableName();
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
@@ -169,6 +174,10 @@ abstract class Type extends Collection
      */
     public function execute()
     {
+        if (!$this->isReady()) {
+            throw new LogicException('Collection is not ready');
+        }
+
         if (is_callable($this->pre_execute_callback)) {
             $ids = $this->executeIds();
 
@@ -204,6 +213,10 @@ abstract class Type extends Collection
      */
     public function executeIds()
     {
+        if (!$this->isReady()) {
+            throw new LogicException('Collection is not ready');
+        }
+
         if ($this->ids === false) {
             $this->ids = $this->connection->executeFirstColumn($this->getSelectSql(false));
 
@@ -260,6 +273,10 @@ abstract class Type extends Collection
      */
     public function count()
     {
+        if (!$this->isReady()) {
+            throw new LogicException('Collection is not ready');
+        }
+
         $table_name = $this->getTableName();
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
@@ -396,13 +413,13 @@ abstract class Type extends Collection
      * 1. As string, where value is for target field and it will map with ID column of the source table,
      * 2. As array, where first element is ID in the source table and second element is field in target table
      *
-     * @param string            $table_name_without_prefix
+     * @param string            $table_name
      * @param array|string|null $join_field
      * @return $this
      */
-    public function &setJoinTable($table_name_without_prefix, $join_field = null)
+    public function &setJoinTable($table_name, $join_field = null)
     {
-        $this->join_table = $table_name_without_prefix;
+        $this->join_table = $table_name;
 
         if (empty($this->join_with_field)) {
             if (is_array($join_field) && count($join_field) === 2) {

@@ -30,6 +30,18 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
+     * Return true if ready
+     *
+     * If collection declares that it is not ready, but execute methods get called, we should throw an exception
+     *
+     * @return boolean
+     */
+    protected function isReady()
+    {
+        return true;
+    }
+
+    /**
      * @var string
      */
     private $application_identifier = 'APPv1.0';

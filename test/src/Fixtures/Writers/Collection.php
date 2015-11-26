@@ -18,4 +18,26 @@ class Collection extends Type
     {
         return Writer::class;
     }
+
+    private $is_ready = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function isReady()
+    {
+        return $this->is_ready;
+    }
+
+    /**
+     * Set collection as not ready
+     *
+     * @return $this
+     */
+    public function &setAsNotReady()
+    {
+        $this->is_ready = false;
+
+        return $this;
+    }
 }
