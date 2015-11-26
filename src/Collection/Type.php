@@ -255,8 +255,8 @@ abstract class Type extends Collection
         $offset = $this->getCurrentPage() !== null ? ($this->getCurrentPage() - 1) * $this->getItemsPerPage() : null;
         $limit = $this->getItemsPerPage();
 
-        $fields = $all_fields ? '*' : 'id';
-        $table_name = $this->getTableName();
+        $fields = $all_fields ? '*' : '`id`';
+        $table_name = $this->connection->escapeTableName($this->getTableName());
         $conditions = $this->conditions ? "WHERE $this->conditions" : '';
 
         if ($order_by = $this->getOrderBy()) {
@@ -285,13 +285,13 @@ abstract class Type extends Collection
             throw new LogicException('Collection is not ready');
         }
 
-        $table_name = $this->getTableName();
+        $table_name = $this->connection->escapeTableName($this->getTableName());
         $conditions = $this->conditions ? " WHERE $this->conditions" : '';
 
         if ($join_expression = $this->getJoinExpression()) {
-            return (integer) $this->connection->executeFirstCell("SELECT COUNT($table_name.id) FROM $table_name $join_expression $conditions");
+            return (integer) $this->connection->executeFirstCell("SELECT COUNT($table_name.`id`) FROM $table_name $join_expression $conditions");
         } else {
-            return $this->connection->executeFirstCell("SELECT COUNT(id) AS 'row_count' FROM $table_name $conditions");
+            return $this->connection->executeFirstCell("SELECT COUNT(`id`) AS 'row_count' FROM $table_name $conditions");
         }
     }
 
