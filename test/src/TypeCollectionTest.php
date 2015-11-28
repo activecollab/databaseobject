@@ -367,7 +367,7 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $this->assertNotEmpty($etag);
 
-        $etag_bits = explode(',', trim($etag, '"'));
+        $etag_bits = explode(',', $etag);
 
         $this->assertCount(6, $etag_bits);
 
@@ -390,7 +390,7 @@ class TypeCollectionTest extends WritersTypeTestCase
 
         $this->assertNotEmpty($etag);
 
-        $etag_bits = explode(',', trim($etag, '"'));
+        $etag_bits = explode(',', $etag);
 
         $this->assertCount(6, $etag_bits);
 

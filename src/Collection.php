@@ -79,7 +79,7 @@ abstract class Collection implements CollectionInterface
      */
     protected function prepareTagFromBits($additional_identifier, $visitor_identifier, $hash)
     {
-        return '"' . implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $additional_identifier, $visitor_identifier, $hash]) . '"';
+        return implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $additional_identifier, $visitor_identifier, $hash]);
     }
 
     /**
