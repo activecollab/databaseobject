@@ -357,6 +357,21 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
+     * Test if etag value is not put in double or single quotes
+     */
+    public function testEtagShouldNotBeQuoted()
+    {
+        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0');
+
+        $etag = $collection->getEtag('ilija.studen@activecollab.com');
+
+        $this->assertNotEmpty($etag);
+
+        $this->assertEquals($etag, trim($etag, '"'));
+        $this->assertEquals($etag, trim($etag, "'"));
+    }
+
+    /**
      * Test if etag format is properly set
      */
     public function testEtagFormat()
