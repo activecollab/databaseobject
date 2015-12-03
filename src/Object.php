@@ -670,7 +670,7 @@ abstract class Object implements ObjectInterface
      * @param  mixed          $value
      * @return DateValue|null
      */
-    protected function getDateValueInstaceFrom($value)
+    protected function getDateValueInstanceFrom($value)
     {
         if ($value === null) {
             return null;

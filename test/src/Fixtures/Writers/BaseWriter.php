@@ -158,7 +158,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
                     parent::setFieldValue($name, (string) $value);
                     break;
                 case 'birthday':
-                    parent::setFieldValue($name, $this->getDateValueInstaceFrom($value));
+                    parent::setFieldValue($name, $this->getDateValueInstanceFrom($value));
                     break;
                 case 'created_at':
                 case 'updated_at':
