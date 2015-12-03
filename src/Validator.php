@@ -288,9 +288,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Return array of validation messages, indexed by field name
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getErrors()
     {
@@ -298,7 +296,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * @return bool
+     * {@inheritdoc}
      */
     public function hasErrors()
     {
@@ -306,10 +304,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Return field errors
-     *
-     * @param  string $field_name
-     * @return array
+     * {@inheritdoc}
      */
     public function getFieldErrors($field_name)
     {
@@ -317,12 +312,9 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Report an error for the given field
-     *
-     * @param string $field_name
-     * @param string $error_message
+     * {@inheritdoc}
      */
-    private function addFieldError($field_name, $error_message)
+    public function addFieldError($field_name, $error_message)
     {
         if (empty($this->errors[$field_name])) {
             $this->errors[$field_name] = [];

@@ -73,9 +73,34 @@ interface ValidatorInterface
     public function email($field_name, $allow_null = false);
 
     /**
+     * Return array of validation messages, indexed by field name
+     *
+     * @return array
+     */
+    public function getErrors();
+
+    /**
+     * Return true if there are error
+     *
      * @return bool
      */
     public function hasErrors();
+
+    /**
+     * Return field errors
+     *
+     * @param  string $field_name
+     * @return array
+     */
+    public function getFieldErrors($field_name);
+
+    /**
+     * Report an error for the given field
+     *
+     * @param string $field_name
+     * @param string $error_message
+     */
+    public function addFieldError($field_name, $error_message);
 
     /**
      * @return ValidationException
