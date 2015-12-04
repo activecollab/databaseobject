@@ -57,7 +57,7 @@ class Pool implements PoolInterface
             }
         }
 
-        throw new InvalidArgumentException("Can't produce an instance of '$type'");
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**
