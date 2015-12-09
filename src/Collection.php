@@ -2,6 +2,7 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\Etag\EtagInterface;
 use ActiveCollab\Etag\EtagInterface\Implementation as EtagInterfaceImplementation;
@@ -15,10 +16,24 @@ abstract class Collection implements CollectionInterface
     use EtagInterfaceImplementation;
 
     /**
-     * Construct the collection instance
+     * @var ConnectionInterface
      */
-    public function __construct()
+    protected $connection;
+
+    /**
+     * @var PoolInterface
+     */
+    protected $pool;
+
+    /**
+     * @param ConnectionInterface $connection
+     * @param PoolInterface       $pool
+     */
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool)
     {
+        $this->connection = $connection;
+        $this->pool = $pool;
+
         $this->configure();
     }
 

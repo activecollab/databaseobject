@@ -2,9 +2,7 @@
 
 namespace ActiveCollab\DatabaseObject\Collection;
 
-use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Collection;
-use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\ObjectInterface;
 use Doctrine\Common\Inflector\Inflector;
@@ -16,28 +14,6 @@ use LogicException;
  */
 abstract class Type extends Collection
 {
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var PoolInterface
-     */
-    private $pool;
-
-    /**
-     * @param ConnectionInterface $connection
-     * @param PoolInterface       $pool
-     */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool)
-    {
-        $this->connection = $connection;
-        $this->pool = $pool;
-
-        parent::__construct();
-    }
-
     /**
      * @var string
      */
