@@ -192,7 +192,9 @@ class Validator implements ValidatorInterface
             if (empty($context)) {
                 $this->addFieldError($field_name, "Value of '$field_name' needs to be unique");
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', $context));
+                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', array_map(function($field_name) {
+                   return "'$field_name'";
+                }, $context)));
             }
 
             return false;
