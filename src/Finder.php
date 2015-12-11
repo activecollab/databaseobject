@@ -174,7 +174,9 @@ class Finder
      */
     public function count()
     {
-        $sql = "SELECT COUNT(`id`) AS 'row_count' FROM " . $this->getEscapedTableName();
+        $table_name = $this->getEscapedTableName();
+
+        $sql = "SELECT COUNT($table_name.`id`) AS 'row_count' FROM $table_name";
 
         if ($this->join) {
             $sql .= " $this->join";
