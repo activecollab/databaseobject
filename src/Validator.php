@@ -189,7 +189,12 @@ class Validator implements ValidatorInterface
         }
 
         if ($this->connection->executeFirstCell($sql) > 0) {
-            $this->addFieldError($field_name, "Value of '$field_name' needs to be unique");
+            if (empty($context)) {
+                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique");
+            } else {
+                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', $context));
+            }
+
             return false;
         }
 

@@ -292,7 +292,15 @@ abstract class Object implements ObjectInterface
         //  Validate
         // ---------------------------------------------------
 
-        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $this->values);
+        $values_to_validate = $this->values;
+
+        foreach ($this->fields as $field_name) {
+            if (!array_key_exists($field_name, $values_to_validate)) {
+                $values_to_validate[$field_name] = null;
+            }
+        }
+
+        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $values_to_validate);
 
         $this->validate($validator);
 
