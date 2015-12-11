@@ -295,7 +295,7 @@ abstract class Object implements ObjectInterface
         $values_to_validate = $this->values;
 
         foreach ($this->fields as $field_name) {
-            if (!array_key_exists($field_name, $values_to_validate)) {
+            if (empty($values_to_validate[$field_name]) && !array_key_exists($field_name, $values_to_validate)) {
                 $values_to_validate[$field_name] = null;
             }
         }
