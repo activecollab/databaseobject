@@ -73,8 +73,8 @@ interface PoolInterface extends ProducerInterface
     /**
      * Forget object if it is loaded in memory
      *
-     * @param string  $type
-     * @param integer $id
+     * @param string    $type
+     * @param array|int $id
      */
     public function forget($type, $id);
 
