@@ -12,12 +12,12 @@ class Producer implements ProducerInterface
     /**
      * @var ConnectionInterface
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var PoolInterface
      */
-    private $pool;
+    protected $pool;
 
     /**
      * @param ConnectionInterface $connection
