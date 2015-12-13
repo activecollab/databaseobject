@@ -297,7 +297,7 @@ class Finder
      */
     private function getSelectIdsSql()
     {
-        return $this->getSelectFieldsSql('`id`');
+        return $this->getSelectFieldsSql($this->getEscapedTableName() . '.`id`');
     }
 
     /**
