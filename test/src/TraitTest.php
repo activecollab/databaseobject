@@ -25,7 +25,7 @@ class TraitTest extends TestCase
      */
     public function testIfTraitsAreCalledWhenNewInstanceIsCreated()
     {
-        $unknown_writer = new Writer($this->pool, $this->connection);
+        $unknown_writer = new Writer($this->connection, $this->pool);
 
         $this->assertTrue($unknown_writer->is_russian);
         $this->assertTrue($unknown_writer->is_classic_writer);

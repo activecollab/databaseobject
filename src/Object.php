@@ -10,6 +10,7 @@ use DateTime;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use LogicException;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -17,14 +18,19 @@ use LogicException;
 abstract class Object implements ObjectInterface
 {
     /**
+     * @var ConnectionInterface
+     */
+    protected $connection;
+
+    /**
      * @var Pool
      */
     protected $pool;
 
     /**
-     * @var ConnectionInterface
+     * @var LoggerInterface
      */
-    protected $connection;
+    protected $log;
 
     /**
      * Name of the table
@@ -67,13 +73,15 @@ abstract class Object implements ObjectInterface
     protected $default_field_values = [];
 
     /**
-     * @param PoolInterface       $pool
-     * @param ConnectionInterface $connection
+     * @param ConnectionInterface  $connection
+     * @param PoolInterface        $pool
+     * @param LoggerInterface|null $log
      */
-    public function __construct(PoolInterface $pool, ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface &$log = null)
     {
-        $this->pool = $pool;
         $this->connection = $connection;
+        $this->pool = $pool;
+        $this->log = $log;
 
         if ($traits = $pool->getTraitNamesByType(get_class($this))) {
             foreach ($traits as $trait) {

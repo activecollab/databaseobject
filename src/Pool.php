@@ -5,6 +5,7 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use LogicException;
 use InvalidArgumentException;
@@ -18,7 +19,12 @@ class Pool implements PoolInterface
     /**
      * @var ConnectionInterface
      */
-    private $connection;
+    protected $connection;
+
+    /**
+     * @var LoggerInterface
+     */
+    protected $log;
 
     /**
      * @var ObjectInterface[]
@@ -26,11 +32,13 @@ class Pool implements PoolInterface
     private $objects_pool = [];
 
     /**
-     * @param ConnectionInterface $connection
+     * @param ConnectionInterface  $connection
+     * @param LoggerInterface|null $log
      */
-    public function __construct(ConnectionInterface $connection)
+    public function __construct(ConnectionInterface $connection, LoggerInterface &$log = null)
     {
         $this->connection = $connection;
+        $this->log = $log;
     }
 
     /**
@@ -139,7 +147,7 @@ class Pool implements PoolInterface
     {
         if (empty($this->producers[$registered_type])) {
             if (empty($this->default_producer)) {
-                $this->default_producer = new Producer($this->connection, $this);
+                $this->default_producer = new Producer($this->connection, $this, $this->log);
             }
 
             return $this->default_producer;
@@ -213,7 +221,7 @@ class Pool implements PoolInterface
                     $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
 
                     /** @var ObjectInterface $object */
-                    $object = new $object_class($this, $this->connection);
+                    $object = new $object_class($this->connection, $this, $this->log);
                     $object->loadFromRow($row);
 
                     return $this->addToObjectPool($registered_type, $id, $object);
@@ -385,7 +393,7 @@ class Pool implements PoolInterface
     public function find($type)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            return new Finder($this, $this->connection, $registered_type);
+            return new Finder($this->connection, $this, $this->log, $registered_type);
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
@@ -418,7 +426,7 @@ class Pool implements PoolInterface
                 $return_by_value = $type;
             }
 
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this, &$this->connection]);
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }

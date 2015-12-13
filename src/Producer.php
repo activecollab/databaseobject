@@ -3,6 +3,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -20,13 +21,20 @@ class Producer implements ProducerInterface
     protected $pool;
 
     /**
-     * @param ConnectionInterface $connection
-     * @param PoolInterface       $pool
+     * @var LoggerInterface
      */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool)
+    protected $log;
+
+    /**
+     * @param ConnectionInterface  $connection
+     * @param PoolInterface        $pool
+     * @param LoggerInterface|null $log
+     */
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface &$log = null)
     {
         $this->connection = $connection;
         $this->pool = $pool;
+        $this->log = $log;
     }
 
     /**
@@ -40,7 +48,7 @@ class Producer implements ProducerInterface
     public function &produce($type, array $attributes = null, $save = true)
     {
         /** @var ObjectInterface $object */
-        $object = new $type($this->pool, $this->connection);
+        $object = new $type($this->connection, $this->pool, $this->log);
 
         if ($attributes) {
             foreach ($attributes as $k => $v) {

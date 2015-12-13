@@ -8,6 +8,7 @@ use ActiveCollab\DatabaseObject\ScrapInterface;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
@@ -37,12 +38,13 @@ class Writer extends BaseWriter implements ScrapInterface
     public $scrapped_using_custom_producer = false;
 
     /**
-     * @param PoolInterface       $pool
-     * @param ConnectionInterface $connection
+     * @param ConnectionInterface  $connection
+     * @param PoolInterface        $pool
+     * @param LoggerInterface|null $log
      */
-    public function __construct(PoolInterface $pool, ConnectionInterface $connection)
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface &$log = null)
     {
-        parent::__construct($pool, $connection);
+        parent::__construct($connection, $pool, $log);
 
         $this->registerEventHandler('on_set_attribute', function($attribute, $value) {
             if ($attribute == 'custom_attribute') {

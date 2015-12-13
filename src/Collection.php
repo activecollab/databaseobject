@@ -7,6 +7,7 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\Etag\EtagInterface;
 use ActiveCollab\Etag\EtagInterface\Implementation as EtagInterfaceImplementation;
 use LogicException;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -26,13 +27,20 @@ abstract class Collection implements CollectionInterface
     protected $pool;
 
     /**
-     * @param ConnectionInterface $connection
-     * @param PoolInterface       $pool
+     * @var LoggerInterface
      */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool)
+    protected $log;
+
+    /**
+     * @param ConnectionInterface  $connection
+     * @param PoolInterface        $pool
+     * @param LoggerInterface|null $log
+     */
+    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface &$log = null)
     {
         $this->connection = $connection;
         $this->pool = $pool;
+        $this->log = $log;
 
         $this->configure();
     }

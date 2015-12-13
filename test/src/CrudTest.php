@@ -16,7 +16,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testNewInstancesGetDefaultFieldValues()
     {
-        $unknown_writer = new Writer($this->pool, $this->connection);
+        $unknown_writer = new Writer($this->connection, $this->pool);
         $this->assertEquals('Unknown Writer', $unknown_writer->getName());
     }
 
@@ -25,7 +25,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testFieldsWithDefaultValueCantBeNull()
     {
-        $unknown_writer = new Writer($this->pool, $this->connection);
+        $unknown_writer = new Writer($this->connection, $this->pool);
         $unknown_writer->setName(null);
     }
 
@@ -34,7 +34,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testIdIsPrimaryKey()
     {
-        $unknown_writer = new Writer($this->pool, $this->connection);
+        $unknown_writer = new Writer($this->connection, $this->pool);
 
         $this->assertTrue($unknown_writer->isPrimaryKey('id'));
         $this->assertFalse($unknown_writer->isPrimaryKey('name'));
@@ -103,7 +103,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testCreate()
     {
-        $chekhov = new Writer($this->pool, $this->connection);
+        $chekhov = new Writer($this->connection, $this->pool);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -143,7 +143,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testChangeIdToNewRecord()
     {
-        $chekhov = new Writer($this->pool, $this->connection);
+        $chekhov = new Writer($this->connection, $this->pool);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -172,7 +172,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testChangeIdToExistingRecord()
     {
-        $chekhov = new Writer($this->pool, $this->connection);
+        $chekhov = new Writer($this->connection, $this->pool);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -211,7 +211,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testSetAttributeWithEventHandler()
     {
-        $writer = new Writer($this->pool, $this->connection);
+        $writer = new Writer($this->connection, $this->pool);
         $this->assertNull($writer->custom_attribute_value);
         $writer->setAttribute('custom_attribute', 13.5);
         $this->assertSame(13.5, $writer->custom_attribute_value);
@@ -222,7 +222,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testSetAttributeWithSetter()
     {
-        $writer = new Writer($this->pool, $this->connection);
+        $writer = new Writer($this->connection, $this->pool);
         $this->assertNull($writer->getCustomFieldValue());
         $writer->setAttribute('custom_field_value', 12);
         $this->assertSame(12, $writer->getCustomFieldValue());
@@ -233,7 +233,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testUnknownAttributeDoesNotProduceAnError()
     {
-        $writer = new Writer($this->pool, $this->connection);
+        $writer = new Writer($this->connection, $this->pool);
         $writer->setAttribute('unknown_attribute', 12);
     }
 }

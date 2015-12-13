@@ -5,6 +5,7 @@ use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -12,14 +13,19 @@ use InvalidArgumentException;
 class Finder
 {
     /**
+     * @var ConnectionInterface
+     */
+    private $connection;
+
+    /**
      * @var Pool
      */
     private $pool;
 
     /**
-     * @var ConnectionInterface
+     * @var LoggerInterface
      */
-    private $connection;
+    private $log;
 
     /**
      * @var string
@@ -52,14 +58,16 @@ class Finder
     private $join;
     
     /**
-     * @param PoolInterface       $pool
-     * @param ConnectionInterface $connection
-     * @param string              $type
+     * @param PoolInterface        $pool
+     * @param ConnectionInterface  $connection
+     * @param LoggerInterface|null $log
+     * @param string               $type
      */
-    public function __construct(PoolInterface $pool, ConnectionInterface $connection, $type)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface &$log = null, $type)
     {
-        $this->pool = $pool;
         $this->connection = $connection;
+        $this->pool = $pool;
+        $this->log = $log;
         $this->type = $type;
         $this->order_by = $this->pool->getEscapedTypeOrderBy($type);
     }
@@ -246,7 +254,7 @@ class Finder
             $return_by_value = $this->type;
         }
 
-        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->pool, &$this->connection]);
+        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
     }
 
     // ---------------------------------------------------
