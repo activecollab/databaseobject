@@ -405,19 +405,52 @@ abstract class Type extends Collection
     {
         $this->join_table = $table_name;
 
-        if (empty($this->join_field)) {
+        if (empty($this->target_join_field)) {
             if (is_string($join_field) && $join_field) {
-                $this->join_field = $join_field;
+                $this->setTargetJoinField($join_field);
+            } elseif(is_array($join_field)) {
+                if (count($join_field) == 2 && !empty($join_field[0]) && !empty($join_field[1])) {
+                    $this->setSourceJoinField($join_field[0]);
+                    $this->setTargetJoinField($join_field[1]);
+                } else {
+                    throw new InvalidArgumentException('Join field should be an array with two elements');
+                }
             } else {
                 $registered_type = $this->getRegisteredType();
 
                 if (($pos = strrpos($registered_type, '\\')) !== false) {
-                    $this->join_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
+                    $this->target_join_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
                 } else {
-                    $this->join_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
+                    $this->target_join_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
                 }
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Join field in source table
+     *
+     * @var string
+     */
+    private $source_join_field = 'id';
+
+    /**
+     * @return string
+     */
+    public function getSourceJoinField()
+    {
+        return $this->source_join_field;
+    }
+
+    /**
+     * @param  string $value
+     * @return $this
+     */
+    public function &setSourceJoinField($value)
+    {
+        $this->source_join_field = $value;
 
         return $this;
     }
@@ -427,26 +460,29 @@ abstract class Type extends Collection
      *
      * @var string
      */
-    private $join_field;
+    private $target_join_field;
 
     /**
      * Return join field name
      *
      * @return string
      */
-    public function getJoinField()
+    public function getTargetJoinField()
     {
-        return $this->join_field;
+        return $this->target_join_field;
     }
 
     /**
      * Set join field name
      *
-     * @param string $value
+     * @param  string $value
+     * @return $this
      */
-    public function setJoinField($value)
+    public function &setTargetJoinField($value)
     {
-        $this->join_field = $value;
+        $this->target_join_field = $value;
+
+        return $this;
     }
 
     /**
@@ -456,8 +492,8 @@ abstract class Type extends Collection
      */
     private function getJoinExpression()
     {
-        if ($this->join_table && $this->join_field) {
-            return "LEFT JOIN $this->join_table ON " . $this->getTableName() . ".`id` = $this->join_table.$this->join_field";
+        if ($this->join_table && $this->target_join_field) {
+            return "LEFT JOIN `$this->join_table` ON `" . $this->getTableName() . "`.`$this->source_join_field` = `$this->join_table`.`$this->target_join_field`";
         }
 
         return null;

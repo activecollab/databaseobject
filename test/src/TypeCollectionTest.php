@@ -256,33 +256,57 @@ class TypeCollectionTest extends WritersTypeTestCase
         $collection = new WritersCollection($this->connection, $this->pool);
 
         $this->assertNull($collection->getJoinTable());
-        $this->assertNull($collection->getJoinField());
+        $this->assertNull($collection->getTargetJoinField());
     }
 
     /**
      * Test if join field is set based on table name
      */
-    public function testJoinFieldBasedOnTableName()
+    public function testTargetJoinFieldBasedOnTableName()
     {
         $collection = new WritersCollection($this->connection, $this->pool);
 
         $collection->setJoinTable('writes_books');
 
         $this->assertEquals('writes_books', $collection->getJoinTable());
-        $this->assertEquals('writer_id', $collection->getJoinField());
+        $this->assertEquals('id', $collection->getSourceJoinField());
+        $this->assertEquals('writer_id', $collection->getTargetJoinField());
     }
 
     /**
      * Test if join field can be specified
      */
-    public function testJoinFieldSpecified()
+    public function testTargetJoinFieldSpecified()
     {
         $collection = new WritersCollection($this->connection, $this->pool);
 
         $collection->setJoinTable('writes_books', 'awesome_writer_id');
 
         $this->assertEquals('writes_books', $collection->getJoinTable());
-        $this->assertEquals('awesome_writer_id', $collection->getJoinField());
+        $this->assertEquals('id', $collection->getSourceJoinField());
+        $this->assertEquals('awesome_writer_id', $collection->getTargetJoinField());
+    }
+
+    /**
+     * Test if both source and target join fields can be specified
+     */
+    public function testSourceAndTargetJoinFieldsSpecified()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->setJoinTable('writes_books', ['source_id', 'target_id']);
+
+        $this->assertEquals('writes_books', $collection->getJoinTable());
+        $this->assertEquals('source_id', $collection->getSourceJoinField());
+        $this->assertEquals('target_id', $collection->getTargetJoinField());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testInvalidSourceAndTargetJoinFieldException()
+    {
+        (new WritersCollection($this->connection, $this->pool))->setJoinTable('writes_books', ['invalid', 'number', 'of', 'arguments']);
     }
 
     /**
@@ -309,7 +333,7 @@ class TypeCollectionTest extends WritersTypeTestCase
         $collection = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 1)->orderBy('`name`');
 
         $this->assertEquals('favorite_writers', $collection->getJoinTable());
-        $this->assertEquals('writer_id', $collection->getJoinField());
+        $this->assertEquals('writer_id', $collection->getTargetJoinField());
 
         $writers = $collection->execute();
 
