@@ -33,9 +33,9 @@ class Finder
     private $type;
 
     /**
-     * @var string|null
+     * @var string[]
      */
-    private $conditions;
+    private $where = [];
 
     /**
      * @var string
@@ -103,9 +103,26 @@ class Finder
             $conditions_to_prepare = array_merge($conditions_to_prepare, $arguments);
         }
 
-        $this->conditions = $this->connection->prepareConditions($conditions_to_prepare);
+        $this->where[] = $this->connection->prepareConditions($conditions_to_prepare);
 
         return $this;
+    }
+
+    /**
+     * Return where part of the query
+     */
+    public function getWhere()
+    {
+        switch (count($this->where)) {
+            case 0:
+                return '';
+            case 1:
+                return $this->where[0];
+            default:
+                return implode(' AND ', array_map(function($condition) {
+                    return "($condition)";
+                }, $this->where));
+        }
     }
 
     /**
@@ -190,8 +207,8 @@ class Finder
             $sql .= " $this->join";
         }
 
-        if ($this->conditions) {
-            $sql .= " WHERE $this->conditions";
+        if ($where = $this->getWhere()) {
+            $sql .= " WHERE $where";
         }
 
         return $this->connection->executeFirstCell($sql);
@@ -234,7 +251,9 @@ class Finder
      */
     public function ids()
     {
-        return $this->connection->executeFirstColumn($this->getSelectIdsSql());
+        $ids = $this->connection->executeFirstColumn($this->getSelectIdsSql());
+
+        return empty($ids) ? [] : $ids;
     }
 
     /**
@@ -314,8 +333,8 @@ class Finder
             $result .= " $this->join";
         }
 
-        if ($this->conditions) {
-            $result .= " WHERE $this->conditions";
+        if ($where = $this->getWhere()) {
+            $result .= " WHERE $where";
         }
 
         if ($this->order_by) {

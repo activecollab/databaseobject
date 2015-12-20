@@ -89,6 +89,17 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
+     * Test if ids() returns an empty array on empty result set
+     */
+    public function testFindIdsAlwaysReturnsArray()
+    {
+        $ids = $this->pool->find(Writer::class)->where('id = ?', -1)->ids();
+
+        $this->assertInternalType('array', $ids);
+        $this->assertCount(0, $ids);
+    }
+
+    /**
      * Test count using finder object
      */
     public function testCountUsingFinder()
@@ -107,6 +118,32 @@ class FindTest extends WritersTypeTestCase
         $this->assertInstanceOf(Writer::class, $should_be_leo);
         $this->assertTrue($should_be_leo->isLoaded());
         $this->assertEquals('Leo Tolstoy', $should_be_leo->getName());
+    }
+
+    /**
+     * Test find using multiple calls to where() method
+     */
+    public function testFindByMultipleConditions()
+    {
+        $finder_1 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01');
+        $this->assertEquals("`birthday` > '1800-01-01'", $finder_1->getWhere());
+
+        /** @var Writer[] $should_be_fyodor */
+        $should_be_fyodor_and_leo = $finder_1->all();
+
+        $this->assertCount(2, $should_be_fyodor_and_leo);
+
+        $finder_2 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01')->where('birthday < ?', '1825-01-01');
+        $this->assertEquals("(`birthday` > '1800-01-01') AND (birthday < '1825-01-01')", $finder_2->getWhere());
+
+        /** @var Writer[] $should_be_fyodor */
+        $should_be_fyodor = $finder_2->all();
+
+        $this->assertCount(1, $should_be_fyodor);
+
+        $this->assertInstanceOf(Writer::class, $should_be_fyodor[0]);
+        $this->assertTrue($should_be_fyodor[0]->isLoaded());
+        $this->assertEquals('Fyodor Dostoyevsky', $should_be_fyodor[0]->getName());
     }
 
     /**
