@@ -71,3 +71,4 @@ Note that in the second case, `WriterGroup` type needs to be registered in the p
 ## To Do
 
 1. Caching
+2. Fix MySQL 5.6 installation on Travis CI
