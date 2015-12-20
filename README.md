@@ -31,6 +31,23 @@ Recently we added `ScrapInterface`. This interface should be implemented by mode
 
 ## Finder
 
+To set conditions, use `where` method:
+
+```php
+$pool->find(Writer::class)
+     ->where('`birthday` > ?', '1800-01-01')
+     ->ids();
+```
+
+This method can be called multiple times, and all conditions will be joined in one block with `AND` operator:
+
+```php
+$pool->find(Writer::class)
+     ->where('`birthday` > ?', '1800-01-01')
+     ->where('`birthday` < ?', '1825-01-01')
+     ->ids();
+```
+
 Finder can join a table, either by table name:
 
 ```php

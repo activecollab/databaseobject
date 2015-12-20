@@ -133,8 +133,8 @@ class FindTest extends WritersTypeTestCase
 
         $this->assertCount(2, $should_be_fyodor_and_leo);
 
-        $finder_2 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01')->where('birthday < ?', '1825-01-01');
-        $this->assertEquals("(`birthday` > '1800-01-01') AND (birthday < '1825-01-01')", $finder_2->getWhere());
+        $finder_2 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01')->where('`birthday` < ?', '1825-01-01');
+        $this->assertEquals("(`birthday` > '1800-01-01') AND (`birthday` < '1825-01-01')", $finder_2->getWhere());
 
         /** @var Writer[] $should_be_fyodor */
         $should_be_fyodor = $finder_2->all();
