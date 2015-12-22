@@ -245,7 +245,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                     /** @var Object|ObjectInterface $object */
                     $object = new $object_class($this->connection, $this, $this->log);
 
-                    if ($object instanceof ContainerInterface && $this->hasContainer()) {
+                    if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
                         $object->setContainer($this->getContainer());
                     }
 

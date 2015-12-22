@@ -51,8 +51,12 @@ class Producer implements ProducerInterface, ContainerAccessInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
-        /** @var ObjectInterface $object */
+        /** @var Object|ObjectInterface $object */
         $object = new $type($this->connection, $this->pool, $this->log);
+
+        if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
+            $object->setContainer($this->getContainer());
+        }
 
         if ($attributes) {
             foreach ($attributes as $k => $v) {
