@@ -6,7 +6,6 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use Psr\Log\LoggerInterface;
-use ReflectionClass;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -117,23 +116,5 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         } else {
             return $instance->delete();
         }
-    }
-
-    /**
-     * @var ReflectionClass[]
-     */
-    private $type_reflection_classes = [];
-
-    /**
-     * @param  string $type
-     * @return ReflectionClass
-     */
-    private function getTypeReflectionClass($type)
-    {
-        if (empty($this->type_reflection_classes[$type])) {
-            $this->type_reflection_classes[$type] = new ReflectionClass($type);
-        }
-
-        return $this->type_reflection_classes[$type];
     }
 }
