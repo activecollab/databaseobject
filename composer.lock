@@ -4,16 +4,22 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "0e515425a128261b991bc8bbfd39c699",
-    "content-hash": "497af3da8393c0e2c8d396f45179066c",
+    "hash": "75956f5f6e7c87f251289fe31d1a06e9",
+    "content-hash": "8982b222f5ea2a3fcb500611994f8044",
     "packages": [
         {
             "name": "activecollab/containeraccess",
-            "version": "dev-master",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
-                "url": "/Users/ilija/Projects/Components/ContainerAccess",
+                "url": "https://github.com/activecollab/containeraccess.git",
                 "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/activecollab/containeraccess/zipball/640a9742f29b62ace7dfe68b7f92deb76b130908",
+                "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908",
+                "shasum": ""
             },
             "require": {
                 "container-interop/container-interop": "~1.1.0",
@@ -28,11 +34,7 @@
                     "ActiveCollab\\ContainerAccess\\": "src"
                 }
             },
-            "autoload-dev": {
-                "psr-4": {
-                    "ActiveCollab\\ContainerAccess\\Test\\": "test/src"
-                }
-            },
+            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -56,22 +58,24 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "e57bcdee1a0a28ffcb66d46ca36626a34bb95d15"
+                "reference": "c1bf7728a2184a6fc5c2bbcf5db22762a83776db"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/e57bcdee1a0a28ffcb66d46ca36626a34bb95d15",
-                "reference": "e57bcdee1a0a28ffcb66d46ca36626a34bb95d15",
+                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/c1bf7728a2184a6fc5c2bbcf5db22762a83776db",
+                "reference": "c1bf7728a2184a6fc5c2bbcf5db22762a83776db",
                 "shasum": ""
             },
             "require": {
+                "activecollab/containeraccess": "~1.0.0",
                 "activecollab/datevalue": "~1.0.0",
                 "ext-mysqli": "*",
                 "php": ">=5.6.0",
                 "psr/log": "~1.0.0"
             },
             "require-dev": {
-                "phpunit/phpunit": "~5.0"
+                "phpunit/phpunit": "~5.0",
+                "pimple/pimple": "~3.0.0"
             },
             "type": "library",
             "autoload": {
@@ -96,7 +100,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "time": "2015-12-13 14:29:22"
+            "time": "2015-12-22 22:33:56"
         },
         {
             "name": "activecollab/datevalue",
@@ -1578,7 +1582,6 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
-        "activecollab/containeraccess": 20,
         "activecollab/databaseconnection": 20
     },
     "prefer-stable": true,
