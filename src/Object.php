@@ -2,8 +2,9 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
+use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;

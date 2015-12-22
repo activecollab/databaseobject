@@ -2,11 +2,11 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
+use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
-use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use LogicException;

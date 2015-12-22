@@ -1,7 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
-use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation;
+use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;

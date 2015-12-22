@@ -1,9 +1,10 @@
 <?php
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
+use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
