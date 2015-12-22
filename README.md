@@ -70,7 +70,7 @@ Note that in the second case, `WriterGroup` type needs to be registered in the p
 
 ## DI Container
 
-Pool implements `ActiveCollab\ContainerAccessInterface`, so you can set any container that implements `Interop\Container\ContainerInterface` interface, and that container will be passed on and made available in finders, producers and objects:
+Pool implements `ActiveCollab\ContainerAccess\ContainerAccessInterface`, so you can set any container that implements `Interop\Container\ContainerInterface` interface, and that container will be passed on and made available in finders, producers and objects:
 
 ```php
 $container = new Container([
