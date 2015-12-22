@@ -4,7 +4,6 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
-use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
@@ -13,7 +12,7 @@ use ReflectionClass;
  */
 class Producer implements ProducerInterface, ContainerAccessInterface
 {
-    use ObjectConstructorArgsInterfaceImplementation, ContainerAccessInterfaceImplementation;
+    use ContainerAccessInterfaceImplementation;
 
     /**
      * @var ConnectionInterface
@@ -53,7 +52,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     public function &produce($type, array $attributes = null, $save = true)
     {
         /** @var ObjectInterface $object */
-        $object = $this->getTypeReflectionClass($type)->newInstanceArgs($this->getObjectConstructorArgs());
+        $object = new $type($this->connection, $this->pool, $this->log);
 
         if ($attributes) {
             foreach ($attributes as $k => $v) {

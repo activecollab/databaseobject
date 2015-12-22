@@ -5,7 +5,7 @@ namespace ActiveCollab\DatabaseObject;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-interface ProducerInterface extends ObjectConstructorArgsInterface
+interface ProducerInterface
 {
     /**
      * Produce new instance of $type

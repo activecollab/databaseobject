@@ -16,7 +16,7 @@ use RuntimeException;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Pool implements PoolInterface, ContainerAccessInterface
+class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
@@ -158,8 +158,6 @@ class Pool implements PoolInterface, ContainerAccessInterface
                 if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
                     $this->default_producer->setContainer($this->getContainer());
                 }
-
-                $this->default_producer->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type)); // @TODO
             }
 
             return $this->default_producer;
@@ -191,8 +189,6 @@ class Pool implements PoolInterface, ContainerAccessInterface
                 }
 
                 $this->producers[$registered_type] = $producer;
-
-                $this->producers[$registered_type]->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type)); // @TODO
             } else {
                 throw new LogicException("Producer for '$type' is already registered");
             }
@@ -432,8 +428,6 @@ class Pool implements PoolInterface, ContainerAccessInterface
             if ($finder instanceof ContainerAccessInterface && $this->hasContainer()) {
                 $finder->setContainer($this->getContainer());
             }
-
-            $finder->setObjectConstructorArgs($this->getObjectConstructorArgs($type));
 
             return $finder;
         } else {
@@ -751,19 +745,5 @@ class Pool implements PoolInterface, ContainerAccessInterface
         if ($class->getParentClass()) {
             $this->recursiveGetTraitNames($class->getParentClass(), $trait_names);
         }
-    }
-
-    // ---------------------------------------------------
-    //  Configure pool products and dependency injection
-    //  using constructor arguments
-    // ---------------------------------------------------
-
-    /**
-     * @param  string $registered_type
-     * @return array
-     */
-    public function getObjectConstructorArgs($registered_type)
-    {
-        return [&$this->connection, &$this, &$this->log];
     }
 }

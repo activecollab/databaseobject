@@ -4,7 +4,6 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
-use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -14,7 +13,7 @@ use Psr\Log\LoggerInterface;
  */
 class Finder implements FinderInterface, ContainerAccessInterface
 {
-    use ObjectConstructorArgsInterfaceImplementation, ContainerAccessInterfaceImplementation;
+    use ContainerAccessInterfaceImplementation;
 
     /**
      * @var ConnectionInterface
@@ -277,7 +276,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
             $return_by_value = $this->type;
         }
 
-        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, $this->getObjectConstructorArgs());
+        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
     }
 
     // ---------------------------------------------------

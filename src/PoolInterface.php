@@ -243,10 +243,4 @@ interface PoolInterface
      * @return string
      */
     public function getDefaultProducerClass();
-
-    /**
-     * @param  string $registered_type
-     * @return array
-     */
-    public function getObjectConstructorArgs($registered_type);
 }
