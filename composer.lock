@@ -4,9 +4,52 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "1223fa4eb1f1da504cb61f46bbbd6631",
-    "content-hash": "230d15ef4bce5338ea6a128010dd06de",
+    "hash": "0e515425a128261b991bc8bbfd39c699",
+    "content-hash": "497af3da8393c0e2c8d396f45179066c",
     "packages": [
+        {
+            "name": "activecollab/containeraccess",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "/Users/ilija/Projects/Components/ContainerAccess",
+                "reference": "640a9742f29b62ace7dfe68b7f92deb76b130908"
+            },
+            "require": {
+                "container-interop/container-interop": "~1.1.0",
+                "php": ">=5.6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "~5.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ActiveCollab\\ContainerAccess\\": "src"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "ActiveCollab\\ContainerAccess\\Test\\": "test/src"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ilija Studen",
+                    "email": "ilija.studen@activecollab.com"
+                }
+            ],
+            "description": "Interface that implement objects that have access DIC access",
+            "homepage": "https://labs.activecollab.com",
+            "keywords": [
+                "activecollab",
+                "dic"
+            ],
+            "time": "2015-12-22 21:47:02"
+        },
         {
             "name": "activecollab/databaseconnection",
             "version": "dev-next",
@@ -1535,6 +1578,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "activecollab/containeraccess": 20,
         "activecollab/databaseconnection": 20
     },
     "prefer-stable": true,

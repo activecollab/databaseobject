@@ -12,13 +12,19 @@
       "email": "ilija.studen@activecollab.com"
     }
   ],
+  "repositories": [
+    {
+      "type": "vcs",
+      "url": "/Users/ilija/Projects/Components/ContainerAccess"
+    }
+  ],
   "require" : {
     "php": ">=5.6.0",
+    "activecollab/containeraccess" : "dev-master",
     "activecollab/databaseconnection" : "dev-next",
     "activecollab/etag" : "~1.0",
     "doctrine/inflector" : "~1.0",
-    "psr/log" : "~1.0.0",
-    "container-interop/container-interop" : "~1.1.0"
+    "psr/log" : "~1.0.0"
   },
   "require-dev" : {
     "phpunit/phpunit": "~5.0",
