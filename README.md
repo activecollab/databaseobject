@@ -68,6 +68,22 @@ $pool->find(Writer::class)
 
 Note that in the second case, `WriterGroup` type needs to be registered in the pool.
 
+## DI Container
+
+Pool implements `ActiveCollab\ContainerAccessInterface`, so you can set any container that implements `Interop\Container\ContainerInterface` interface, and that container will be passed on and made available in finders, producers and objects:
+
+```php
+$container = new Container([
+    'dependency' => 'it works!',
+]);
+
+$pool->setContainer($container);
+
+foreach ($pool->find(Writer::class)->all() as $writer) {
+    print $writer->dependency . "\n"; // Prints it works!
+}
+```
+
 ## To Do
 
 1. Caching
