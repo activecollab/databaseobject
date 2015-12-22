@@ -30,6 +30,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
      */
     public function testGetByIdInstantination()
     {
+        /** @var Writer $special_writer */
         $special_writer = $this->pool->getById(Writer::class, 1);
 
         $this->assertInstanceOf(Writer::class, $special_writer);
@@ -42,6 +43,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
      */
     public function testFindIdInstantination()
     {
+        /** @var Writer $special_writer */
         $special_writer = $this->pool->find(Writer::class)->where('id = ?', 1)->first();
 
         $this->assertInstanceOf(Writer::class, $special_writer);
@@ -53,6 +55,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
      */
     public function testInstantinationUsingProducer()
     {
+        /** @var Writer $special_writer */
         $special_writer = $this->pool->produce(Writer::class, [
             'name' => 'Special Writer',
             'birthday' => '2013-10-02',

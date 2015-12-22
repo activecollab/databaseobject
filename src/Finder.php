@@ -277,7 +277,11 @@ class Finder implements FinderInterface, ContainerAccessInterface
             $return_by_value = $this->type;
         }
 
-        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
+        if ($this->hasContainer()) {
+            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log], $this->getContainer());
+        } else {
+            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
+        }
     }
 
     // ---------------------------------------------------

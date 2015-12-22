@@ -11,6 +11,8 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
 use Psr\Log\LoggerInterface;
 
 /**
+ * @property string $is_special
+ *
  * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
  */
 class Writer extends BaseWriter implements ScrapInterface
