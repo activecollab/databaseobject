@@ -3,17 +3,17 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
-use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Producer implements ProducerInterface
+class Producer implements ProducerInterface, ContainerAccessInterface
 {
-    use ObjectConstructorArgsInterfaceImplementation;
+    use ObjectConstructorArgsInterfaceImplementation, ContainerAccessInterfaceImplementation;
 
     /**
      * @var ConnectionInterface

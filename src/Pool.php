@@ -3,8 +3,10 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use Interop\Container\ContainerInterface;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use LogicException;
@@ -14,8 +16,10 @@ use RuntimeException;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Pool implements PoolInterface
+class Pool implements PoolInterface, ContainerAccessInterface
 {
+    use ContainerAccessInterfaceImplementation;
+
     /**
      * @var ConnectionInterface
      */
@@ -147,14 +151,29 @@ class Pool implements PoolInterface
     {
         if (empty($this->producers[$registered_type])) {
             if (empty($this->default_producer)) {
-                $this->default_producer = (new ReflectionClass($this->getDefaultProducerClass()))->newInstanceArgs($this->getProducerConstructorArgs());
-                $this->default_producer->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type));
+                $default_producer_class = $this->getDefaultProducerClass();
+
+                $this->default_producer = new $default_producer_class($this->connection, $this);
+
+                if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
+                    $this->default_producer->setContainer($this->getContainer());
+                }
+
+                $this->default_producer->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type)); // @TODO
             }
 
             return $this->default_producer;
         } else {
             return $this->producers[$registered_type];
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultProducerClass()
+    {
+        return Producer::class;
     }
 
     /**
@@ -167,8 +186,13 @@ class Pool implements PoolInterface
     {
         if ($registered_type = $this->getRegisteredType($type)) {
             if (empty($this->producers[$registered_type])) {
+                if ($producer instanceof ContainerAccessInterface && $this->hasContainer()) {
+                    $producer->setContainer($this->getContainer());
+                }
+
                 $this->producers[$registered_type] = $producer;
-                $this->producers[$registered_type]->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type));
+
+                $this->producers[$registered_type]->setObjectConstructorArgs($this->getObjectConstructorArgs($registered_type)); // @TODO
             } else {
                 throw new LogicException("Producer for '$type' is already registered");
             }
@@ -189,12 +213,7 @@ class Pool implements PoolInterface
             $producer_class_reflection = new ReflectionClass($producer_class);
 
             if ($producer_class_reflection->implementsInterface(ProducerInterface::class)) {
-                /** @var ProducerInterface $producer */
-                if ($producer = $producer_class_reflection->newInstanceArgs($this->getProducerConstructorArgs())) {
-                    $this->registerProducer($type, $producer);
-                } else {
-                    throw new RuntimeException("Failed to construct a new '$producer_class' producer");
-                }
+                $this->registerProducer($type, new $producer_class($this->connection, $this));
             } else {
                 throw new InvalidArgumentException("Class '$producer_class' does not implement '" . ProducerInterface::class . "' interface");
             }
@@ -227,8 +246,13 @@ class Pool implements PoolInterface
                 if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
                     $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
 
-                    /** @var ObjectInterface $object */
-                    $object = (new ReflectionClass($object_class))->newInstanceArgs($this->getObjectConstructorArgs($registered_type));
+                    /** @var Object|ObjectInterface $object */
+                    $object = new $object_class($this->connection, $this, $this->log);
+
+                    if ($object instanceof ContainerInterface && $this->hasContainer()) {
+                        $object->setContainer($this->getContainer());
+                    }
+
                     $object->loadFromRow($row);
 
                     return $this->addToObjectPool($registered_type, $id, $object);
@@ -400,14 +424,29 @@ class Pool implements PoolInterface
     public function find($type)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
+            $default_finder_class = $this->getDefaultFinderClass();
+
             /** @var Finder $finder */
-            $finder = (new ReflectionClass($this->getDefaultFinderClass()))->newInstanceArgs($this->getFinderConstructorArgs($registered_type));
+            $finder = new $default_finder_class($this->connection, $this, $this->log, $registered_type);
+
+            if ($finder instanceof ContainerAccessInterface && $this->hasContainer()) {
+                $finder->setContainer($this->getContainer());
+            }
+
             $finder->setObjectConstructorArgs($this->getObjectConstructorArgs($type));
 
             return $finder;
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getDefaultFinderClass()
+    {
+        return Finder::class;
     }
 
     /**
@@ -718,41 +757,6 @@ class Pool implements PoolInterface
     //  Configure pool products and dependency injection
     //  using constructor arguments
     // ---------------------------------------------------
-
-    /**
-     * @return string
-     */
-    public function getDefaultFinderClass()
-    {
-        return Finder::class;
-    }
-
-    /**
-     * @param  string $registered_type
-     * @return array
-     */
-    public function getFinderConstructorArgs($registered_type)
-    {
-        return [&$this->connection, &$this, &$this->log, $registered_type];
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultProducerClass()
-    {
-        return Producer::class;
-    }
-
-    /**
-     * Return producer constructor arguments
-     *
-     * @return array
-     */
-    public function getProducerConstructorArgs()
-    {
-        return [&$this->connection, &$this];
-    }
 
     /**
      * @param  string $registered_type

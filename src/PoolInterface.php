@@ -240,22 +240,9 @@ interface PoolInterface
     public function getDefaultFinderClass();
 
     /**
-     * @param  string $registered_type
-     * @return array
-     */
-    public function getFinderConstructorArgs($registered_type);
-
-    /**
      * @return string
      */
     public function getDefaultProducerClass();
-
-    /**
-     * Return producer constructor arguments
-     *
-     * @return array
-     */
-    public function getProducerConstructorArgs();
 
     /**
      * @param  string $registered_type

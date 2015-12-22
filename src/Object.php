@@ -3,6 +3,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
@@ -15,8 +16,10 @@ use Psr\Log\LoggerInterface;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-abstract class Object implements ObjectInterface
+abstract class Object implements ObjectInterface, ContainerAccessInterface
 {
+    use ContainerAccessInterfaceImplementation;
+
     /**
      * @var ConnectionInterface
      */

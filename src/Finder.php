@@ -3,6 +3,7 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
@@ -11,9 +12,9 @@ use Psr\Log\LoggerInterface;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Finder implements FinderInterface
+class Finder implements FinderInterface, ContainerAccessInterface
 {
-    use ObjectConstructorArgsInterfaceImplementation;
+    use ObjectConstructorArgsInterfaceImplementation, ContainerAccessInterfaceImplementation;
 
     /**
      * @var ConnectionInterface

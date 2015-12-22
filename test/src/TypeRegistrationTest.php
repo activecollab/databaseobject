@@ -1,6 +1,7 @@
 <?php
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\ContainerAccessInterface\Implementation;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
@@ -188,6 +189,10 @@ class TypeRegistrationTest extends TestCase
         $trait_names = $this->pool->getTraitNamesByType(Writer::class);
 
         $this->assertInternalType('array', $trait_names);
-        $this->assertEquals([Russian::class, ClassicWriter::class], $trait_names);
+        $this->assertCount(3, $trait_names);
+
+        $this->assertContains(Implementation::class, $trait_names);
+        $this->assertContains(Russian::class, $trait_names);
+        $this->assertContains(ClassicWriter::class, $trait_names);
     }
 }
