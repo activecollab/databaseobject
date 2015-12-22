@@ -7,8 +7,37 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-interface PoolInterface extends ProducerInterface
+interface PoolInterface
 {
+    /**
+     * Produce new instance of $type
+     *
+     * @param  string          $type
+     * @param  array|null      $attributes
+     * @param  boolean         $save
+     * @return ObjectInterface
+     */
+    public function &produce($type, array $attributes = null, $save = true);
+
+    /**
+     * Update an instance
+     *
+     * @param  ObjectInterface $instance
+     * @param  array|null      $attributes
+     * @param  boolean         $save
+     * @return ObjectInterface
+     */
+    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true);
+
+    /**
+     * Scrap an instance (move it to trash, if object supports, or delete it)
+     *
+     * @param  ObjectInterface $instance
+     * @param  boolean         $force_delete
+     * @return ObjectInterface
+     */
+    public function &scrap(ObjectInterface &$instance, $force_delete = false);
+
     /**
      * Register producer instance for the given type
      *
@@ -204,4 +233,33 @@ interface PoolInterface extends ProducerInterface
      * @return array
      */
     public function getTraitNamesByType($type);
+
+    /**
+     * @return string
+     */
+    public function getDefaultFinderClass();
+
+    /**
+     * @param  string $registered_type
+     * @return array
+     */
+    public function getFinderConstructorArgs($registered_type);
+
+    /**
+     * @return string
+     */
+    public function getDefaultProducerClass();
+
+    /**
+     * Return producer constructor arguments
+     *
+     * @return array
+     */
+    public function getProducerConstructorArgs();
+
+    /**
+     * @param  string $registered_type
+     * @return array
+     */
+    public function getObjectConstructorArgs($registered_type);
 }

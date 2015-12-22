@@ -1,4 +1,5 @@
 <?php
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseObject\Exception\ValidationException;

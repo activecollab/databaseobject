@@ -5,7 +5,7 @@ namespace ActiveCollab\DatabaseObject;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-interface FinderInterface
+interface FinderInterface extends ObjectConstructorArgsInterface
 {
     /**
      * @return string

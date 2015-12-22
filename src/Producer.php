@@ -3,13 +3,18 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
+use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
+use ReflectionClass;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
 class Producer implements ProducerInterface
 {
+    use ObjectConstructorArgsInterfaceImplementation;
+
     /**
      * @var ConnectionInterface
      */
@@ -48,7 +53,7 @@ class Producer implements ProducerInterface
     public function &produce($type, array $attributes = null, $save = true)
     {
         /** @var ObjectInterface $object */
-        $object = new $type($this->connection, $this->pool, $this->log);
+        $object = $this->getTypeReflectionClass($type)->newInstanceArgs($this->getObjectConstructorArgs());
 
         if ($attributes) {
             foreach ($attributes as $k => $v) {
@@ -108,5 +113,23 @@ class Producer implements ProducerInterface
         } else {
             return $instance->delete();
         }
+    }
+
+    /**
+     * @var ReflectionClass[]
+     */
+    private $type_reflection_classes = [];
+
+    /**
+     * @param  string $type
+     * @return ReflectionClass
+     */
+    private function getTypeReflectionClass($type)
+    {
+        if (empty($this->type_reflection_classes[$type])) {
+            $this->type_reflection_classes[$type] = new ReflectionClass($type);
+        }
+
+        return $this->type_reflection_classes[$type];
     }
 }

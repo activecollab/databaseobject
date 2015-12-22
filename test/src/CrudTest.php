@@ -1,4 +1,5 @@
 <?php
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;

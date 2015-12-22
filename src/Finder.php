@@ -3,6 +3,7 @@ namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseObject\ObjectConstructorArgsInterface\Implementation as ObjectConstructorArgsInterfaceImplementation;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -10,8 +11,10 @@ use Psr\Log\LoggerInterface;
 /**
  * @package ActiveCollab\DatabaseObject
  */
-class Finder
+class Finder implements FinderInterface
 {
+    use ObjectConstructorArgsInterfaceImplementation;
+
     /**
      * @var ConnectionInterface
      */
@@ -273,7 +276,7 @@ class Finder
             $return_by_value = $this->type;
         }
 
-        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
+        return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, $this->getObjectConstructorArgs());
     }
 
     // ---------------------------------------------------
