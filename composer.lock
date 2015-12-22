@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "07113d01c93374b07234814518861a7f",
-    "content-hash": "10a7b378d437505d95bca1d99eab96a7",
+    "hash": "89489efca86fe828b1913f4417a4837a",
+    "content-hash": "c4e247bb2db38c48195e158056b170f8",
     "packages": [
         {
             "name": "activecollab/databaseconnection",
@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "7229fcb0343cae1471a6c13d0c07d43d49658fa0"
+                "reference": "e57bcdee1a0a28ffcb66d46ca36626a34bb95d15"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/7229fcb0343cae1471a6c13d0c07d43d49658fa0",
-                "reference": "7229fcb0343cae1471a6c13d0c07d43d49658fa0",
+                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/e57bcdee1a0a28ffcb66d46ca36626a34bb95d15",
+                "reference": "e57bcdee1a0a28ffcb66d46ca36626a34bb95d15",
                 "shasum": ""
             },
             "require": {
@@ -53,7 +53,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "time": "2015-12-13 14:07:41"
+            "time": "2015-12-13 14:29:22"
         },
         {
             "name": "activecollab/datevalue",
@@ -146,6 +146,33 @@
                 "activecollab"
             ],
             "time": "2015-11-09 09:18:16"
+        },
+        {
+            "name": "container-interop/container-interop",
+            "version": "1.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/container-interop/container-interop.git",
+                "reference": "fc08354828f8fd3245f77a66b9e23a6bca48297e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/container-interop/container-interop/zipball/fc08354828f8fd3245f77a66b9e23a6bca48297e",
+                "reference": "fc08354828f8fd3245f77a66b9e23a6bca48297e",
+                "shasum": ""
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Interop\\Container\\": "src/Interop/Container/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
+            "time": "2014-12-30 15:22:37"
         },
         {
             "name": "doctrine/inflector",
