@@ -147,10 +147,11 @@ class ValidationException extends Exception
     /**
      * Add error to array
      *
-     * @param string $error Error message
-     * @param string $field
+     * @param  string $error
+     * @param  string $field
+     * @return $this
      */
-    public function addError($error, $field = self::ANY_FIELD)
+    public function &addError($error, $field = self::ANY_FIELD)
     {
         if (empty($field)) {
             $field = self::ANY_FIELD;
@@ -161,5 +162,7 @@ class ValidationException extends Exception
         }
 
         $this->errors[$field][] = $error;
+
+        return $this;
     }
 }
