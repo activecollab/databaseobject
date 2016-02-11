@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -42,16 +48,16 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Produce new instance of $type
+     * Produce new instance of $type.
      *
      * @param  string          $type
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
-        /** @var Object|ObjectInterface $object */
+        /** @var object|ObjectInterface $object */
         $object = new $type($this->connection, $this->pool, $this->log);
 
         if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
@@ -76,11 +82,11 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Update an instance
+     * Update an instance.
      *
      * @param  ObjectInterface $instance
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
@@ -103,10 +109,10 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Scrap an instance (move it to trash, if object can be trashed, or delete it)
+     * Scrap an instance (move it to trash, if object can be trashed, or delete it).
      *
      * @param  ObjectInterface $instance
-     * @param  boolean         $force_delete
+     * @param  bool            $force_delete
      * @return ObjectInterface
      */
     public function &scrap(ObjectInterface &$instance, $force_delete = false)

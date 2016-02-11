@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
@@ -12,7 +18,7 @@ use ActiveCollab\DatabaseObject\Validator;
 class EmailValidatorTest extends TestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -23,7 +29,7 @@ class EmailValidatorTest extends TestCase
     }
 
     /**
-     * Test if valid email address passes validation
+     * Test if valid email address passes validation.
      */
     public function testValidEmailAddressPassesValidation()
     {
@@ -41,7 +47,7 @@ class EmailValidatorTest extends TestCase
     }
 
     /**
-     * Test if invalid email address does not pass email validation
+     * Test if invalid email address does not pass email validation.
      */
     public function testInvalidEmailAddressFailsValidation()
     {
@@ -59,7 +65,7 @@ class EmailValidatorTest extends TestCase
     }
 
     /**
-     * Test if NULL value passes validation when it is allowed
+     * Test if NULL value passes validation when it is allowed.
      */
     public function testNullPassesValidationWhenAllowed()
     {
@@ -77,7 +83,7 @@ class EmailValidatorTest extends TestCase
     }
 
     /**
-     * Test if NULL value fails validation when it is not allowed
+     * Test if NULL value fails validation when it is not allowed.
      */
     public function testNullFailsValidationWhenNotAllowed()
     {

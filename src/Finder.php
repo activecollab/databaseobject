@@ -1,10 +1,17 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
+use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -47,12 +54,12 @@ class Finder implements FinderInterface, ContainerAccessInterface
     private $order_by;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $offset;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $limit;
 
@@ -60,7 +67,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @var string
      */
     private $join;
-    
+
     /**
      * @param PoolInterface        $pool
      * @param ConnectionInterface  $connection
@@ -89,9 +96,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Set finder conditions
+     * Set finder conditions.
      *
-     * @param  string $pattern
+     * @param string $pattern
      * @param  mixed  ...$arguments
      * @return $this
      */
@@ -113,7 +120,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return where part of the query
+     * Return where part of the query.
      */
     public function getWhere()
     {
@@ -123,7 +130,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
             case 1:
                 return $this->where[0];
             default:
-                return implode(' AND ', array_map(function($condition) {
+                return implode(' AND ', array_map(function ($condition) {
                     return "($condition)";
                 }, $this->where));
         }
@@ -141,8 +148,8 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  integer $offset
-     * @param  integer $limit
+     * @param  int   $offset
+     * @param  int   $limit
      * @return $this
      */
     public function &limit($offset, $limit)
@@ -158,7 +165,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  string $field_name
      * @return $this
      */
-    public function &join($type, $field_name = null)
+    public function &implode($type, $field_name = null)
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
@@ -197,9 +204,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Return number of records that match the given criteria
+     * Return number of records that match the given criteria.
      *
-     * @return integer
+     * @return int
      */
     public function count()
     {
@@ -219,9 +226,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return all records that match the given criteria
+     * Return all records that match the given criteria.
      *
-     * @return Result|Object[]|null
+     * @return Result|object[]|null
      */
     public function all()
     {
@@ -229,9 +236,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return first record that matches the given criteria
+     * Return first record that matches the given criteria.
      *
-     * @return Object|null
+     * @return object|null
      */
     public function first()
     {
@@ -249,9 +256,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array of ID-s that match the given criteria
+     * Return array of ID-s that match the given criteria.
      *
-     * @return integer[]
+     * @return int[]
      */
     public function ids()
     {
@@ -261,7 +268,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Prepare SQL and load one or more records
+     * Prepare SQL and load one or more records.
      *
      * @return mixed
      */
@@ -289,12 +296,12 @@ class Finder implements FinderInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * @var boolean
+     * @var bool
      */
     private $load_by_type_field;
 
     /**
-     * Check if we should load by type field or by type class
+     * Check if we should load by type field or by type class.
      *
      * @return bool
      */
@@ -308,7 +315,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Prepare select one or more rows query
+     * Prepare select one or more rows query.
      *
      * @return string
      */
@@ -318,7 +325,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return select ID-s SQL
+     * Return select ID-s SQL.
      *
      * @return string
      */
@@ -328,7 +335,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Construct SELECT query for the given fields based on set criteria
+     * Construct SELECT query for the given fields based on set criteria.
      *
      * @param  string $escaped_field_names
      * @return string

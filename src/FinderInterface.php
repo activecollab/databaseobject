@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 /**
@@ -17,9 +23,9 @@ interface FinderInterface
     // ---------------------------------------------------
 
     /**
-     * Set finder conditions
+     * Set finder conditions.
      *
-     * @param  string $pattern
+     * @param string $pattern
      * @param  mixed  ...$arguments
      * @return $this
      */
@@ -32,8 +38,8 @@ interface FinderInterface
     public function &orderBy($order_by);
 
     /**
-     * @param  integer $offset
-     * @param  integer $limit
+     * @param  int   $offset
+     * @param  int   $limit
      * @return $this
      */
     public function &limit($offset, $limit);
@@ -43,7 +49,7 @@ interface FinderInterface
      * @param  string $field_name
      * @return $this
      */
-    public function &join($type, $field_name = null);
+    public function &implode($type, $field_name = null);
 
     /**
      * @param  string $table_name
@@ -57,35 +63,35 @@ interface FinderInterface
     // ---------------------------------------------------
 
     /**
-     * Return number of records that match the given criteria
+     * Return number of records that match the given criteria.
      *
-     * @return integer
+     * @return int
      */
     public function count();
 
     /**
-     * Return all records that match the given criteria
+     * Return all records that match the given criteria.
      *
      * @return \ActiveCollab\DatabaseConnection\Result\Result|ObjectInterface[]|null
      */
     public function all();
 
     /**
-     * Return first record that matches the given criteria
+     * Return first record that matches the given criteria.
      *
      * @return ObjectInterface|null
      */
     public function first();
 
     /**
-     * Return array of ID-s that match the given criteria
+     * Return array of ID-s that match the given criteria.
      *
-     * @return integer[]
+     * @return int[]
      */
     public function ids();
 
     /**
-     * Prepare SQL and load one or more records
+     * Prepare SQL and load one or more records.
      *
      * @return mixed
      */

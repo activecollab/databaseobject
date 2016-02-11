@@ -1,9 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
-use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 
 /**
@@ -27,12 +33,12 @@ class Validator implements ValidatorInterface
     private $table_name;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $object_id;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $old_object_id;
 
@@ -44,8 +50,8 @@ class Validator implements ValidatorInterface
     /**
      * @param ConnectionInterface $connection
      * @param string              $table_name
-     * @param integer|null        $object_id
-     * @param integer|null        $old_object_id
+     * @param int|null            $object_id
+     * @param int|null            $old_object_id
      * @param array               $field_values
      */
     public function __construct(ConnectionInterface $connection, $table_name, $object_id, $old_object_id, array $field_values)
@@ -58,13 +64,13 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Check if value of $field_name is present
+     * Check if value of $field_name is present.
      *
      * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are consdiered
      * to be present (because we check strlen(trim($value)).
      *
-     * @param  string  $field_name
-     * @return boolean
+     * @param  string $field_name
+     * @return bool
      */
     public function present($field_name)
     {
@@ -92,7 +98,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Fail presence validation
+     * Fail presence validation.
      *
      * @param  string $field_name
      * @return bool
@@ -100,6 +106,7 @@ class Validator implements ValidatorInterface
     private function failPresenceValidation($field_name)
     {
         $this->addFieldError($field_name, "Value of '$field_name' is required");
+
         return false;
     }
 
@@ -112,14 +119,14 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Check if value that we are trying to save is unique in the given context
+     * Check if value that we are trying to save is unique in the given context.
      *
      * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
      * raising an error
      *
-     * @param  string                   $field_name
+     * @param string $field_name
      * @param  string                   ...$context
-     * @return boolean
+     * @return bool
      * @throws InvalidArgumentException
      */
     public function unique($field_name, ...$context)
@@ -128,15 +135,15 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Check if value that we are trying to save is unique in the given context
+     * Check if value that we are trying to save is unique in the given context.
      *
      * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
      * raising an error
      *
-     * @param  string                   $field_name
-     * @param  array|string             $where
+     * @param string       $field_name
+     * @param array|string $where
      * @param  string                   ...$context
-     * @return boolean
+     * @return bool
      * @throws InvalidArgumentException
      */
     public function uniqueWhere($field_name, $where, ...$context)
@@ -178,7 +185,6 @@ class Validator implements ValidatorInterface
             } else {
                 $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
             }
-
         }
 
         $conditions = implode(' AND ', $conditions);
@@ -193,7 +199,7 @@ class Validator implements ValidatorInterface
             if (empty($context)) {
                 $this->addFieldError($field_name, "Value of '$field_name' needs to be unique");
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', array_map(function($field_name) {
+                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', array_map(function ($field_name) {
                    return "'$field_name'";
                 }, $context)));
             }
@@ -205,9 +211,9 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Field value needs to be present and unique
+     * Field value needs to be present and unique.
      *
-     * @param  string $field_name
+     * @param string $field_name
      * @param  string ...$context
      * @return bool
      */
@@ -221,10 +227,10 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Field value needs to be present and unique
+     * Field value needs to be present and unique.
      *
-     * @param  string       $field_name
-     * @param  array|string $where
+     * @param string       $field_name
+     * @param array|string $where
      * @param  string       ...$context
      * @return bool
      */
@@ -238,7 +244,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Validate email address value
+     * Validate email address value.
      *
      * @param  string     $field_name
      * @param  bool|false $allow_null
@@ -259,6 +265,7 @@ class Validator implements ValidatorInterface
                 return true;
             } else {
                 $this->addFieldError($field_name, "Value of '$field_name' is not a valid email address");
+
                 return false;
             }
         } else {
@@ -267,7 +274,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Validate URL value
+     * Validate URL value.
      *
      * @param  string     $field_name
      * @param  bool|false $allow_null
@@ -288,6 +295,7 @@ class Validator implements ValidatorInterface
                 return true;
             } else {
                 $this->addFieldError($field_name, "Value of '$field_name' is not a valid URL");
+
                 return false;
             }
         } else {
@@ -344,7 +352,7 @@ class Validator implements ValidatorInterface
         foreach ($this->errors as $field => $error_messages) {
             foreach ($error_messages as $error_message) {
                 $first_messages[] = $error_message;
-                $counter++;
+                ++$counter;
 
                 if ($counter > 3) {
                     break 2;

@@ -1,10 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Validator;
-use ActiveCollab\DatabaseObject\Exception\ValidationException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -12,7 +18,7 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
 class ValidatorTest extends WritersTypeTestCase
 {
     /**
-     * Test if validator properly produces and populates ValidationException
+     * Test if validator properly produces and populates ValidationException.
      */
     public function testValidatorException()
     {

@@ -1,9 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Collection;
 
-use ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseObject\ObjectInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
@@ -20,14 +26,14 @@ abstract class Type extends Collection
     private $registered_type;
 
     /**
-     * Return type that this collection works with
+     * Return type that this collection works with.
      *
      * @return string
      */
     abstract public function getType();
 
     /**
-     * Return registered type
+     * Return registered type.
      *
      * @return string
      */
@@ -49,7 +55,7 @@ abstract class Type extends Collection
     // ---------------------------------------------------
 
     /**
-     * Return true if this object can be tagged and cached on client side
+     * Return true if this object can be tagged and cached on client side.
      *
      * @return bool|null
      */
@@ -59,17 +65,17 @@ abstract class Type extends Collection
     }
 
     /**
-     * Cached tag value
+     * Cached tag value.
      *
      * @var string
      */
     private $tag = false;
 
     /**
-     * Return collection etag
+     * Return collection etag.
      *
-     * @param  string  $visitor_identifier
-     * @param  boolean $use_cache
+     * @param  string $visitor_identifier
+     * @param  bool   $use_cache
      * @return string
      */
     public function getEtag($visitor_identifier, $use_cache = true)
@@ -92,14 +98,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Cached time stamp field name
+     * Cached time stamp field name.
      *
      * @var string|bool
      */
     private $timestamp_field = null;
 
     /**
-     * Return timestamp field name
+     * Return timestamp field name.
      *
      * @return string|bool
      */
@@ -121,7 +127,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return timestamp hash
+     * Return timestamp hash.
      *
      * @param  string $timestamp_field
      * @return string
@@ -141,7 +147,6 @@ abstract class Type extends Collection
             } else {
                 return sha1($this->connection->executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $conditions"));
             }
-
         }
 
         return sha1(get_class($this));
@@ -152,7 +157,7 @@ abstract class Type extends Collection
     // ---------------------------------------------------
 
     /**
-     * Run the query and return DB result
+     * Run the query and return DB result.
      *
      * @return ResultInterface|ObjectInterface[]
      */
@@ -186,12 +191,12 @@ abstract class Type extends Collection
     }
 
     /**
-     * @var integer[]
+     * @var int[]
      */
     private $ids = false;
 
     /**
-     * Return ID-s of matching records
+     * Return ID-s of matching records.
      *
      * @return array
      */
@@ -213,7 +218,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return number of items that will be displayed on the current page of paginated collection (or total, if collection is not paginated)
+     * Return number of items that will be displayed on the current page of paginated collection (or total, if collection is not paginated).
      *
      * @return int
      */
@@ -223,7 +228,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * @param  bool $all_fields
+     * @param  bool   $all_fields
      * @return string
      */
     private function getSelectSql($all_fields = true)
@@ -251,9 +256,9 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return number of records that match conditions set by the collection
+     * Return number of records that match conditions set by the collection.
      *
-     * @return integer
+     * @return int
      */
     public function count()
     {
@@ -272,14 +277,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return model table name
+     * Return model table name.
      *
      * @var string
      */
     private $table_name;
 
     /**
-     * Return model table name
+     * Return model table name.
      *
      * @return mixed
      */
@@ -293,14 +298,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Cached order by value
+     * Cached order by value.
      *
      * @var string|null
      */
     private $order_by = false;
 
     /**
-     * Return order by
+     * Return order by.
      *
      * @return string|null
      */
@@ -314,7 +319,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Set how system should order records in this collection
+     * Set how system should order records in this collection.
      *
      * @param  string $value
      * @return $this
@@ -331,14 +336,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Collection conditions
+     * Collection conditions.
      *
      * @var string
      */
     private $conditions;
 
     /**
-     * Return conditions
+     * Return conditions.
      *
      * @return string|null
      */
@@ -348,7 +353,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Set collection conditions
+     * Set collection conditions.
      *
      * @param  mixed ...$arguments
      * @return $this
@@ -373,14 +378,14 @@ abstract class Type extends Collection
     // ---------------------------------------------------
 
     /**
-     * Name of the join table
+     * Name of the join table.
      *
      * @var string
      */
     private $join_table;
 
     /**
-     * Return join table name
+     * Return join table name.
      *
      * @return string
      */
@@ -390,15 +395,15 @@ abstract class Type extends Collection
     }
 
     /**
-     * Set join table name
+     * Set join table name.
      *
      * If $join_field is null, join field will be based on model name. There are two ways to specify it:
      *
      * 1. As string, where value is for target field and it will map with ID column of the source table,
      * 2. As array, where first element is ID in the source table and second element is field in target table
      *
-     * @param string            $table_name
-     * @param array|string|null $join_field
+     * @param  string            $table_name
+     * @param  array|string|null $join_field
      * @return $this
      */
     public function &setJoinTable($table_name, $join_field = null)
@@ -408,7 +413,7 @@ abstract class Type extends Collection
         if (empty($this->target_join_field)) {
             if (is_string($join_field) && $join_field) {
                 $this->setTargetJoinField($join_field);
-            } elseif(is_array($join_field)) {
+            } elseif (is_array($join_field)) {
                 if (count($join_field) == 2 && !empty($join_field[0]) && !empty($join_field[1])) {
                     $this->setSourceJoinField($join_field[0]);
                     $this->setTargetJoinField($join_field[1]);
@@ -430,7 +435,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Join field in source table
+     * Join field in source table.
      *
      * @var string
      */
@@ -456,14 +461,14 @@ abstract class Type extends Collection
     }
 
     /**
-     * Join with field name
+     * Join with field name.
      *
      * @var string
      */
     private $target_join_field;
 
     /**
-     * Return join field name
+     * Return join field name.
      *
      * @return string
      */
@@ -473,7 +478,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Set join field name
+     * Set join field name.
      *
      * @param  string $value
      * @return $this
@@ -486,7 +491,7 @@ abstract class Type extends Collection
     }
 
     /**
-     * Return join expression
+     * Return join expression.
      *
      * @return string|null
      */
@@ -505,7 +510,7 @@ abstract class Type extends Collection
     private $pre_execute_callback;
 
     /**
-     * Set a callback that will be triggered prior to collection execution
+     * Set a callback that will be triggered prior to collection execution.
      *
      * @param callable $callback
      */

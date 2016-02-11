@@ -1,9 +1,16 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DateValue\DateValue;
 
@@ -13,7 +20,7 @@ use ActiveCollab\DateValue\DateValue;
 class PoolProduceTest extends WritersTypeTestCase
 {
     /**
-     * Test if pool can produce an instance of registered type
+     * Test if pool can produce an instance of registered type.
      */
     public function testPoolCanProduceRegisteredType()
     {
@@ -26,7 +33,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if pool can produce a new instance of subclass of registered type
+     * Test if pool can produce a new instance of subclass of registered type.
      */
     public function testPoolCanProduceSubclassOfRegisteredType()
     {
@@ -40,7 +47,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if produce can set object attributes
+     * Test if produce can set object attributes.
      */
     public function testProduceCanSetAttributes()
     {
@@ -54,7 +61,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if produce saves objects by default
+     * Test if produce saves objects by default.
      */
     public function testProduceSavesByDefault()
     {
@@ -67,7 +74,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if produce can skip save when requested
+     * Test if produce can skip save when requested.
      */
     public function testProduceCanSkipSave()
     {
@@ -80,7 +87,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test produce() and save() calls save object to the pool
+     * Test produce() and save() calls save object to the pool.
      */
     public function testProduceSavesToObjectPool()
     {
@@ -94,7 +101,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if produced object can be forgotten
+     * Test if produced object can be forgotten.
      */
     public function testProducedObjectCanBeForgotten()
     {
@@ -113,7 +120,7 @@ class PoolProduceTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if updates to the object are reflected back to the pool
+     * Test if updates to the object are reflected back to the pool.
      */
     public function testProducedObjectUpdateIsSavedToPool()
     {
@@ -133,7 +140,7 @@ class PoolProduceTest extends WritersTypeTestCase
         $object->setName('Anton Pavlovich Chekhov');
         $object->save();
 
-        /** @var Writer $object_from_pool */
+        /* @var Writer $object_from_pool */
         $object_from_pool_second_take = $this->pool->getById(Writer::class, $object->getId());
         $this->assertInstanceOf(Writer::class, $object_from_pool_second_take);
         $this->assertEquals('Anton Pavlovich Chekhov', $object_from_pool_second_take->getName());

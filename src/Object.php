@@ -1,10 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
-use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
@@ -37,21 +43,21 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     protected $log;
 
     /**
-     * Name of the table
+     * Name of the table.
      *
      * @var string
      */
     protected $table_name;
 
     /**
-     * Primary key fields
+     * Primary key fields.
      *
      * @var array
      */
     protected $primary_key = 'id';
 
     /**
-     * Name of autoincrement field (if exists)
+     * Name of autoincrement field (if exists).
      *
      * @var string
      */
@@ -63,14 +69,14 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     protected $order_by = ['id'];
 
     /**
-     * Array of field names
+     * Array of field names.
      *
      * @var array
      */
     protected $fields;
 
     /**
-     * List of default field values
+     * List of default field values.
      *
      * @var array
      */
@@ -103,28 +109,28 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Indicates if this is new object (not saved)
+     * Indicates if this is new object (not saved).
      *
-     * @var boolean
+     * @var bool
      */
     private $is_new = true;
 
     /**
-     * This flag is set to true when data from row are inserted into fields
+     * This flag is set to true when data from row are inserted into fields.
      *
-     * @var boolean
+     * @var bool
      */
     private $is_loading = false;
 
     /**
-     * Field values
+     * Field values.
      *
      * @var array
      */
     private $values = [];
 
     /**
-     * Array of modified field values
+     * Array of modified field values.
      *
      * Elements of this array are populated on setter call. Real name is
      * resolved, old value is saved here (if exists) and new one is set. Keys
@@ -135,21 +141,21 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     private $old_values = [];
 
     /**
-     * Array of modified fiels
+     * Array of modified fiels.
      *
      * @var array
      */
     private $modified_fields = [];
 
     /**
-     * Primary key is updated
+     * Primary key is updated.
      *
-     * @var boolean
+     * @var bool
      */
     private $primary_key_modified = false;
 
     /**
-     * Validate object properties before object is saved
+     * Validate object properties before object is saved.
      *
      * This method is called before the item is saved and can be used to fetch
      * errors in data before we really save it database. $errors is instance of
@@ -164,13 +170,13 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Returns true if $var is the same object this object is
+     * Returns true if $var is the same object this object is.
      *
      * Comparison is done on class - PK values for loaded objects, or as simple
      * object comparison in case objects are not saved and loaded
      *
-     * @param  Object  $var
-     * @return boolean
+     * @param  object $var
+     * @return bool
      */
     public function is(&$var)
     {
@@ -192,7 +198,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return object attributes
+     * Return object attributes.
      *
      * This function will return array of attribute name -> attribute value pairs
      * for this specific project
@@ -211,7 +217,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return primary key columns
+     * Return primary key columns.
      *
      * @return array
      */
@@ -221,7 +227,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return value of table name
+     * Return value of table name.
      *
      * @return string
      */
@@ -235,7 +241,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Load data from database row
+     * Load data from database row.
      *
      * If $cache_row is set to true row data will be added to cache
      *
@@ -260,7 +266,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Save object into database (insert or update)
+     * Save object into database (insert or update).
      *
      * @return $this
      * @throws ValidationException
@@ -338,21 +344,21 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Delete specific object (and related objects if neccecery)
+     * Delete specific object (and related objects if neccecery).
      *
-     * @param  boolean $bulk
+     * @param  bool  $bulk
      * @return $this
      */
     public function &delete($bulk = false)
     {
         if ($this->isLoaded()) {
-            $this->connection->transact(function() use ($bulk) {
-                $this->triggerEvent('on_before_delete', [ $bulk ]);
+            $this->connection->transact(function () use ($bulk) {
+                $this->triggerEvent('on_before_delete', [$bulk]);
 
                 $this->connection->delete($this->table_name, $this->getWherePartById($this->getId()));
                 $this->is_new = true;
 
-                $this->triggerEvent('on_after_delete', [ $bulk ]);
+                $this->triggerEvent('on_after_delete', [$bulk]);
             });
         }
 
@@ -360,17 +366,17 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Create a copy of this object and optionally save it
+     * Create a copy of this object and optionally save it.
      *
-     * @param  boolean $save
-     * @return Object
+     * @param  bool   $save
+     * @return object
      */
     public function copy($save = false)
     {
         $object_class = get_class($this);
 
-        /**
-         * @var Object $copy
+        /*
+         * @var object
          */
         $copy = new $object_class();
 
@@ -392,9 +398,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Return value of $is_new variable
+     * Return value of $is_new variable.
      *
-     * @return boolean
+     * @return bool
      */
     public function isNew()
     {
@@ -402,9 +408,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Returns true if this object have row in database
+     * Returns true if this object have row in database.
      *
-     * @return boolean
+     * @return bool
      */
     public function isLoaded()
     {
@@ -412,7 +418,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Mark start of loading from row
+     * Mark start of loading from row.
      */
     private function startLoading()
     {
@@ -420,7 +426,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Done loading from row
+     * Done loading from row.
      */
     private function doneLoading()
     {
@@ -432,7 +438,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Set loaded stamp value
+     * Set loaded stamp value.
      */
     private function setAsLoaded()
     {
@@ -442,9 +448,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
 
     /**
      * Returns true if this object is in the middle of hydration process
-     * (loading values from database row)
+     * (loading values from database row).
      *
-     * @return boolean
+     * @return bool
      */
     protected function isLoading()
     {
@@ -456,9 +462,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Return object ID
+     * Return object ID.
      *
-     * @return integer
+     * @return int
      */
     public function getId()
     {
@@ -466,9 +472,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Set value of id field
+     * Set value of id field.
      *
-     * @param  integer $value
+     * @param  int   $value
      * @return $this
      */
     public function &setId($value)
@@ -479,10 +485,10 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if specific field is defined
+     * Check if specific field is defined.
      *
-     * @param  string  $field Field name
-     * @return boolean
+     * @param  string $field Field name
+     * @return bool
      */
     public function fieldExists($field)
     {
@@ -490,7 +496,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array of modified fields
+     * Return array of modified fields.
      *
      * @return array
      */
@@ -500,9 +506,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if this object has modified columns
+     * Check if this object has modified columns.
      *
-     * @return boolean
+     * @return bool
      */
     public function isModified()
     {
@@ -510,10 +516,10 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Returns true if specific field is modified
+     * Returns true if specific field is modified.
      *
-     * @param  string  $field
-     * @return boolean
+     * @param  string $field
+     * @return bool
      */
     public function isModifiedField($field)
     {
@@ -521,7 +527,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return true if primary key is modified
+     * Return true if primary key is modified.
      *
      * @return bool
      */
@@ -531,7 +537,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Revert field to old value
+     * Revert field to old value.
      *
      * @param $field
      */
@@ -547,10 +553,10 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if selected field is primary key
+     * Check if selected field is primary key.
      *
-     * @param  string  $field Field that need to be checked
-     * @return boolean
+     * @param  string $field Field that need to be checked
+     * @return bool
      */
     public function isPrimaryKey($field)
     {
@@ -558,7 +564,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return list of fields
+     * Return list of fields.
      */
     public function getFields()
     {
@@ -582,7 +588,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return old field values, before fields were updated
+     * Return old field values, before fields were updated.
      *
      * @return array
      */
@@ -592,7 +598,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return all field value
+     * Return all field value.
      *
      * @param  string $field
      * @return mixed
@@ -603,7 +609,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Set specific field value
+     * Set specific field value.
      *
      * Set value of the $field. This function will make sure that everything
      * runs fine - modifications are saved, in case of primary key old value
@@ -626,7 +632,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
             }
 
             if (!$this->isLoading()) {
-                $this->triggerEvent('on_prepare_field_value_before_set', [ $field, &$value ]);
+                $this->triggerEvent('on_prepare_field_value_before_set', [$field, &$value]);
             }
 
             if (!array_key_exists($field, $this->values) || ($this->values[$field] !== $value)) {
@@ -665,7 +671,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Set non-field value during DataManager::create() and DataManager::update() calls
+     * Set non-field value during DataManager::create() and DataManager::update() calls.
      *
      * @param  string $attribute
      * @param  mixed  $value
@@ -685,7 +691,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Use input $value and return a valid DateValue instance
+     * Use input $value and return a valid DateValue instance.
      *
      * @param  mixed          $value
      * @return DateValue|null
@@ -702,7 +708,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Use input $value and return a valid DateTimeValue instance
+     * Use input $value and return a valid DateTimeValue instance.
      *
      * @param  mixed              $value
      * @return DateTimeValue|null
@@ -723,7 +729,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Insert record in the database
+     * Insert record in the database.
      */
     private function insert()
     {
@@ -737,7 +743,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Update database record
+     * Update database record.
      */
     private function update()
     {
@@ -752,7 +758,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
                 $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
 
                 if ($this->pool->exists(get_class($this), $this->getId())) {
-                    throw new LogicException("Object #" . $this->getId() . " can't be overwritten");
+                    throw new LogicException('Object #' . $this->getId() . " can't be overwritten");
                 } else {
                     $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
                 }
@@ -765,9 +771,9 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return where part of query
+     * Return where part of query.
      *
-     * @param  integer $id
+     * @param  int    $id
      * @return string
      */
     private function getWherePartById($id)
@@ -780,7 +786,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Reset modification idicators
+     * Reset modification idicators.
      *
      * Useful when you use setXXX functions but you dont want to modify
      * anything (just loading data from database in fresh object using
@@ -797,14 +803,14 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Registered event handlers
+     * Registered event handlers.
      *
      * @var array
      */
     private $event_handlers = [];
 
     /**
-     * Register an internal event handler
+     * Register an internal event handler.
      *
      * @param string   $event
      * @param callable $handler
@@ -827,7 +833,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Trigger an internal event
+     * Trigger an internal event.
      *
      * @param string     $event
      * @param array|null $event_parameters
@@ -846,7 +852,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array or property => value pairs that describes this object
+     * Return array or property => value pairs that describes this object.
      *
      * @return array
      */
@@ -854,6 +860,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     {
         $result = ['id' => $this->getId(), 'type' => get_class($this)];
         $this->triggerEvent('on_json_serialize', [&$result]);
+
         return $result;
     }
 }

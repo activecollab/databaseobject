@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base;
 
 use ActiveCollab\DatabaseObject\Object;
@@ -11,21 +17,21 @@ use ActiveCollab\DatabaseObject\ValidatorInterface;
 abstract class User extends Object
 {
     /**
-     * Name of the table where records are stored
+     * Name of the table where records are stored.
      *
      * @var string
      */
     protected $table_name = 'users';
 
     /**
-     * All table fields
+     * All table fields.
      *
      * @var array
      */
     protected $fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
 
     /**
-     * List of default field values
+     * List of default field values.
      *
      * @var array
      */
@@ -36,7 +42,7 @@ abstract class User extends Object
     ];
 
     /**
-     * Return value of type field
+     * Return value of type field.
      *
      * @return string
      */
@@ -46,7 +52,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of type field
+     * Set value of type field.
      *
      * @param  string $value
      * @return $this
@@ -59,7 +65,7 @@ abstract class User extends Object
     }
 
     /**
-     * Return value of first_name field
+     * Return value of first_name field.
      *
      * @return string
      */
@@ -69,7 +75,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of first_name  field
+     * Set value of first_name  field.
      *
      * @param  string $value
      * @return $this
@@ -82,7 +88,7 @@ abstract class User extends Object
     }
 
     /**
-     * Return value of last_name field
+     * Return value of last_name field.
      *
      * @return string
      */
@@ -92,7 +98,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of last_name  field
+     * Set value of last_name  field.
      *
      * @param  string $value
      * @return $this
@@ -105,7 +111,7 @@ abstract class User extends Object
     }
 
     /**
-     * Return value of email field
+     * Return value of email field.
      *
      * @return string
      */
@@ -115,7 +121,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of email  field
+     * Set value of email  field.
      *
      * @param  string $value
      * @return $this
@@ -128,7 +134,7 @@ abstract class User extends Object
     }
 
     /**
-     * Return value of homepage_url field
+     * Return value of homepage_url field.
      *
      * @return string
      */
@@ -138,7 +144,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of homepage_url field
+     * Set value of homepage_url field.
      *
      * @param  string $value
      * @return $this
@@ -151,7 +157,7 @@ abstract class User extends Object
     }
 
     /**
-     * Return value of password field
+     * Return value of password field.
      *
      * @return string
      */
@@ -161,7 +167,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of password  field
+     * Set value of password  field.
      *
      * @param  string $value
      * @return $this
@@ -174,7 +180,7 @@ abstract class User extends Object
     }
 
     /**
-     * Set value of specific field
+     * Set value of specific field.
      *
      * @param  string                    $name
      * @param  mixed                     $value
@@ -205,7 +211,7 @@ abstract class User extends Object
     }
 
     /**
-     * Validate object properties before object is saved
+     * Validate object properties before object is saved.
      *
      * @param ValidatorInterface $validator
      */

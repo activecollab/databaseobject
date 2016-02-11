@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
@@ -12,21 +18,21 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 class ContainerPropagatesToObjectTest extends WritersTypeTestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
         parent::setUp();
 
         $this->pool->setContainer(new Container([
-            'is_special' => true
+            'is_special' => true,
         ]));
         $this->assertTrue($this->pool->hasContainer());
-        $this->assertInstanceOf(Container::class, $this->pool->getContainer());;
+        $this->assertInstanceOf(Container::class, $this->pool->getContainer());
     }
 
     /**
-     * Test instantination via getById() method
+     * Test instantination via getById() method.
      */
     public function testGetByIdInstantination()
     {
@@ -39,7 +45,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
     }
 
     /**
-     * Test instantination via finder
+     * Test instantination via finder.
      */
     public function testFindIdInstantination()
     {
@@ -51,7 +57,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
     }
 
     /**
-     * Test instantinaion using producer
+     * Test instantinaion using producer.
      */
     public function testInstantinationUsingProducer()
     {

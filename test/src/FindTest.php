@@ -1,11 +1,18 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Finder;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\DatabaseObject\Finder;
 use ActiveCollab\DateValue\DateValue;
 
 /**
@@ -14,7 +21,7 @@ use ActiveCollab\DateValue\DateValue;
 class FindTest extends WritersTypeTestCase
 {
     /**
-     * Test count all
+     * Test count all.
      */
     public function testCount()
     {
@@ -30,7 +37,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test count by the given conditions
+     * Test count by the given conditions.
      */
     public function testCountWithConditions()
     {
@@ -38,7 +45,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if find() method returns Finder instance
+     * Test if find() method returns Finder instance.
      */
     public function testFindReturnsFinder()
     {
@@ -49,7 +56,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find all writers from the database
+     * Test find all writers from the database.
      */
     public function testFindAll()
     {
@@ -65,7 +72,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find first record
+     * Test find first record.
      */
     public function testFindFirst()
     {
@@ -78,7 +85,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find all ID-s
+     * Test find all ID-s.
      */
     public function testFindAllIds()
     {
@@ -89,7 +96,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if ids() returns an empty array on empty result set
+     * Test if ids() returns an empty array on empty result set.
      */
     public function testFindIdsAlwaysReturnsArray()
     {
@@ -100,7 +107,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test count using finder object
+     * Test count using finder object.
      */
     public function testCountUsingFinder()
     {
@@ -108,7 +115,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find by conditions
+     * Test find by conditions.
      */
     public function testFindByConditions()
     {
@@ -121,14 +128,14 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find using multiple calls to where() method
+     * Test find using multiple calls to where() method.
      */
     public function testFindByMultipleConditions()
     {
         $finder_1 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01');
         $this->assertEquals("`birthday` > '1800-01-01'", $finder_1->getWhere());
 
-        /** @var Writer[] $should_be_fyodor */
+        /* @var Writer[] $should_be_fyodor */
         $should_be_fyodor_and_leo = $finder_1->all();
 
         $this->assertCount(2, $should_be_fyodor_and_leo);
@@ -155,7 +162,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test count using finder object with conditions
+     * Test count using finder object with conditions.
      */
     public function testCountUsingFinderByConditions()
     {
@@ -163,7 +170,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find ID-s by conditions
+     * Test find ID-s by conditions.
      */
     public function testFindIdsByCondition()
     {
@@ -175,7 +182,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test limit and offset
+     * Test limit and offset.
      */
     public function testOffset()
     {
@@ -193,11 +200,11 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if dependencies are properly set to hydrated objects so they are fully functional
+     * Test if dependencies are properly set to hydrated objects so they are fully functional.
      */
     public function testHydratedObjectsAreFullyFunctional()
     {
-        /** @var Writer $leo */
+        /* @var Writer $leo */
         $should_be_leo = $this->pool->find(Writer::class)->where('`name` = ?', 'Leo Tolstoy')->first();
 
         $this->assertInstanceOf(Writer::class, $should_be_leo);
@@ -240,7 +247,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if find by SQL properly loads data
+     * Test if find by SQL properly loads data.
      */
     public function testFindBySql()
     {
@@ -256,7 +263,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if find by SQL properly accepts and escapes arguments
+     * Test if find by SQL properly accepts and escapes arguments.
      */
     public function testFindBySqlWithArguments()
     {

@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Object;
@@ -13,28 +19,28 @@ use InvalidArgumentException;
 abstract class BaseWriter extends Object implements ObjectInterface
 {
     /**
-     * Name of the table where records are stored
+     * Name of the table where records are stored.
      *
      * @var string
      */
     protected $table_name = 'writers';
 
     /**
-     * All table fields
+     * All table fields.
      *
      * @var array
      */
     protected $fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
 
     /**
-     * List of default field values
+     * List of default field values.
      *
      * @var array
      */
     protected $default_field_values = ['name' => 'Unknown Writer'];
 
     /**
-     * Name of AI field (if any)
+     * Name of AI field (if any).
      *
      * @var string
      */
@@ -46,7 +52,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     protected $order_by = ['!id'];
 
     /**
-     * Return value of name field
+     * Return value of name field.
      *
      * @return string
      */
@@ -56,7 +62,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Set value of name field
+     * Set value of name field.
      *
      * @param  string $value
      * @return $this
@@ -69,7 +75,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Return value of birthday field
+     * Return value of birthday field.
      *
      * @return DateValueInterface
      */
@@ -79,7 +85,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Set value of birthday field
+     * Set value of birthday field.
      *
      * @param  DateValueInterface $value
      * @return $this
@@ -92,7 +98,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Return value of created_at field
+     * Return value of created_at field.
      *
      * @return \ActiveCollab\DateValue\DateTimeValueInterface|null
      */
@@ -102,7 +108,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Set value of created_at  field
+     * Set value of created_at  field.
      *
      * @param  \ActiveCollab\DateValue\DateTimeValueInterface|null $value
      * @return $this
@@ -115,7 +121,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Return value of updated_at field
+     * Return value of updated_at field.
      *
      * @return \ActiveCollab\DateValue\DateTimeValueInterface|null
      */
@@ -125,7 +131,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Set value of updated_at  field
+     * Set value of updated_at  field.
      *
      * @param  \ActiveCollab\DateValue\DateTimeValueInterface|null $value
      * @return $this
@@ -138,7 +144,7 @@ abstract class BaseWriter extends Object implements ObjectInterface
     }
 
     /**
-     * Set value of specific field
+     * Set value of specific field.
      *
      * @param  string                   $name
      * @param  mixed                    $value

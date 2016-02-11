@@ -1,13 +1,19 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\ScrapInterface;
-use ActiveCollab\DatabaseObject\ValidatorInterface;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
+use ActiveCollab\DatabaseObject\ValidatorInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -48,7 +54,7 @@ class Writer extends BaseWriter implements ScrapInterface
     {
         parent::__construct($connection, $pool, $log);
 
-        $this->registerEventHandler('on_set_attribute', function($attribute, $value) {
+        $this->registerEventHandler('on_set_attribute', function ($attribute, $value) {
             if ($attribute == 'custom_attribute') {
                 $this->custom_attribute_value = $value;
             }
@@ -61,7 +67,7 @@ class Writer extends BaseWriter implements ScrapInterface
     private $custom_field_value;
 
     /**
-     * Return custom field value
+     * Return custom field value.
      *
      * @return mixed
      */
@@ -71,7 +77,7 @@ class Writer extends BaseWriter implements ScrapInterface
     }
 
     /**
-     * Set custom field value
+     * Set custom field value.
      *
      * @param  mixed $value
      * @return $this
@@ -95,7 +101,7 @@ class Writer extends BaseWriter implements ScrapInterface
     }
 
     /**
-     * Scrap the object, instead of permanently deleting it
+     * Scrap the object, instead of permanently deleting it.
      *
      * @param  bool|false $bulk
      * @return $this

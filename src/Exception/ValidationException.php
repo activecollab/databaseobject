@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Exception;
 
 use ActiveCollab\DatabaseObject\ObjectInterface;
@@ -13,14 +19,14 @@ class ValidationException extends Exception
     const ANY_FIELD = '-- any --';
 
     /**
-     * Object instance
+     * Object instance.
      *
      * @var ObjectInterface
      */
     private $object;
 
     /**
-     * Errors array
+     * Errors array.
      *
      * @var array
      */
@@ -31,7 +37,7 @@ class ValidationException extends Exception
      * @param int            $code
      * @param Exception|null $previous
      */
-    public function __construct($message = "", $code = 0, Exception $previous = null)
+    public function __construct($message = '', $code = 0, Exception $previous = null)
     {
         if (empty($message)) {
             $message = 'Validation failed';
@@ -41,9 +47,9 @@ class ValidationException extends Exception
     }
 
     /**
-     * Return parent object instance
+     * Return parent object instance.
      *
-     * @return Object
+     * @return object
      */
     public function getObject()
     {
@@ -59,12 +65,12 @@ class ValidationException extends Exception
     }
 
     /**
-     * Return array or property => value pairs that describes this object
+     * Return array or property => value pairs that describes this object.
      * @return array
      */
     public function jsonSerialize()
     {
-        $result = [ 'message' => $this->getMessage(), 'type' => get_class($this), 'field_errors' => [] ];
+        $result = ['message' => $this->getMessage(), 'type' => get_class($this), 'field_errors' => []];
 
         foreach ($this->getErrors() as $field => $messages) {
             foreach ($messages as $message) {
@@ -88,7 +94,7 @@ class ValidationException extends Exception
     // ---------------------------------------------------
 
     /**
-     * Return number of errors from specific form
+     * Return number of errors from specific form.
      *
      * @return array
      */
@@ -98,7 +104,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Set errors
+     * Set errors.
      *
      * Key is field name, value is array of error messages for the given field
      *
@@ -113,7 +119,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Return field errors
+     * Return field errors.
      *
      * @param  string $field
      * @return array
@@ -124,9 +130,9 @@ class ValidationException extends Exception
     }
 
     /**
-     * Returns true if there are error messages reported
+     * Returns true if there are error messages reported.
      *
-     * @return boolean
+     * @return bool
      */
     public function hasErrors()
     {
@@ -134,10 +140,10 @@ class ValidationException extends Exception
     }
 
     /**
-     * Check if a specific field has reported errors
+     * Check if a specific field has reported errors.
      *
-     * @param  string  $field
-     * @return boolean
+     * @param  string $field
+     * @return bool
      */
     public function hasError($field)
     {
@@ -145,7 +151,7 @@ class ValidationException extends Exception
     }
 
     /**
-     * Add error to array
+     * Add error to array.
      *
      * @param  string $error
      * @param  string $field

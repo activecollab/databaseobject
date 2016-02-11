@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Collection\Type;
@@ -10,7 +16,7 @@ use ActiveCollab\DatabaseObject\Collection\Type;
 class PreconfiguredCollection extends Type
 {
     /**
-     * Return type that this collection manages
+     * Return type that this collection manages.
      *
      * @return string
      */
@@ -20,7 +26,7 @@ class PreconfiguredCollection extends Type
     }
 
     /**
-     * Configure the collection when it is created
+     * Configure the collection when it is created.
      */
     protected function configure()
     {

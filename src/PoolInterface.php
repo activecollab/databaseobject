@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
@@ -10,36 +16,36 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 interface PoolInterface
 {
     /**
-     * Produce new instance of $type
+     * Produce new instance of $type.
      *
      * @param  string          $type
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &produce($type, array $attributes = null, $save = true);
 
     /**
-     * Update an instance
+     * Update an instance.
      *
      * @param  ObjectInterface $instance
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true);
 
     /**
-     * Scrap an instance (move it to trash, if object supports, or delete it)
+     * Scrap an instance (move it to trash, if object supports, or delete it).
      *
      * @param  ObjectInterface $instance
-     * @param  boolean         $force_delete
+     * @param  bool            $force_delete
      * @return ObjectInterface
      */
     public function &scrap(ObjectInterface &$instance, $force_delete = false);
 
     /**
-     * Register producer instance for the given type
+     * Register producer instance for the given type.
      *
      * @param string            $type
      * @param ProducerInterface $producer
@@ -47,7 +53,7 @@ interface PoolInterface
     public function registerProducer($type, ProducerInterface $producer);
 
     /**
-     * Register producerby providing a producer class name
+     * Register producerby providing a producer class name.
      *
      * @param string $type
      * @param string $producer_class
@@ -58,49 +64,49 @@ interface PoolInterface
      * Return object from object pool by the given type and ID; if object is not found, return NULL.
      *
      * @param  string      $type
-     * @param  integer     $id
-     * @param  boolean     $use_cache
-     * @return Object|null
+     * @param  int         $id
+     * @param  bool        $use_cache
+     * @return object|null
      */
     public function &getById($type, $id, $use_cache = true);
 
     /**
      * Return object from object pool by the given type and ID; if object is not found, raise an exception.
      *
-     * @param  string  $type
-     * @param  integer $id
-     * @param  boolean $use_cache
-     * @return Object
+     * @param  string $type
+     * @param  int    $id
+     * @param  bool   $use_cache
+     * @return object
      */
     public function &mustGetById($type, $id, $use_cache = true);
 
     /**
-     * Reload an object of the give type with the given ID
+     * Reload an object of the give type with the given ID.
      *
-     * @param  string  $type
-     * @param  integer $id
-     * @return Object
+     * @param  string $type
+     * @param  int    $id
+     * @return object
      */
     public function &reload($type, $id);
 
     /**
-     * Check if object #ID of $type is in the pool
+     * Check if object #ID of $type is in the pool.
      *
-     * @param  string  $type
-     * @param  integer $id
-     * @return boolean
+     * @param  string $type
+     * @param  int    $id
+     * @return bool
      */
     public function isInPool($type, $id);
 
     /**
-     * Add object to the pool
+     * Add object to the pool.
      *
      * @param ObjectInterface $object
      */
     public function remember(ObjectInterface &$object);
 
     /**
-     * Forget object if it is loaded in memory
+     * Forget object if it is loaded in memory.
      *
      * @param string    $type
      * @param array|int $id
@@ -108,25 +114,25 @@ interface PoolInterface
     public function forget($type, $id);
 
     /**
-     * Return number of records of the given type that match the given conditions
+     * Return number of records of the given type that match the given conditions.
      *
      * @param  string            $type
      * @param  array|string|null $conditions
-     * @return integer
+     * @return int
      */
     public function count($type, $conditions = null);
 
     /**
-     * Return true if object of the given type with the given ID exists
+     * Return true if object of the given type with the given ID exists.
      *
-     * @param  string  $type
-     * @param  integer $id
+     * @param  string $type
+     * @param  int    $id
      * @return bool
      */
     public function exists($type, $id);
 
     /**
-     * Find records by type
+     * Find records by type.
      *
      * @param  string $type
      * @return Finder
@@ -134,7 +140,7 @@ interface PoolInterface
     public function find($type);
 
     /**
-     * Return result by a prepared SQL statement
+     * Return result by a prepared SQL statement.
      *
      * @param  string                                 $type
      * @param  string                                 $sql
@@ -144,10 +150,10 @@ interface PoolInterface
     public function findBySql($type, $sql, ...$arguments);
 
     /**
-     * Return table name by type
+     * Return table name by type.
      *
-     * @param  string  $type
-     * @param  boolean $escaped
+     * @param  string $type
+     * @param  bool   $escaped
      * @return string
      */
     public function getTypeTable($type, $escaped = false);
@@ -159,7 +165,7 @@ interface PoolInterface
     public function getTypeFields($type);
 
     /**
-     * Get a particular type property, and make it (using $callback) if it is not set already
+     * Get a particular type property, and make it (using $callback) if it is not set already.
      *
      * @param  string   $type
      * @param  string   $property
@@ -169,7 +175,7 @@ interface PoolInterface
     public function getTypeProperty($type, $property, callable $callback);
 
     /**
-     * Return a list of escaped field names for the given type
+     * Return a list of escaped field names for the given type.
      *
      * @param  string $type
      * @return string
@@ -177,7 +183,7 @@ interface PoolInterface
     public function getEscapedTypeFields($type);
 
     /**
-     * Return default order by for the given type
+     * Return default order by for the given type.
      *
      * @param  string   $type
      * @return string[]
@@ -185,7 +191,7 @@ interface PoolInterface
     public function getTypeOrderBy($type);
 
     /**
-     * Return escaped list of fields that we can order by
+     * Return escaped list of fields that we can order by.
      *
      * @param  string $type
      * @return string
@@ -198,7 +204,7 @@ interface PoolInterface
     public function getRegisteredTypes();
 
     /**
-     * Return registered type for the given $type. This function is subclassing aware
+     * Return registered type for the given $type. This function is subclassing aware.
      *
      * @param  string      $type
      * @return string|null
@@ -206,7 +212,7 @@ interface PoolInterface
     public function getRegisteredType($type);
 
     /**
-     * Return true if $type is registered
+     * Return true if $type is registered.
      *
      * @param  string $type
      * @return bool
@@ -214,7 +220,7 @@ interface PoolInterface
     public function isTypeRegistered($type);
 
     /**
-     * Return true if $type is polymorph (has type column that is used to figure out a class of individual record)
+     * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
      *
      * @param  string $type
      * @return bool
@@ -227,7 +233,7 @@ interface PoolInterface
     public function registerType(...$types);
 
     /**
-     * Return trait names by object
+     * Return trait names by object.
      *
      * @param  string $type
      * @return array

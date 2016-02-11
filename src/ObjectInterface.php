@@ -1,11 +1,17 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
-use JsonSerializable;
 use InvalidArgumentException;
+use JsonSerializable;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -13,7 +19,7 @@ use InvalidArgumentException;
 interface ObjectInterface extends LoadFromRow, JsonSerializable
 {
     /**
-     * Validate object properties before object is saved
+     * Validate object properties before object is saved.
      *
      * This method is called before the item is saved and can be used to fetch
      * errors in data before we really save it database. $errors is instance of
@@ -25,18 +31,18 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function validate(ValidatorInterface &$validator);
 
     /**
-     * Returns true if $var is the same object this object is
+     * Returns true if $var is the same object this object is.
      *
      * Comparison is done on class - PK values for loaded objects, or as simple
      * object comparison in case objects are not saved and loaded
      *
-     * @param  Object  $var
-     * @return boolean
+     * @param  object $var
+     * @return bool
      */
     public function is(&$var);
 
     /**
-     * Return object attributes
+     * Return object attributes.
      *
      * This function will return array of attribute name -> attribute value pairs
      * for this specific project
@@ -46,14 +52,14 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function getAttributes();
 
     /**
-     * Return primary key columns
+     * Return primary key columns.
      *
      * @return array
      */
     public function getPrimaryKey();
 
     /**
-     * Return value of table name
+     * Return value of table name.
      *
      * @return string
      */
@@ -64,7 +70,7 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     // ---------------------------------------------------
 
     /**
-     * Load data from database row
+     * Load data from database row.
      *
      * If $cache_row is set to true row data will be added to cache
      *
@@ -74,7 +80,7 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function loadFromRow(array $row);
 
     /**
-     * Save object into database (insert or update)
+     * Save object into database (insert or update).
      *
      * @return $this
      * @throws ValidationException
@@ -82,18 +88,18 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function &save();
 
     /**
-     * Delete specific object (and related objects if neccecery)
+     * Delete specific object (and related objects if neccecery).
      *
-     * @param  boolean $bulk
+     * @param  bool  $bulk
      * @return $this
      */
     public function &delete($bulk = false);
 
     /**
-     * Create a copy of this object and optionally save it
+     * Create a copy of this object and optionally save it.
      *
-     * @param  boolean $save
-     * @return Object
+     * @param  bool   $save
+     * @return object
      */
     public function copy($save = false);
 
@@ -102,16 +108,16 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     // ---------------------------------------------------
 
     /**
-     * Return value of $is_new variable
+     * Return value of $is_new variable.
      *
-     * @return boolean
+     * @return bool
      */
     public function isNew();
 
     /**
-     * Returns true if this object have row in database
+     * Returns true if this object have row in database.
      *
-     * @return boolean
+     * @return bool
      */
     public function isLoaded();
 
@@ -120,74 +126,74 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     // ---------------------------------------------------
 
     /**
-     * Return object ID
+     * Return object ID.
      *
-     * @return integer
+     * @return int
      */
     public function getId();
 
     /**
-     * Set value of id field
+     * Set value of id field.
      *
-     * @param  integer $value
+     * @param  int   $value
      * @return $this
      */
     public function &setId($value);
 
     /**
-     * Check if specific field is defined
+     * Check if specific field is defined.
      *
-     * @param  string  $field Field name
-     * @return boolean
+     * @param  string $field Field name
+     * @return bool
      */
     public function fieldExists($field);
 
     /**
-     * Return array of modified fields
+     * Return array of modified fields.
      *
      * @return array
      */
     public function getModifiedFields();
 
     /**
-     * Check if this object has modified columns
+     * Check if this object has modified columns.
      *
-     * @return boolean
+     * @return bool
      */
     public function isModified();
 
     /**
-     * Returns true if specific field is modified
+     * Returns true if specific field is modified.
      *
-     * @param  string  $field
-     * @return boolean
+     * @param  string $field
+     * @return bool
      */
     public function isModifiedField($field);
 
     /**
-     * Return true if primary key is modified
+     * Return true if primary key is modified.
      *
      * @return bool
      */
     public function isPrimaryKeyModified();
 
     /**
-     * Revert field to old value
+     * Revert field to old value.
      *
      * @param $field
      */
     public function revertField($field);
 
     /**
-     * Check if selected field is primary key
+     * Check if selected field is primary key.
      *
-     * @param  string  $field Field that need to be checked
-     * @return boolean
+     * @param  string $field Field that need to be checked
+     * @return bool
      */
     public function isPrimaryKey($field);
 
     /**
-     * Return list of fields
+     * Return list of fields.
      */
     public function getFields();
 
@@ -201,22 +207,22 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function getFieldValue($field, $default = null);
 
     /**
-     * Return old field values, before fields were updated
+     * Return old field values, before fields were updated.
      *
      * @return array
      */
     public function getOldValues();
 
     /**
-     * Return all field value
+     * Return all field value.
      *
-     * @param string $field
+     * @param  string $field
      * @return mixed
      */
     public function getOldFieldValue($field);
 
     /**
-     * Set specific field value
+     * Set specific field value.
      *
      * Set value of the $field. This function will make sure that everything
      * runs fine - modifications are saved, in case of primary key old value
@@ -230,7 +236,7 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function &setFieldValue($field, $value);
 
     /**
-     * Set non-field value during DataManager::create() and DataManager::update() calls
+     * Set non-field value during DataManager::create() and DataManager::update() calls.
      *
      * @param  string $attribute
      * @param  mixed  $value

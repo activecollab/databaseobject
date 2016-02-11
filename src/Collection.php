@@ -1,10 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\Etag\EtagInterface;
 use ActiveCollab\Etag\EtagInterface\Implementation as EtagInterfaceImplementation;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -46,18 +51,18 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Pre-configure the collection when it is created
+     * Pre-configure the collection when it is created.
      */
     protected function configure()
     {
     }
 
     /**
-     * Return true if ready
+     * Return true if ready.
      *
      * If collection declares that it is not ready, but execute methods get called, we should throw an exception
      *
-     * @return boolean
+     * @return bool
      */
     protected function isReady()
     {
@@ -70,7 +75,7 @@ abstract class Collection implements CollectionInterface
     private $application_identifier = 'APPv1.0';
 
     /**
-     * Return application identifier
+     * Return application identifier.
      *
      * @return string
      */
@@ -80,7 +85,7 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Set application identifier
+     * Set application identifier.
      *
      * @param  string $value
      * @return $this
@@ -93,7 +98,7 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Prepare collection tag from bits of information
+     * Prepare collection tag from bits of information.
      *
      * @param  string $additional_identifier
      * @param  string $visitor_identifier
@@ -106,7 +111,7 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Return true if this object can be tagged and cached on client side
+     * Return true if this object can be tagged and cached on client side.
      *
      * @return bool|null
      */
@@ -120,10 +125,10 @@ abstract class Collection implements CollectionInterface
     // ---------------------------------------------------
 
     /**
-     * Set pagination configuration
+     * Set pagination configuration.
      *
-     * @param  integer $current_page
-     * @param  integer $items_per_page
+     * @param  int   $current_page
+     * @param  int   $items_per_page
      * @return $this
      */
     public function &pagination($current_page = 1, $items_per_page = 100)
@@ -132,7 +137,7 @@ abstract class Collection implements CollectionInterface
 
         $this->currentPage($current_page);
 
-        $this->items_per_page = (int)$items_per_page;
+        $this->items_per_page = (int) $items_per_page;
 
         if ($this->items_per_page < 1) {
             $this->items_per_page = 100;
@@ -147,9 +152,9 @@ abstract class Collection implements CollectionInterface
     private $is_paginated = false;
 
     /**
-     * Return true if collection is paginated
+     * Return true if collection is paginated.
      *
-     * @return boolean
+     * @return bool
      */
     public function isPaginated()
     {
@@ -157,19 +162,19 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $current_page = null;
 
     /**
-     * @var integer|null
+     * @var int|null
      */
     private $items_per_page = null;
 
     /**
-     * Set current page
+     * Set current page.
      *
-     * @param  integer $value
+     * @param  int   $value
      * @return $this
      */
     public function &currentPage($value)
@@ -188,9 +193,9 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Return current page #
+     * Return current page #.
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getCurrentPage()
     {
@@ -198,9 +203,9 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Return number of items that are displayed per page
+     * Return number of items that are displayed per page.
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getItemsPerPage()
     {
@@ -208,7 +213,7 @@ abstract class Collection implements CollectionInterface
     }
 
     /**
-     * Return array or property => value pairs that describes this object
+     * Return array or property => value pairs that describes this object.
      *
      * @return array
      */

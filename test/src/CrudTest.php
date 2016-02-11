@@ -1,10 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
 
 /**
@@ -13,7 +19,7 @@ use ActiveCollab\DateValue\DateValue;
 class CrudTest extends WritersTypeTestCase
 {
     /**
-     * Test if instances get default values pre-populated
+     * Test if instances get default values pre-populated.
      */
     public function testNewInstancesGetDefaultFieldValues()
     {
@@ -31,7 +37,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if ID is primary key
+     * Test if ID is primary key.
      */
     public function testIdIsPrimaryKey()
     {
@@ -42,7 +48,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test get object by ID
+     * Test get object by ID.
      */
     public function testGetById()
     {
@@ -57,7 +63,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if Pool::getById() properly returns NULL when record was not found
+     * Test if Pool::getById() properly returns NULL when record was not found.
      */
     public function testGetByIdForNonExistingRecord()
     {
@@ -66,7 +72,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if Pool::mustGetById() throws an exception when record was not found
+     * Test if Pool::mustGetById() throws an exception when record was not found.
      *
      * @expectedException \ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException
      */
@@ -77,7 +83,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if getById is subclassing aware
+     * Test if getById is subclassing aware.
      */
     public function testSublassingAwareGetById()
     {
@@ -100,7 +106,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Object create
+     * Object create.
      */
     public function testCreate()
     {
@@ -118,7 +124,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test record update
+     * Test record update.
      */
     public function testUpdate()
     {
@@ -140,7 +146,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if we can change ID to a new value that is not yet reserved
+     * Test if we can change ID to a new value that is not yet reserved.
      */
     public function testChangeIdToNewRecord()
     {
@@ -190,7 +196,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test delete
+     * Test delete.
      */
     public function testDelete()
     {
@@ -208,7 +214,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set attributes when we have on_set_attribute event handler specified
+     * Test set attributes when we have on_set_attribute event handler specified.
      */
     public function testSetAttributeWithEventHandler()
     {
@@ -219,7 +225,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set attributes when we find attribute setter
+     * Test set attributes when we find attribute setter.
      */
     public function testSetAttributeWithSetter()
     {
@@ -230,7 +236,7 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
-     * Test that there will be no exception if we try to set an unknown attribute
+     * Test that there will be no exception if we try to set an unknown attribute.
      */
     public function testUnknownAttributeDoesNotProduceAnError()
     {

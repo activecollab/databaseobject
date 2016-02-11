@@ -1,16 +1,22 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
-use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use InvalidArgumentException;
+use LogicException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
-use LogicException;
-use InvalidArgumentException;
 use RuntimeException;
 
 /**
@@ -46,11 +52,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Produce new instance of $type
+     * Produce new instance of $type.
      *
      * @param  string          $type
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
@@ -73,11 +79,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Update an instance
+     * Update an instance.
      *
      * @param  ObjectInterface $instance
      * @param  array|null      $attributes
-     * @param  boolean         $save
+     * @param  bool            $save
      * @return ObjectInterface
      */
     public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
@@ -102,10 +108,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Scrap an instance (move it to trash, if object supports, or delete it)
+     * Scrap an instance (move it to trash, if object supports, or delete it).
      *
      * @param  ObjectInterface $instance
-     * @param  boolean         $force_delete
+     * @param  bool            $force_delete
      * @return ObjectInterface
      */
     public function &scrap(ObjectInterface &$instance, $force_delete = false)
@@ -142,7 +148,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     private $producers = [];
 
     /**
-     * Return producer for registered type
+     * Return producer for registered type.
      *
      * @param  string            $registered_type
      * @return ProducerInterface
@@ -175,7 +181,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Register producer instance for the given type
+     * Register producer instance for the given type.
      *
      * @param string            $type
      * @param ProducerInterface $producer
@@ -198,7 +204,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Register producerby providing a producer class name
+     * Register producerby providing a producer class name.
      *
      * @param string $type
      * @param string $producer_class
@@ -220,9 +226,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * Return object from object pool by the given type and ID; if object is not found, return NULL.
      *
      * @param  string                   $type
-     * @param  integer                  $id
-     * @param  boolean                  $use_cache
-     * @return Object
+     * @param  int                      $id
+     * @param  bool                     $use_cache
+     * @return object
      * @throws InvalidArgumentException
      */
     public function &getById($type, $id, $use_cache = true)
@@ -242,7 +248,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
                     $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
 
-                    /** @var Object|ObjectInterface $object */
+                    /** @var object|ObjectInterface $object */
                     $object = new $object_class($this->connection, $this, $this->log);
 
                     if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
@@ -267,9 +273,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * Return object from object pool by the given type and ID; if object is not found, raise an exception.
      *
      * @param  string                   $type
-     * @param  integer                  $id
-     * @param  boolean                  $use_cache
-     * @return Object
+     * @param  int                      $id
+     * @param  bool                     $use_cache
+     * @return object
      * @throws ObjectNotFoundException
      * @throws InvalidArgumentException
      */
@@ -285,11 +291,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Reload an object of the give type with the given ID
+     * Reload an object of the give type with the given ID.
      *
-     * @param  string  $type
-     * @param  integer $id
-     * @return Object
+     * @param  string $type
+     * @param  int    $id
+     * @return object
      */
     public function &reload($type, $id)
     {
@@ -297,16 +303,16 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if object #ID of $type is in the pool
+     * Check if object #ID of $type is in the pool.
      *
-     * @param  string  $type
-     * @param  integer $id
-     * @return boolean
+     * @param  string $type
+     * @param  int    $id
+     * @return bool
      */
     public function isInPool($type, $id)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (integer)$id;
+            $id = (integer) $id;
 
             if ($id < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -319,10 +325,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Add object to the object pool
+     * Add object to the object pool.
      *
      * @param  string               $registered_type
-     * @param  integer              $id
+     * @param  int                  $id
      * @param  ObjectInterface|null $value_to_store
      * @return ObjectInterface
      */
@@ -338,7 +344,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Add object to the pool
+     * Add object to the pool.
      *
      * @param ObjectInterface $object
      */
@@ -380,11 +386,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return number of records of the given type that match the given conditions
+     * Return number of records of the given type that match the given conditions.
      *
      * @param  string            $type
      * @param  array|string|null $conditions
-     * @return integer
+     * @return int
      */
     public function count($type, $conditions = null)
     {
@@ -400,10 +406,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return true if object of the given type with the given ID exists
+     * Return true if object of the given type with the given ID exists.
      *
-     * @param  string  $type
-     * @param  integer $id
+     * @param  string $type
+     * @param  int    $id
      * @return bool
      */
     public function exists($type, $id)
@@ -412,7 +418,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Find records by type
+     * Find records by type.
      *
      * @param  string $type
      * @return Finder
@@ -444,7 +450,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return result by a prepared SQL statement
+     * Return result by a prepared SQL statement.
      *
      * @param  string                                 $type
      * @param  string                                 $sql
@@ -477,10 +483,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return table name by type
+     * Return table name by type.
      *
-     * @param  string  $type
-     * @param  boolean $escaped
+     * @param  string $type
+     * @param  bool   $escaped
      * @return string
      */
     public function getTypeTable($type, $escaped = false)
@@ -514,7 +520,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Get a particular type property, and make it (using $callback) if it is not set already
+     * Get a particular type property, and make it (using $callback) if it is not set already.
      *
      * @param  string   $type
      * @param  string   $property
@@ -535,7 +541,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return select by ID-s query for the given type
+     * Return select by ID-s query for the given type.
      *
      * @param  string $type
      * @return string
@@ -550,24 +556,24 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return a list of escaped field names for the given type
+     * Return a list of escaped field names for the given type.
      *
      * @param  string $type
      * @return string
      */
     public function getEscapedTypeFields($type)
     {
-        return $this->getTypeProperty($type, 'escaped_fields', function() use ($type) {
+        return $this->getTypeProperty($type, 'escaped_fields', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            return implode(',', array_map(function($field_name) use ($table_name) {
+            return implode(',', array_map(function ($field_name) use ($table_name) {
                 return $table_name . '.' . $this->connection->escapeFieldName($field_name);
             }, $this->getTypeFields($type)));
         });
     }
 
     /**
-     * Return default order by for the given type
+     * Return default order by for the given type.
      *
      * @param  string   $type
      * @return string[]
@@ -582,17 +588,17 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return escaped list of fields that we can order by
+     * Return escaped list of fields that we can order by.
      *
      * @param  string $type
      * @return string
      */
     public function getEscapedTypeOrderBy($type)
     {
-        return $this->getTypeProperty($type, 'escaped_order_by', function() use ($type) {
+        return $this->getTypeProperty($type, 'escaped_order_by', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            return implode(',', array_map(function($field_name) use ($table_name) {
+            return implode(',', array_map(function ($field_name) use ($table_name) {
                 if (substr($field_name, 0, 1) == '!') {
                     return $table_name . '.' . $this->connection->escapeFieldName(substr($field_name, 1)) . ' DESC';
                 } else {
@@ -616,14 +622,14 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Cached type to registered type map
+     * Cached type to registered type map.
      *
      * @var array
      */
     private $known_types = [];
 
     /**
-     * Return registered type for the given $type. This function is subclassing aware
+     * Return registered type for the given $type. This function is subclassing aware.
      *
      * @param  string      $type
      * @return string|null
@@ -659,7 +665,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return true if $type is registered
+     * Return true if $type is registered.
      *
      * @param  string $type
      * @return bool
@@ -670,7 +676,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return true if $type is polymorph (has type column that is used to figure out a class of individual record)
+     * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
      *
      * @param  string $type
      * @return bool
@@ -713,7 +719,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return trait names by object
+     * Return trait names by object.
      *
      * Note: $type does not need to be directly registered, because we need to support subclasses, which call can have
      * different traits impelemnted!
@@ -733,7 +739,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Recursively get trait names for the given class
+     * Recursively get trait names for the given class.
      *
      * @param ReflectionClass $class
      * @param array           $trait_names

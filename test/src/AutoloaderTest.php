@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
@@ -7,10 +13,10 @@ use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
-class AutploaderTest extends TestCase
+class AutoloaderTest extends TestCase
 {
     /**
-     * Test if classes are properly loaded
+     * Test if classes are properly loaded.
      */
     public function testAutoloader()
     {

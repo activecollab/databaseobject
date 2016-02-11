@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
@@ -11,7 +17,7 @@ use ActiveCollab\DatabaseObject\Validator;
 class PresenceValidatorTest extends WritersTypeTestCase
 {
     /**
-     * Test validation pass
+     * Test validation pass.
      */
     public function testPass()
     {
@@ -29,7 +35,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test validation failure
+     * Test validation failure.
      */
     public function testFail()
     {
@@ -47,7 +53,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test fail because there is no value
+     * Test fail because there is no value.
      */
     public function testFailBecauseTheresNoValue()
     {
@@ -65,7 +71,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test type check
+     * Test type check.
      */
     public function testTypeCheck()
     {

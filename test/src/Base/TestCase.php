@@ -1,4 +1,11 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Base;
 
 use ActiveCollab\DatabaseConnection\Connection;
@@ -26,7 +33,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $pool;
 
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -43,7 +50,7 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Tear down test environment
+     * Tear down test environment.
      */
     public function tearDown()
     {

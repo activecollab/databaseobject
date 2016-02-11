@@ -1,21 +1,27 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
-use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersCollection;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
 /**
- * Test data object collection
+ * Test data object collection.
  *
  * @package angie.tests
  */
 class TypeCollectionTest extends WritersTypeTestCase
 {
     /**
-     * Tear down test environment
+     * Tear down test environment.
      */
     public function tearDown()
     {
@@ -27,9 +33,9 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if collection reads settings from type
+     * Test if collection reads settings from type.
      */
-    function testTypeCollectionReadsSettingsFromType()
+    public function testTypeCollectionReadsSettingsFromType()
     {
         $collection = new WritersCollection($this->connection, $this->pool);
 
@@ -39,7 +45,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set conditions from string
+     * Test set conditions from string.
      */
     public function testSetConditionsFromString()
     {
@@ -50,7 +56,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set conditions from array
+     * Test set conditions from array.
      */
     public function testSetConditionsFromArray()
     {
@@ -61,7 +67,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set conditions from array of arguments
+     * Test set conditions from array of arguments.
      */
     public function testSetConditionsFromArrayOfArguments()
     {
@@ -88,7 +94,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test set order by
+     * Test set order by.
      */
     public function testSetOrderBy()
     {
@@ -131,7 +137,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if execute IDs returns a correct result
+     * Test if execute IDs returns a correct result.
      */
     public function testExecuteIds()
     {
@@ -139,7 +145,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test execute collection
+     * Test execute collection.
      */
     public function testExecute()
     {
@@ -154,7 +160,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test execution with conditions
+     * Test execution with conditions.
      */
     public function testExecuteWithConditions()
     {
@@ -168,7 +174,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test execution with conditions and order by set
+     * Test execution with conditions and order by set.
      */
     public function testExecuteWithConditionsAndOrder()
     {
@@ -182,7 +188,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test is pagianted call
+     * Test is pagianted call.
      */
     public function testIsPaginated()
     {
@@ -202,7 +208,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if we can change current page for paginated collection
+     * Test if we can change current page for paginated collection.
      */
     public function testSetCurrentPageForPaginatedCollection()
     {
@@ -214,7 +220,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test paginated execution
+     * Test paginated execution.
      */
     public function testExecutePaginated()
     {
@@ -249,7 +255,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Confirm that join is turned off by default
+     * Confirm that join is turned off by default.
      */
     public function testJoinIsTurnedOffByDefault()
     {
@@ -260,7 +266,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if join field is set based on table name
+     * Test if join field is set based on table name.
      */
     public function testTargetJoinFieldBasedOnTableName()
     {
@@ -274,7 +280,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if join field can be specified
+     * Test if join field can be specified.
      */
     public function testTargetJoinFieldSpecified()
     {
@@ -288,7 +294,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if both source and target join fields can be specified
+     * Test if both source and target join fields can be specified.
      */
     public function testSourceAndTargetJoinFieldsSpecified()
     {
@@ -310,9 +316,9 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if we can set conditions so they are joined with another table
+     * Test if we can set conditions so they are joined with another table.
      */
-    public function testJoin() 
+    public function testJoin()
     {
         $create_table = $this->connection->execute("CREATE TABLE `favorite_writers` (
             `user_id` int UNSIGNED NOT NULL DEFAULT '0',
@@ -358,7 +364,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if timestamp hash is properly loaded from the timestamp fields
+     * Test if timestamp hash is properly loaded from the timestamp fields.
      */
     public function testTimestampHash()
     {
@@ -381,7 +387,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if etag value is not put in double or single quotes
+     * Test if etag value is not put in double or single quotes.
      */
     public function testEtagShouldNotBeQuoted()
     {
@@ -396,7 +402,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if etag format is properly set
+     * Test if etag format is properly set.
      */
     public function testEtagFormat()
     {
@@ -419,7 +425,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if additional identifier can be specified
+     * Test if additional identifier can be specified.
      */
     public function testEtagCanIncludeAdditionalIdenfitier()
     {

@@ -1,9 +1,15 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Exception;
 
-use RuntimeException;
 use Exception;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Exception

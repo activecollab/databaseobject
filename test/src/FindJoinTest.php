@@ -1,12 +1,16 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseConnection\Result\Result;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
-use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\DatabaseObject\Finder;
-use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -14,7 +18,7 @@ use ActiveCollab\DateValue\DateValue;
 class FindJoinTest extends WritersTypeTestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -39,7 +43,7 @@ class FindJoinTest extends WritersTypeTestCase
     }
 
     /**
-     * Tear down test environment
+     * Tear down test environment.
      */
     public function tearDown()
     {
@@ -51,7 +55,7 @@ class FindJoinTest extends WritersTypeTestCase
     }
 
     /**
-     * Test count all
+     * Test count all.
      */
     public function testCount()
     {
@@ -61,7 +65,7 @@ class FindJoinTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find all writers from the database
+     * Test find all writers from the database.
      */
     public function testFindAll()
     {
@@ -85,11 +89,11 @@ class FindJoinTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find first record
+     * Test find first record.
      */
     public function testFindFirst()
     {
-        /** @var Writer $should_be_leo */
+        /* @var Writer $should_be_leo */
         $should_be_tolstoy = $this->pool->find(Writer::class)->orderBy('`id`')->first();
 
         $this->assertInstanceOf(Writer::class, $should_be_tolstoy);
@@ -112,7 +116,7 @@ class FindJoinTest extends WritersTypeTestCase
     }
 
     /**
-     * Test find all ID-s
+     * Test find all ID-s.
      */
     public function testFindAllIds()
     {

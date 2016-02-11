@@ -1,4 +1,11 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
@@ -10,7 +17,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 class TraitTest extends TestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -21,7 +28,7 @@ class TraitTest extends TestCase
     }
 
     /**
-     * Test if trait "constructors" are called when instance is created
+     * Test if trait "constructors" are called when instance is created.
      */
     public function testIfTraitsAreCalledWhenNewInstanceIsCreated()
     {

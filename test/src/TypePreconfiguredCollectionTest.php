@@ -1,10 +1,16 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\PreconfiguredCollection;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -12,7 +18,7 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 class TypePreconfiguredCollectionTest extends WritersTypeTestCase
 {
     /**
-     * Test if configure() method is called when collection is constructed
+     * Test if configure() method is called when collection is constructed.
      */
     public function testCollectionIsPreconfigured()
     {
@@ -23,7 +29,7 @@ class TypePreconfiguredCollectionTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if pre-configured collection works as expected
+     * Test if pre-configured collection works as expected.
      */
     public function testExecutePreconfiguredCollection()
     {

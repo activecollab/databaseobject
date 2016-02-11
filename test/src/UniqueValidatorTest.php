@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
@@ -12,7 +18,7 @@ use ActiveCollab\DateValue\DateValue;
 class UniqueValidatorTest extends WritersTypeTestCase
 {
     /**
-     * Test if theres no error thrown for NULL even though there are NULL records in the table
+     * Test if theres no error thrown for NULL even though there are NULL records in the table.
      */
     public function testNoErrorOnNull()
     {
@@ -34,7 +40,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test new record does not throw an error when name value is not a duplicate
+     * Test new record does not throw an error when name value is not a duplicate.
      */
     public function testNewRecordDoesNotReportAnErrorWhenTheresNoDuplicateValue()
     {
@@ -52,7 +58,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if validate unique value works properly
+     * Test if validate unique value works properly.
      */
     public function testNewRecordReportsAnErrorOnDuplicateValue()
     {
@@ -70,7 +76,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if error will not be thrown for existing row that does not produces a duplicate value
+     * Test if error will not be thrown for existing row that does not produces a duplicate value.
      */
     public function testExistingRecordDoesNotReportAnErrorWhenTheresNoDuplicateValue()
     {
@@ -88,7 +94,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if error will be thrown for existing row that does produces a duplicate value
+     * Test if error will be thrown for existing row that does produces a duplicate value.
      */
     public function testExistingRecordReportsAnErrorOnDuplicateValue()
     {
@@ -106,7 +112,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if error will not be thrown for existing row that does not produces a duplicate value, but changes ID
+     * Test if error will not be thrown for existing row that does not produces a duplicate value, but changes ID.
      */
     public function testExistingRecordDoesNotReportAnErrorWhenTheresNoDuplicateValueOnIdChange()
     {
@@ -124,7 +130,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if error will be thrown for existing row that does produces a duplicate value, but changes ID
+     * Test if error will be thrown for existing row that does produces a duplicate value, but changes ID.
      */
     public function testExistingRecordReportsAnErrorOnDuplicateValueOnIdChange()
     {
@@ -142,13 +148,13 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test unique where filter does not throw an error when conditions are not met
+     * Test unique where filter does not throw an error when conditions are not met.
      */
     public function testNoErrorWhenUniqueWhereIsNotMatched()
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
 
-        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateValue('1800-01-01') ]);
+        $is_unique = $validator->uniqueWhere('name', ['birthday < ?', new DateValue('1800-01-01')]);
 
         $this->assertTrue($is_unique);
         $this->assertFalse($validator->hasErrors());
@@ -160,13 +166,13 @@ class UniqueValidatorTest extends WritersTypeTestCase
     }
 
     /**
-     * Test unique where filter properly reports an error when conditions are met
+     * Test unique where filter properly reports an error when conditions are met.
      */
     public function testErrorWhenUniqueWhereIsMatched()
     {
         $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
 
-        $is_unique = $validator->uniqueWhere('name', [ 'birthday < ?', new DateValue('1900-01-01') ]);
+        $is_unique = $validator->uniqueWhere('name', ['birthday < ?', new DateValue('1900-01-01')]);
 
         $this->assertFalse($is_unique);
         $this->assertTrue($validator->hasErrors());

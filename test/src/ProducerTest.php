@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
@@ -15,7 +21,7 @@ use ActiveCollab\DateValue\DateValue;
 class ProducerTest extends WritersTypeTestCase
 {
     /**
-     * Test if default producer is used by default
+     * Test if default producer is used by default.
      */
     public function testDefaultProducerIsUsedByDefault()
     {
@@ -30,7 +36,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if custom producer can be set for registered type
+     * Test if custom producer can be set for registered type.
      */
     public function testCustomProducerCanBeSetForType()
     {
@@ -48,7 +54,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if custom producer can be set for subtype
+     * Test if custom producer can be set for subtype.
      */
     public function testCustomProducerCanBeSetForSubtype()
     {
@@ -66,7 +72,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test if custom producer can be set for registered type
+     * Test if custom producer can be set for registered type.
      */
     public function testCustomProducerCanBeSetByClassName()
     {
@@ -120,7 +126,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test modify using default producer
+     * Test modify using default producer.
      */
     public function testModifyUsingDefaultProducer()
     {
@@ -144,7 +150,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test modify using custom producer
+     * Test modify using custom producer.
      */
     public function testModifyUsingCustomProducer()
     {
@@ -185,7 +191,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test instance scrap using default producer
+     * Test instance scrap using default producer.
      */
     public function testScrapUsingDefaultProducer()
     {
@@ -209,7 +215,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test instance scrap using custom producer
+     * Test instance scrap using custom producer.
      */
     public function testScrapUsingCustomProducer()
     {
@@ -235,7 +241,7 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
-     * Test instance force delete
+     * Test instance force delete.
      */
     public function testForceDelete()
     {

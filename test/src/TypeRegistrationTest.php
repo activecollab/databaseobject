@@ -1,15 +1,22 @@
 <?php
+
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
-use ActiveCollab\DateValue\DateValue;;
+use ActiveCollab\DateValue\DateValue;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -17,7 +24,7 @@ use ActiveCollab\DateValue\DateValue;;
 class TypeRegistrationTest extends TestCase
 {
     /**
-     * Test if there is no types defined by default
+     * Test if there is no types defined by default.
      */
     public function testRegisteredTypesIsEmptyByDefault()
     {
@@ -25,7 +32,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test if registerType() can be called without types
+     * Test if registerType() can be called without types.
      */
     public function testRegisterEmptyList()
     {
@@ -42,7 +49,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test type registration
+     * Test type registration.
      */
     public function testRegisterType()
     {
@@ -53,7 +60,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test if type registration is aware of subclassing
+     * Test if type registration is aware of subclassing.
      */
     public function testRegisteredTypeIsSubclassingAware()
     {
@@ -65,7 +72,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test table name for registered type
+     * Test table name for registered type.
      */
     public function testTableNameForRegisteredType()
     {
@@ -75,7 +82,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test table name for class that extends registered type
+     * Test table name for class that extends registered type.
      */
     public function testTableNameForClassThatExtendsRegisteredType()
     {
@@ -85,7 +92,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test fields for registered type
+     * Test fields for registered type.
      */
     public function testFieldsForRegisteredTypes()
     {
@@ -101,7 +108,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test if we can get fields for class that extends registered type
+     * Test if we can get fields for class that extends registered type.
      */
     public function testFieldsForClassThatExtendsRegisteredType()
     {
@@ -117,7 +124,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test is type polymorph check
+     * Test is type polymorph check.
      */
     public function testIsTypePolymorph()
     {
@@ -130,7 +137,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test order by for registered type
+     * Test order by for registered type.
      */
     public function testOrderByForRegisteredType()
     {
@@ -140,7 +147,7 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test order by for class that extends registered type
+     * Test order by for class that extends registered type.
      */
     public function testOrderByForClassThatExtendsRegisteredType()
     {
@@ -150,39 +157,39 @@ class TypeRegistrationTest extends TestCase
     }
 
     /**
-     * Test return type property
+     * Test return type property.
      */
     public function testGetTypeProperty()
     {
         $this->pool->registerType(Writer::class);
 
-        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function() {
+        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function () {
             return 1;
         }));
 
-        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function() {
+        $this->assertEquals(1, $this->pool->getTypeProperty(Writer::class, 'should_be_one', function () {
             return 2345; // This callback should never be executed because we already have the value set in previous call
         }));
     }
 
     /**
-     * Test if type properties are set for registered type, even when called for subtypes
+     * Test if type properties are set for registered type, even when called for subtypes.
      */
     public function testGetTypePropertySetsPropetyForTheRegisteredType()
     {
         $this->pool->registerType(Writer::class);
 
-        $this->assertEquals(123, $this->pool->getTypeProperty(AwesomeWriter::class, 'should_be_set_for_writer', function() {
+        $this->assertEquals(123, $this->pool->getTypeProperty(AwesomeWriter::class, 'should_be_set_for_writer', function () {
             return 123;
         }));
 
-        $this->assertEquals(123, $this->pool->getTypeProperty(Writer::class, 'should_be_set_for_writer', function() {
+        $this->assertEquals(123, $this->pool->getTypeProperty(Writer::class, 'should_be_set_for_writer', function () {
             return 987;
         }));
     }
 
     /**
-     * Get trait names by type
+     * Get trait names by type.
      */
     public function testTraitNamesByType()
     {

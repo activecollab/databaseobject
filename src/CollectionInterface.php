@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
@@ -12,14 +18,14 @@ use JsonSerializable;
 interface CollectionInterface extends EtagInterface, JsonSerializable
 {
     /**
-     * Return application identifier
+     * Return application identifier.
      *
      * @return string
      */
     public function getApplicationIdentifier();
 
     /**
-     * Set application identifier
+     * Set application identifier.
      *
      * @param  string $value
      * @return $this
@@ -27,61 +33,61 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
     public function &setApplicationIdentifier($value);
 
     /**
-     * Run the query and return DB result
+     * Run the query and return DB result.
      *
      * @return ResultInterface|ObjectInterface[]
      */
     public function execute();
 
     /**
-     * Return ID-s of matching records
+     * Return ID-s of matching records.
      *
      * @return array
      */
     public function executeIds();
 
     /**
-     * Return number of records that match conditions set by the collection
+     * Return number of records that match conditions set by the collection.
      *
-     * @return integer
+     * @return int
      */
     public function count();
 
     /**
-     * Set pagination configuration
+     * Set pagination configuration.
      *
-     * @param  integer $current_page
-     * @param  integer $items_per_page
+     * @param  int   $current_page
+     * @param  int   $items_per_page
      * @return $this
      */
     public function &pagination($current_page = 1, $items_per_page = 100);
 
     /**
-     * Return true if collection is paginated
+     * Return true if collection is paginated.
      *
-     * @return boolean
+     * @return bool
      */
     public function isPaginated();
 
     /**
-     * Set current page
+     * Set current page.
      *
-     * @param  integer $value
+     * @param  int   $value
      * @return $this
      */
     public function &currentPage($value);
 
     /**
-     * Return current page #
+     * Return current page #.
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getCurrentPage();
 
     /**
-     * Return number of items that are displayed per page
+     * Return number of items that are displayed per page.
      *
-     * @return integer|null
+     * @return int|null
      */
     public function getItemsPerPage();
 }

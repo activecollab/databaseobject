@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Finder;
@@ -13,14 +19,14 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 class ContainerPropagatesToFinderTest extends TestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
         parent::setUp();
 
         $this->pool->setContainer(new Container([
-            'dependency' => 'it works!'
+            'dependency' => 'it works!',
         ]));
         $this->assertTrue($this->pool->hasContainer());
         $this->assertInstanceOf(Container::class, $this->pool->getContainer());
@@ -29,7 +35,7 @@ class ContainerPropagatesToFinderTest extends TestCase
     }
 
     /**
-     * Test if container propages to finder
+     * Test if container propages to finder.
      */
     public function testCustomFinderRecivesContainer()
     {
@@ -41,7 +47,7 @@ class ContainerPropagatesToFinderTest extends TestCase
     }
 
     /**
-     * Test custom finder instantination
+     * Test custom finder instantination.
      */
     public function testCustomFinderInstantination()
     {

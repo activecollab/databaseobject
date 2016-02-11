@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is part of the Active Collab DatabaseObject project.
+ *
+ * (c) A51 doo <info@activecollab.com>. All rights reserved.
+ */
+
 namespace ActiveCollab\DatabaseObject\Test\Base;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
@@ -11,7 +17,7 @@ use ActiveCollab\DateValue\DateValue;
 abstract class WritersTypeTestCase extends TestCase
 {
     /**
-     * Set up test environment
+     * Set up test environment.
      */
     public function setUp()
     {
@@ -21,14 +27,14 @@ abstract class WritersTypeTestCase extends TestCase
             $this->connection->dropTable('writers');
         }
 
-        $create_table = $this->connection->execute("CREATE TABLE `writers` (
+        $create_table = $this->connection->execute('CREATE TABLE `writers` (
             `id` int(11) NOT NULL AUTO_INCREMENT,
             `name` varchar(191) COLLATE utf8mb4_unicode_ci,
             `birthday` date NOT NULL,
             `created_at` datetime DEFAULT CURRENT_TIMESTAMP,
             `updated_at` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             PRIMARY KEY (`id`)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;');
 
         $this->assertTrue($create_table);
 
@@ -39,7 +45,7 @@ abstract class WritersTypeTestCase extends TestCase
     }
 
     /**
-     * Tear down test environment
+     * Tear down test environment.
      */
     public function tearDown()
     {
