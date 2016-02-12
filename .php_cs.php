@@ -21,7 +21,6 @@ return (new Symfony\CS\Config\Config('psr2'))->fixers([
     'double_arrow_multiline_whitespaces',
     'hash_to_slash_comment',
     'include',
-    'join_function',
     'multiline_array_trailing_comma',
     'namespace_no_leading_whitespace',
     'no_blank_lines_after_class_opening ',
@@ -47,4 +46,5 @@ return (new Symfony\CS\Config\Config('psr2'))->fixers([
     '-print_to_echo',
     '-concat_without_spaces',
     '-empty_return',
+    '-join_function',
 ])->finder((new Symfony\CS\Finder\DefaultFinder())->in([__DIR__ . '/src', __DIR__ . '/test']));

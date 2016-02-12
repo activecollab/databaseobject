@@ -49,7 +49,7 @@ interface FinderInterface
      * @param  string $field_name
      * @return $this
      */
-    public function &implode($type, $field_name = null);
+    public function &join($type, $field_name = null);
 
     /**
      * @param  string $table_name

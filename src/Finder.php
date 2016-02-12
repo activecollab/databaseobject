@@ -165,7 +165,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  string $field_name
      * @return $this
      */
-    public function &implode($type, $field_name = null)
+    public function &join($type, $field_name = null)
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
