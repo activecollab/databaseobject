@@ -87,4 +87,3 @@ foreach ($pool->find(Writer::class)->all() as $writer) {
 ## To Do
 
 1. Caching
-2. Fix MySQL 5.6 installation on Travis CI
