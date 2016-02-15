@@ -198,25 +198,6 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return object attributes.
-     *
-     * This function will return array of attribute name -> attribute value pairs
-     * for this specific project
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        $field_values = [];
-
-        foreach ($this->fields as $field) {
-            $field_values[$field] = $this->getFieldValue($field);
-        }
-
-        return $field_values;
-    }
-
-    /**
      * Return primary key columns.
      *
      * @return array
@@ -671,6 +652,27 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
+     * Return a list of attributes that this object supports.
+     *
+     * @return array
+     */
+    protected function getAttributes()
+    {
+        return [];
+    }
+
+    /**
+     * Return setter method name for the given attribute.
+     *
+     * @param  string $attribute
+     * @return string
+     */
+    private function getAttributeSetter($attribute)
+    {
+        return 'set' . Inflector::classify($attribute);
+    }
+
+    /**
      * Set non-field value during DataManager::create() and DataManager::update() calls.
      *
      * @param  string $attribute
@@ -679,10 +681,12 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
      */
     public function &setAttribute($attribute, $value)
     {
-        $setter = 'set' . Inflector::classify($attribute);
+        if (in_array($attribute, $this->getAttributes())) {
+            $setter = $this->getAttributeSetter($attribute);
 
-        if (method_exists($this, $setter)) {
-            $this->$setter($value);
+            if (method_exists($this, $setter)) {
+                $this->$setter($value);
+            }
         } else {
             $this->triggerEvent('on_set_attribute', [$attribute, $value]);
         }

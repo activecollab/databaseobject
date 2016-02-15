@@ -42,16 +42,6 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function is(&$var);
 
     /**
-     * Return object attributes.
-     *
-     * This function will return array of attribute name -> attribute value pairs
-     * for this specific project
-     *
-     * @return array
-     */
-    public function getAttributes();
-
-    /**
      * Return primary key columns.
      *
      * @return array

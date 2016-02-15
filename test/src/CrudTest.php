@@ -236,6 +236,17 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
+     * Test if set attribute ignores unknown attributes (value will not be set, even though we can resolve setter).
+     */
+    public function testSetAttributeIgnoresUnknownAttributes()
+    {
+        $writer = new Writer($this->connection, $this->pool);
+        $this->assertEquals('protected', $writer->getProtectedCustomFieldValue());
+        $writer->setAttribute('protected_custom_field_value', 12);
+        $this->assertEquals('protected', $writer->getProtectedCustomFieldValue());
+    }
+
+    /**
      * Test that there will be no exception if we try to set an unknown attribute.
      */
     public function testUnknownAttributeDoesNotProduceAnError()

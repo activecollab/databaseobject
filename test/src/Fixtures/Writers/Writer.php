@@ -62,6 +62,14 @@ class Writer extends BaseWriter implements ScrapInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getAttributes()
+    {
+        return array_merge(parent::getAttributes(), ['custom_field_value']);
+    }
+
+    /**
      * @var mixed
      */
     private $custom_field_value;
@@ -85,6 +93,34 @@ class Writer extends BaseWriter implements ScrapInterface
     public function &setCustomFieldValue($value)
     {
         $this->custom_field_value = $value;
+
+        return $this;
+    }
+
+    /**
+     * @var string
+     */
+    private $protected_custom_field_value = 'protected';
+
+    /**
+     * Return protected field value.
+     *
+     * @return string
+     */
+    public function getProtectedCustomFieldValue()
+    {
+        return $this->protected_custom_field_value;
+    }
+
+    /**
+     * Set protected custom field value.
+     *
+     * @param  mixed $value
+     * @return $this
+     */
+    public function &setProtectedCustomFieldValue($value)
+    {
+        $this->protected_custom_field_value = $value;
 
         return $this;
     }
