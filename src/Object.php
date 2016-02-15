@@ -856,9 +856,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array or property => value pairs that describes this object.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function jsonSerialize()
     {
@@ -866,5 +864,13 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
         $this->triggerEvent('on_json_serialize', [&$result]);
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function jsonSerializeDetails()
+    {
+        return [];
     }
 }

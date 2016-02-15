@@ -233,4 +233,11 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
      * @return $this
      */
     public function &setAttribute($attribute, $value);
+
+    /**
+     * Return an array of object properties that are needed to fully display this object on a page.
+     *
+     * @return array
+     */
+    public function jsonSerializeDetails();
 }
