@@ -36,8 +36,16 @@ interface ValidatorInterface
     public function greaterThan($field_name);
 
     /**
-     * @param string $field_name
-     * @param  string  ...$context
+     * @param  string     $field_name
+     * @param  array      $array_of_values
+     * @param  bool|false $allow_null
+     * @return bool
+     */
+    public function inArray($field_name, array $array_of_values, $allow_null = false);
+
+    /**
+     * @param  string   $field_name
+     * @param  string[] $context
      * @return bool
      */
     public function unique($field_name, ...$context);
@@ -47,15 +55,15 @@ interface ValidatorInterface
      *
      * @param string       $field_name
      * @param array|string $where
-     * @param  string       ...$context
+     * @param string[]     $context
      */
     public function uniqueWhere($field_name, $where, ...$context);
 
     /**
      * Field value needs to be present and unique.
      *
-     * @param string $field_name
-     * @param  string ...$context
+     * @param  string   $field_name
+     * @param  string[] $context
      * @return bool
      */
     public function presentAndUnique($field_name, ...$context);
@@ -63,9 +71,9 @@ interface ValidatorInterface
     /**
      * Present and unique, with the given condition.
      *
-     * @param string       $field_name
-     * @param array|string $where
-     * @param  string       ...$context
+     * @param  string       $field_name
+     * @param  array|string $where
+     * @param  string[]     $context
      * @return bool
      */
     public function presentAndUniqueWhere($field_name, $where, ...$context);

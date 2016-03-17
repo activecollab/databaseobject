@@ -119,15 +119,38 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Check if value that we are trying to save is unique in the given context.
-     *
-     * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
-     * raising an error
-     *
-     * @param string $field_name
-     * @param  string                   ...$context
-     * @return bool
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
+     */
+    public function inArray($field_name, array $array_of_values, $allow_null = false)
+    {
+        if (empty($field_name)) {
+            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+        }
+
+        if (array_key_exists($field_name, $this->field_values)) {
+            if ($this->field_values[$field_name] === null) {
+                if ($allow_null) {
+                    return true;
+                } else {
+                    return $this->failPresenceValidation($field_name);
+                }
+            }
+
+            if (in_array($this->field_values[$field_name], $array_of_values)) {
+                return true;
+            } else {
+                $this->addFieldError($field_name, "Value of '$field_name' is not present in the list of supported values");
+
+                return false;
+            }
+        } else {
+            return $this->failPresenceValidation($field_name);
+        }
+    }
+
+
+    /**
+     * {@inheritdoc}
      */
     public function unique($field_name, ...$context)
     {
@@ -135,16 +158,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Check if value that we are trying to save is unique in the given context.
-     *
-     * Note: NULL is not checked for uniquenss because MySQL lets us save as many objects as we need with NULL without
-     * raising an error
-     *
-     * @param string       $field_name
-     * @param array|string $where
-     * @param  string                   ...$context
-     * @return bool
-     * @throws InvalidArgumentException
+     * {@inheritdoc}
      */
     public function uniqueWhere($field_name, $where, ...$context)
     {
@@ -211,11 +225,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Field value needs to be present and unique.
-     *
-     * @param string $field_name
-     * @param  string ...$context
-     * @return bool
+     * {@inheritdoc}
      */
     public function presentAndUnique($field_name, ...$context)
     {
@@ -227,12 +237,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Field value needs to be present and unique.
-     *
-     * @param string       $field_name
-     * @param array|string $where
-     * @param  string       ...$context
-     * @return bool
+     * {@inheritdoc}
      */
     public function presentAndUniqueWhere($field_name, $where, ...$context)
     {
@@ -244,11 +249,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Validate email address value.
-     *
-     * @param  string     $field_name
-     * @param  bool|false $allow_null
-     * @return bool
+     * {@inheritdoc}
      */
     public function email($field_name, $allow_null = false)
     {
@@ -274,11 +275,7 @@ class Validator implements ValidatorInterface
     }
 
     /**
-     * Validate URL value.
-     *
-     * @param  string     $field_name
-     * @param  bool|false $allow_null
-     * @return bool
+     * {@inheritdoc}
      */
     public function url($field_name, $allow_null = false)
     {
