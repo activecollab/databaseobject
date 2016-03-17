@@ -24,16 +24,20 @@ interface ValidatorInterface
     public function present($field_name);
 
     /**
-     * @param  string $field_name
+     * @param  string     $field_name
+     * @param  int        $reference_value
+     * @param  bool|false $allow_null
      * @return bool
      */
-    public function lowerThan($field_name);
+    public function lowerThan($field_name, $reference_value, $allow_null = false);
 
     /**
-     * @param  string $field_name
+     * @param  string     $field_name
+     * @param  int        $reference_value
+     * @param  bool|false $allow_null
      * @return bool
      */
-    public function greaterThan($field_name);
+    public function greaterThan($field_name, $reference_value, $allow_null = false);
 
     /**
      * @param  string     $field_name

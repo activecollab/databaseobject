@@ -110,12 +110,61 @@ class Validator implements ValidatorInterface
         return false;
     }
 
-    public function lowerThan($field_name)
+    /**
+     * {@inheritdoc}
+     */
+    public function lowerThan($field_name, $reference_value, $allow_null = false)
     {
+        if (empty($field_name)) {
+            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+        }
+
+        if (array_key_exists($field_name, $this->field_values)) {
+            if ($this->field_values[$field_name] === null) {
+                if ($allow_null) {
+                    return true;
+                } else {
+                    return $this->failPresenceValidation($field_name);
+                }
+            }
+
+            if ($this->field_values[$field_name] < $reference_value) {
+                return true;
+            } else {
+                $this->addFieldError($field_name, "Value of '$field_name' is not lower than $reference_value");
+
+                return false;
+            }
+        } else {
+            return $this->failPresenceValidation($field_name);
+        }
     }
 
-    public function greaterThan($field_name)
+    public function greaterThan($field_name, $reference_value, $allow_null = false)
     {
+        if (empty($field_name)) {
+            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+        }
+
+        if (array_key_exists($field_name, $this->field_values)) {
+            if ($this->field_values[$field_name] === null) {
+                if ($allow_null) {
+                    return true;
+                } else {
+                    return $this->failPresenceValidation($field_name);
+                }
+            }
+
+            if ($this->field_values[$field_name] > $reference_value) {
+                return true;
+            } else {
+                $this->addFieldError($field_name, "Value of '$field_name' is not greater than $reference_value");
+
+                return false;
+            }
+        } else {
+            return $this->failPresenceValidation($field_name);
+        }
     }
 
     /**
