@@ -115,32 +115,52 @@ class Validator implements ValidatorInterface
      */
     public function lowerThan($field_name, $reference_value, $allow_null = false)
     {
-        if (empty($field_name)) {
-            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
-        }
-
-        if (array_key_exists($field_name, $this->field_values)) {
-            if ($this->field_values[$field_name] === null) {
-                if ($allow_null) {
-                    return true;
-                } else {
-                    return $this->failPresenceValidation($field_name);
-                }
-            }
-
-            if ($this->field_values[$field_name] < $reference_value) {
-                return true;
-            } else {
-                $this->addFieldError($field_name, "Value of '$field_name' is not lower than $reference_value");
-
-                return false;
-            }
-        } else {
-            return $this->failPresenceValidation($field_name);
-        }
+        return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
+            return $a < $b;
+        }, "Value of '$field_name' is not lower than $reference_value");
     }
 
+    /**
+     * {@inheritdoc}
+     */
+    public function lowerThanOrEquals($field_name, $reference_value, $allow_null = false)
+    {
+        return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
+            return $a <= $b;
+        }, "Value of '$field_name' is not lower than or equal to $reference_value");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function greaterThan($field_name, $reference_value, $allow_null = false)
+    {
+        return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
+            return $a > $b;
+        }, "Value of '$field_name' is not greater than $reference_value");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false)
+    {
+        return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
+            return $a >= $b;
+        }, "Value of '$field_name' is not greater than or equal to $reference_value");
+    }
+
+    /**
+     * Validate field value by comparing it to a reference value using a closure.
+     *
+     * @param  string   $field_name
+     * @param  mixed    $reference_value
+     * @param  bool     $allow_null
+     * @param  callable $compare_with
+     * @param  string   $validation_failed_message
+     * @return bool
+     */
+    protected function compareValues($field_name, $reference_value, $allow_null, callable $compare_with, $validation_failed_message)
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
@@ -155,10 +175,10 @@ class Validator implements ValidatorInterface
                 }
             }
 
-            if ($this->field_values[$field_name] > $reference_value) {
+            if (call_user_func($compare_with, $this->field_values[$field_name], $reference_value)) {
                 return true;
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' is not greater than $reference_value");
+                $this->addFieldError($field_name, $validation_failed_message);
 
                 return false;
             }
@@ -196,7 +216,6 @@ class Validator implements ValidatorInterface
             return $this->failPresenceValidation($field_name);
         }
     }
-
 
     /**
      * {@inheritdoc}

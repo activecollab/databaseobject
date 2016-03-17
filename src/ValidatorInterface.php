@@ -37,7 +37,23 @@ interface ValidatorInterface
      * @param  bool|false $allow_null
      * @return bool
      */
+    public function lowerThanOrEquals($field_name, $reference_value, $allow_null = false);
+
+    /**
+     * @param  string     $field_name
+     * @param  int        $reference_value
+     * @param  bool|false $allow_null
+     * @return bool
+     */
     public function greaterThan($field_name, $reference_value, $allow_null = false);
+
+    /**
+     * @param  string     $field_name
+     * @param  int        $reference_value
+     * @param  bool|false $allow_null
+     * @return bool
+     */
+    public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false);
 
     /**
      * @param  string     $field_name
