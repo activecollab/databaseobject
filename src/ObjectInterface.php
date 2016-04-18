@@ -161,6 +161,13 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     public function isModifiedField($field);
 
     /**
+     * Return modificications indexed by field name, with value composed of an old and new value.
+     *
+     * @return array
+     */
+    public function getModifications();
+
+    /**
      * Return true if primary key is modified.
      *
      * @return bool

@@ -146,6 +146,29 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
+     * Test get modifications grouped by field name.
+     */
+    public function testModifications()
+    {
+        /** @var Writer $tolstoy */
+        $tolstoy = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertEmpty($tolstoy->getModifications());
+
+        $tolstoy->setName('Lev Nikolayevich Tolstoy')->setBirthday(new DateValue('1828-09-10'));
+
+        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertCount(2, $tolstoy->getModifications());
+
+        $this->assertEquals('Leo Tolstoy', $tolstoy->getModifications()['name'][0]);
+        $this->assertEquals('Lev Nikolayevich Tolstoy', $tolstoy->getModifications()['name'][1]);
+
+        $this->assertEquals('1828-09-09', $tolstoy->getModifications()['birthday'][0]->format('Y-m-d'));
+        $this->assertEquals('1828-09-10', $tolstoy->getModifications()['birthday'][1]->format('Y-m-d'));
+    }
+
+    /**
      * Test if we can change ID to a new value that is not yet reserved.
      */
     public function testChangeIdToNewRecord()

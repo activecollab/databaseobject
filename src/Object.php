@@ -271,19 +271,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
         // ---------------------------------------------------
 
         $is_new = $this->isNew();
-
-        $modifications = [];
-
-        if (count($this->getModifiedFields())) {
-            foreach ($this->getModifiedFields() as $field) {
-                $old_value = $this->getOldFieldValue($field);
-                $new_value = $this->getFieldValue($field);
-
-                if ($old_value != $new_value) {
-                    $modifications[$field] = [$this->getOldFieldValue($field), $this->getFieldValue($field)];
-                }
-            }
-        }
+        $modifications = $this->getModifications();
 
         $this->triggerEvent('on_before_save', [$is_new, $modifications]);
 
@@ -356,9 +344,7 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     {
         $object_class = get_class($this);
 
-        /*
-         * @var object
-         */
+        /** @var ObjectInterface $copy */
         $copy = new $object_class();
 
         foreach ($this->fields as $field) {
@@ -477,13 +463,32 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array of modified fields.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getModifiedFields()
     {
         return $this->modified_fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getModifications()
+    {
+        $result = [];
+
+        if (count($this->getModifiedFields())) {
+            foreach ($this->getModifiedFields() as $field) {
+                $old_value = $this->getOldFieldValue($field);
+                $new_value = $this->getFieldValue($field);
+
+                if ($old_value != $new_value) {
+                    $result[$field] = [$this->getOldFieldValue($field), $this->getFieldValue($field)];
+                }
+            }
+        }
+
+        return $result;
     }
 
     /**
