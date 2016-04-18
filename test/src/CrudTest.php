@@ -166,6 +166,11 @@ class CrudTest extends WritersTypeTestCase
 
         $this->assertEquals('1828-09-09', $tolstoy->getModifications()['birthday'][0]->format('Y-m-d'));
         $this->assertEquals('1828-09-10', $tolstoy->getModifications()['birthday'][1]->format('Y-m-d'));
+
+        $tolstoy->save();
+
+        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertEmpty($tolstoy->getModifications());
     }
 
     /**
