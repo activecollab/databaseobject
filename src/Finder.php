@@ -178,7 +178,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     public function &joinTable($table_name, $field_name = null)
     {
         $join_table = $this->connection->escapeTableName($table_name);
-        $join_field = $this->connection->escapeFieldname($field_name ? $field_name : $this->getJoinFieldNameFromType());
+        $join_field = $this->connection->escapeFieldName($field_name ? $field_name : $this->getJoinFieldNameFromType());
 
         $this->join = "LEFT JOIN $join_table ON {$this->getEscapedTableName()}.`id` = $join_table.$join_field";
 

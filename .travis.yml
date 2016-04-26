@@ -19,4 +19,4 @@ before_install:
 install: composer install --dev
 before_script:
   - mysql -u root -e 'create database activecollab_database_object_test'
-script: phpunit -c test/phpunit.xml
+script: phpunit
