@@ -18,17 +18,17 @@
     ],
     "require": {
         "php": ">=5.6.0",
-        "activecollab/databaseconnection": "dev-next",
-        "activecollab/etag": "~1.0",
-        "doctrine/inflector": "~1.0",
-        "psr/log": "~1.0.0"
+        "activecollab/databaseconnection": "^2.0.0",
+        "activecollab/etag": "^1.0",
+        "doctrine/inflector": "^1.0",
+        "psr/log": "^1.0.0"
     },
     "require-dev": {
         "fabpot/php-cs-fixer": "~1.0",
         "phpunit/phpunit": "~5.0",
         "pimple/pimple": "~3.0.0"
     },
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "autoload": {
         "psr-4": {
             "ActiveCollab\\DatabaseObject\\": "src",
