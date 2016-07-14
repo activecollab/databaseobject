@@ -13,7 +13,7 @@ use ActiveCollab\DatabaseObject\Pool;
 use mysqli;
 
 /**
- * @package ActiveCollab\JobsQueue\Test
+ * @package ActiveCollab\DatabaseObject\Test\Base
  */
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {

@@ -12,11 +12,12 @@ use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 use JsonSerializable;
+use ActiveCollab\Object\ObjectInterface as BaseObjectInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
  */
-interface ObjectInterface extends LoadFromRow, JsonSerializable
+interface ObjectInterface extends BaseObjectInterface, LoadFromRow, JsonSerializable
 {
     /**
      * Validate object properties before object is saved.
@@ -29,17 +30,6 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
      * @param ValidatorInterface $validator
      */
     public function validate(ValidatorInterface &$validator);
-
-    /**
-     * Returns true if $var is the same object this object is.
-     *
-     * Comparison is done on class - PK values for loaded objects, or as simple
-     * object comparison in case objects are not saved and loaded
-     *
-     * @param  object $var
-     * @return bool
-     */
-    public function is(&$var);
 
     /**
      * Return primary key columns.
@@ -114,13 +104,6 @@ interface ObjectInterface extends LoadFromRow, JsonSerializable
     // ---------------------------------------------------
     //  Fields
     // ---------------------------------------------------
-
-    /**
-     * Return object ID.
-     *
-     * @return int
-     */
-    public function getId();
 
     /**
      * Set value of id field.

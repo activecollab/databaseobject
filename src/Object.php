@@ -170,22 +170,16 @@ abstract class Object implements ObjectInterface, ContainerAccessInterface
     }
 
     /**
-     * Returns true if $var is the same object this object is.
-     *
-     * Comparison is done on class - PK values for loaded objects, or as simple
-     * object comparison in case objects are not saved and loaded
-     *
-     * @param  object $var
-     * @return bool
+     * {@inheritdoc}
      */
-    public function is(&$var)
+    public function is($object)
     {
-        if ($var instanceof ObjectInterface) {
+        if ($object instanceof ObjectInterface) {
             if ($this->isLoaded()) {
-                return $var->isLoaded() && get_class($this) == get_class($var) && $this->getId() == $var->getId();
+                return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
             } else {
                 foreach ($this->getFields() as $field_name) {
-                    if (!$var->fieldExists($field_name) || $this->getFieldValue($field_name) !== $var->getFieldValue($field_name)) {
+                    if (!$object->fieldExists($field_name) || $this->getFieldValue($field_name) !== $object->getFieldValue($field_name)) {
                         return false;
                     }
                 }
