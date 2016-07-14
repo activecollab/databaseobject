@@ -25,9 +25,9 @@ class ContainerPropagatesToFinderTest extends TestCase
     {
         parent::setUp();
 
-        $this->pool->setContainer(new Container([
-            'dependency' => 'it works!',
-        ]));
+        $container = new Container(['dependency' => 'it works!']);
+
+        $this->pool->setContainer($container);
         $this->assertTrue($this->pool->hasContainer());
         $this->assertInstanceOf(Container::class, $this->pool->getContainer());
 

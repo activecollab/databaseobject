@@ -24,9 +24,9 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
     {
         parent::setUp();
 
-        $this->pool->setContainer(new Container([
-            'is_special' => true,
-        ]));
+        $container = new Container(['is_special' => true]);
+
+        $this->pool->setContainer($container);
         $this->assertTrue($this->pool->hasContainer());
         $this->assertInstanceOf(Container::class, $this->pool->getContainer());
     }
