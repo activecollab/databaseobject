@@ -139,7 +139,7 @@ abstract class Type extends Collection
         }
 
         $table_name = $this->getTableName();
-        $conditions = $this->conditions ? " WHERE $this->conditions" : '';
+        $conditions = $this->getConditions() ? " WHERE {$this->getConditions()}" : '';
 
         if ($this->count() > 0) {
             if ($join_expression = $this->getJoinExpression()) {
@@ -238,7 +238,7 @@ abstract class Type extends Collection
 
         $fields = $all_fields ? '*' : '`id`';
         $table_name = $this->connection->escapeTableName($this->getTableName());
-        $conditions = $this->conditions ? "WHERE $this->conditions" : '';
+        $conditions = $this->getConditions() ? "WHERE {$this->getConditions()}" : '';
 
         if ($order_by = $this->getOrderBy()) {
             $order_by = "ORDER BY $this->order_by";
@@ -267,7 +267,7 @@ abstract class Type extends Collection
         }
 
         $table_name = $this->connection->escapeTableName($this->getTableName());
-        $conditions = $this->conditions ? " WHERE $this->conditions" : '';
+        $conditions = $this->getConditions() ? " WHERE {$this->getConditions()}" : '';
 
         if ($join_expression = $this->getJoinExpression()) {
             return (integer) $this->connection->executeFirstCell("SELECT COUNT($table_name.`id`) FROM $table_name $join_expression $conditions");
@@ -340,7 +340,16 @@ abstract class Type extends Collection
      *
      * @var string
      */
-    private $conditions;
+    private $conditions = [];
+
+    /**
+     * Cached conditions as string.
+     *
+     * Call to where() resets this value to false, and getConditions() rebuilds it if it FALSE on request.
+     *
+     * @var string|bool
+     */
+    private $conditions_as_string = false;
 
     /**
      * Return conditions.
@@ -349,26 +358,51 @@ abstract class Type extends Collection
      */
     public function getConditions()
     {
-        return $this->conditions;
+        if ($this->conditions_as_string === false) {
+            switch (count($this->conditions)) {
+                case 0:
+                    $this->conditions_as_string = '';
+                    break;
+                case 1:
+                    $this->conditions_as_string = $this->conditions[0];
+                    break;
+                default:
+                    $this->conditions_as_string = implode(' AND ', array_map(function($condition) {
+                        return "($condition)";
+                    }, $this->conditions));
+            }
+        }
+
+        return $this->conditions_as_string;
     }
 
     /**
      * Set collection conditions.
      *
-     * @param  mixed ...$arguments
+     * @param  string $pattern
+     * @param  array  $arguments
      * @return $this
      */
-    public function &where()
+    public function &where($pattern, ...$arguments)
     {
-        $number_of_arguments = func_num_args();
-
-        if ($number_of_arguments === 1) {
-            $this->conditions = $this->connection->prepareConditions(func_get_arg(0));
-        } elseif ($number_of_arguments > 1) {
-            $this->conditions = $this->connection->prepareConditions(func_get_args());
-        } else {
-            throw new InvalidArgumentException('At least one argument expected');
+        if (empty($pattern)) {
+            throw new InvalidArgumentException('Pattern argument is required');
         }
+
+        if (is_string($pattern)) {
+            $this->conditions[] = $this->connection->prepareConditions(array_merge([$pattern], $arguments));
+        } elseif (is_array($pattern)) {
+            if (!empty($arguments)) {
+                throw new LogicException('When pattern is an array, no extra arguments are allowed');
+            }
+
+            $this->conditions[] = $this->connection->prepareConditions($pattern);
+        } else {
+            throw new InvalidArgumentException('Pattern can be string or an array');
+        }
+
+        // Force rebuild of conditions as string on next getConditions() call
+        $this->conditions_as_string = false;
 
         return $this;
     }

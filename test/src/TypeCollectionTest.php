@@ -67,6 +67,17 @@ class TypeCollectionTest extends WritersTypeTestCase
     }
 
     /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage When pattern is an array, no extra arguments are allowed
+     */
+    public function testSetConditionsFromArrayAcceptsOnlyPatternArgument()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->where(['type = ?', 'File'], 1, 2, 3);
+    }
+
+    /**
      * Test set conditions from array of arguments.
      */
     public function testSetConditionsFromArrayOfArguments()
@@ -79,18 +90,40 @@ class TypeCollectionTest extends WritersTypeTestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Pattern argument is required
      */
-    public function testEmptyListOfArgumentsThrowsAnException()
+    public function testEmptyPatternStringThrowsAnException()
     {
-        (new WritersCollection($this->connection, $this->pool))->where();
+        (new WritersCollection($this->connection, $this->pool))->where('');
     }
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Pattern argument is required
+     */
+    public function testEmptyPatternArrayThrowsAnException()
+    {
+        (new WritersCollection($this->connection, $this->pool))->where([]);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Pattern can be string or an array
      */
     public function testInvalidConditionsTypeThrowsAnException()
     {
         (new WritersCollection($this->connection, $this->pool))->where(123);
+    }
+
+    public function testSetMultipleConditions()
+    {
+        $collection = new WritersCollection($this->connection, $this->pool);
+
+        $collection->where('type = ?', 'File');
+        $collection->where('type = ?', 'YouTubeVideo');
+        $collection->where('type = ?', 'GoogleDocument');
+
+        $this->assertEquals($collection->getConditions(), "(type = 'File') AND (type = 'YouTubeVideo') AND (type = 'GoogleDocument')");
     }
 
     /**
