@@ -9,6 +9,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\Etag\EtagInterface;
 use JsonSerializable;
 
@@ -35,7 +36,7 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
     /**
      * Run the query and return DB result.
      *
-     * @return ResultInterface|ObjectInterface[]
+     * @return ResultInterface|EntityInterface[]
      */
     public function execute();
 

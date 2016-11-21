@@ -7,6 +7,7 @@
  */
 
 namespace ActiveCollab\DatabaseObject;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -72,14 +73,14 @@ interface FinderInterface
     /**
      * Return all records that match the given criteria.
      *
-     * @return \ActiveCollab\DatabaseConnection\Result\Result|ObjectInterface[]|null
+     * @return \ActiveCollab\DatabaseConnection\Result\Result|EntityInterface[]|null
      */
     public function all();
 
     /**
      * Return first record that matches the given criteria.
      *
-     * @return ObjectInterface|null
+     * @return EntityInterface|null
      */
     public function first();
 

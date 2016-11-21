@@ -9,6 +9,7 @@
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -21,28 +22,28 @@ interface PoolInterface
      * @param  string          $type
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
     public function &produce($type, array $attributes = null, $save = true);
 
     /**
      * Update an instance.
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true);
+    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true);
 
     /**
      * Scrap an instance (move it to trash, if object supports, or delete it).
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  bool            $force_delete
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &scrap(ObjectInterface &$instance, $force_delete = false);
+    public function &scrap(EntityInterface &$instance, $force_delete = false);
 
     /**
      * Register producer instance for the given type.
@@ -101,9 +102,9 @@ interface PoolInterface
     /**
      * Add object to the pool.
      *
-     * @param ObjectInterface $object
+     * @param EntityInterface $object
      */
-    public function remember(ObjectInterface &$object);
+    public function remember(EntityInterface &$object);
 
     /**
      * Forget object if it is loaded in memory.
@@ -145,7 +146,7 @@ interface PoolInterface
      * @param  string                                 $type
      * @param  string                                 $sql
      * @param  mixed                                  $arguments
-     * @return ResultInterface|ObjectInterface[]|null
+     * @return ResultInterface|EntityInterface[]|null
      */
     public function findBySql($type, $sql, ...$arguments);
 

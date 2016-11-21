@@ -29,7 +29,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     private $connection;
 
     /**
-     * @var Pool
+     * @var PoolInterface
      */
     private $pool;
 
@@ -96,7 +96,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Set finder conditions.
+     * Set finder  .
      *
      * @param string $pattern
      * @param  mixed  ...$arguments
@@ -378,5 +378,33 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
 
         return $this->escaped_table_name;
+    }
+
+    // ---------------------------------------------------
+    //  Access to dependencies
+    // ---------------------------------------------------
+
+    /**
+     * @return ConnectionInterface
+     */
+    protected function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * @return PoolInterface
+     */
+    protected function getPool()
+    {
+        return $this->pool;
+    }
+
+    /**
+     * @return LoggerInterface|null
+     */
+    protected function getLog()
+    {
+        return $this->log;
     }
 }

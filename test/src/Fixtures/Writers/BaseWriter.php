@@ -8,15 +8,15 @@
 
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
-use ActiveCollab\DatabaseObject\Object;
-use ActiveCollab\DatabaseObject\ObjectInterface;
+use ActiveCollab\DatabaseObject\Entity\Entity;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DateValue\DateValueInterface;
 use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
  */
-abstract class BaseWriter extends Object implements ObjectInterface
+abstract class BaseWriter extends Entity implements EntityInterface
 {
     /**
      * Name of the table where records are stored.

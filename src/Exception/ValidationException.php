@@ -8,7 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject\Exception;
 
-use ActiveCollab\DatabaseObject\ObjectInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Exception;
 
 /**
@@ -21,7 +21,7 @@ class ValidationException extends Exception
     /**
      * Object instance.
      *
-     * @var ObjectInterface
+     * @var EntityInterface
      */
     private $object;
 
@@ -57,9 +57,9 @@ class ValidationException extends Exception
     }
 
     /**
-     * @param ObjectInterface $object
+     * @param EntityInterface $object
      */
-    public function setObject(ObjectInterface $object)
+    public function setObject(EntityInterface $object)
     {
         $this->object = $object;
     }
@@ -82,7 +82,7 @@ class ValidationException extends Exception
             }
         }
 
-        if ($this->object instanceof ObjectInterface) {
+        if ($this->object instanceof EntityInterface) {
             $result['object_class'] = get_class($this->object);
         }
 
