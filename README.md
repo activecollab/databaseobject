@@ -87,4 +87,5 @@ foreach ($pool->find(Writer::class)->all() as $writer) {
 
 ## To Do
 
-1. Caching
+1. Caching,
+1. Remove deprecated `ObjectInterface` and `Object` class.
