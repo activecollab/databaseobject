@@ -8,7 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject\Test\Fixtures;
 
-use ActiveCollab\DatabaseObject\ObjectInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Producer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
@@ -23,7 +23,7 @@ class CustomProducer extends Producer
      * @param  string          $type
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
@@ -39,12 +39,12 @@ class CustomProducer extends Producer
     /**
      * Update an instance.
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
     {
         $instance = parent::modify($instance, $attributes, $save);
 
@@ -58,11 +58,11 @@ class CustomProducer extends Producer
     /**
      * Scrap an instance (move it to trash, if object can be trashed, or delete it).
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  bool            $force_delete
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    public function &scrap(EntityInterface &$instance, $force_delete = false)
     {
         $instance = parent::scrap($instance, $force_delete);
 

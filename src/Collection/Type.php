@@ -10,7 +10,7 @@ namespace ActiveCollab\DatabaseObject\Collection;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Collection;
-use ActiveCollab\DatabaseObject\ObjectInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use LogicException;
@@ -159,7 +159,7 @@ abstract class Type extends Collection
     /**
      * Run the query and return DB result.
      *
-     * @return ResultInterface|ObjectInterface[]
+     * @return ResultInterface|EntityInterface[]
      */
     public function execute()
     {

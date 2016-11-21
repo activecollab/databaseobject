@@ -11,6 +11,7 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Psr\Log\LoggerInterface;
 
 /**
@@ -53,11 +54,11 @@ class Producer implements ProducerInterface, ContainerAccessInterface
      * @param  string          $type
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
-        /** @var object|ObjectInterface $object */
+        /** @var object|EntityInterface $object */
         $object = new $type($this->connection, $this->pool, $this->log);
 
         if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
@@ -84,12 +85,12 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     /**
      * Update an instance.
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
     {
         if ($attributes) {
             foreach ($attributes as $k => $v) {
@@ -111,11 +112,11 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     /**
      * Scrap an instance (move it to trash, if object can be trashed, or delete it).
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  bool            $force_delete
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    public function &scrap(EntityInterface &$instance, $force_delete = false)
     {
         if (!$force_delete && $instance instanceof ScrapInterface) {
             return $instance->scrap();

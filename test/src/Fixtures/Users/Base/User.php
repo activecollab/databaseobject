@@ -8,13 +8,13 @@
 
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base;
 
-use ActiveCollab\DatabaseObject\Object;
+use ActiveCollab\DatabaseObject\Entity\Entity;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 
 /**
  * @package ActiveCollab\Id\Model\Base
  */
-abstract class User extends Object
+abstract class User extends Entity
 {
     /**
      * Name of the table where records are stored.

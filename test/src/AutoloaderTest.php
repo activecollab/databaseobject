@@ -20,7 +20,7 @@ class AutoloaderTest extends TestCase
      */
     public function testAutoloader()
     {
-        $this->assertTrue(class_exists('\ActiveCollab\DatabaseObject\Object'));
+        $this->assertTrue(class_exists('\ActiveCollab\DatabaseObject\Entity\Entity'));
         $this->assertTrue(class_exists('\ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer'));
     }
 }

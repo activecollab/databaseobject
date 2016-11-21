@@ -12,6 +12,7 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
 use InvalidArgumentException;
 use LogicException;
@@ -37,7 +38,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     protected $log;
 
     /**
-     * @var ObjectInterface[]
+     * @var EntityInterface[]
      */
     private $objects_pool = [];
 
@@ -57,14 +58,14 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string          $type
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
             $object = $this->getProducerForRegisteredType($registered_type)->produce($type, $attributes, $save);
 
-            if ($object instanceof ObjectInterface) {
+            if ($object instanceof EntityInterface) {
                 if ($object->isLoaded()) {
                     $this->objects_pool[$registered_type][$object->getId()] = $object;
                 }
@@ -81,12 +82,12 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * Update an instance.
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  array|null      $attributes
      * @param  bool            $save
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &modify(ObjectInterface &$instance, array $attributes = null, $save = true)
+    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
@@ -97,7 +98,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         if ($registered_type = $this->getRegisteredType($instance_type)) {
             $instance = $this->getProducerForRegisteredType($registered_type)->modify($instance, $attributes, $save);
 
-            if ($instance instanceof ObjectInterface) {
+            if ($instance instanceof EntityInterface) {
                 $this->objects_pool[$registered_type][$instance->getId()] = $instance;
             }
 
@@ -110,11 +111,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * Scrap an instance (move it to trash, if object supports, or delete it).
      *
-     * @param  ObjectInterface $instance
+     * @param  EntityInterface $instance
      * @param  bool            $force_delete
-     * @return ObjectInterface
+     * @return EntityInterface
      */
-    public function &scrap(ObjectInterface &$instance, $force_delete = false)
+    public function &scrap(EntityInterface &$instance, $force_delete = false)
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
@@ -248,7 +249,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
                     $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
 
-                    /** @var object|ObjectInterface $object */
+                    /** @var object|EntityInterface $object */
                     $object = new $object_class($this->connection, $this, $this->log);
 
                     if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
@@ -329,8 +330,8 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      *
      * @param  string               $registered_type
      * @param  int                  $id
-     * @param  ObjectInterface|null $value_to_store
-     * @return ObjectInterface
+     * @param  EntityInterface|null $value_to_store
+     * @return EntityInterface
      */
     private function &addToObjectPool($registered_type, $id, &$value_to_store)
     {
@@ -346,9 +347,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * Add object to the pool.
      *
-     * @param ObjectInterface $object
+     * @param EntityInterface $object
      */
-    public function remember(ObjectInterface &$object)
+    public function remember(EntityInterface &$object)
     {
         if ($object->isLoaded()) {
             if ($registered_type = $this->getRegisteredType(get_class($object))) {
@@ -455,7 +456,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string                                 $type
      * @param  string                                 $sql
      * @param  mixed                                  $arguments
-     * @return ResultInterface|ObjectInterface[]|null
+     * @return ResultInterface|EntityInterface[]|null
      */
     public function findBySql($type, $sql, ...$arguments)
     {
@@ -645,7 +646,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 if (class_exists($type, true)) {
                     $reflection_class = new ReflectionClass($type);
 
-                    if ($reflection_class->implementsInterface(ObjectInterface::class)) {
+                    if ($reflection_class->implementsInterface(EntityInterface::class)) {
                         foreach ($this->types as $registered_type => $registered_type_properties) {
                             if ($reflection_class->isSubclassOf($registered_type)) {
                                 $this->known_types[ $type ] = $registered_type;
@@ -697,7 +698,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             if (class_exists($type, true)) {
                 $reflection = new ReflectionClass($type);
 
-                if ($reflection->implementsInterface(ObjectInterface::class)) {
+                if ($reflection->implementsInterface(EntityInterface::class)) {
                     $default_properties = $reflection->getDefaultProperties();
 
                     if (empty($default_properties['order_by'])) {
@@ -710,7 +711,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                         'order_by' => $default_properties['order_by'],
                     ];
                 } else {
-                    throw new InvalidArgumentException("Type '$type' does not implement '" . ObjectInterface::class . "' interface");
+                    throw new InvalidArgumentException("Type '$type' does not implement '" . EntityInterface::class . "' interface");
                 }
             } else {
                 throw new InvalidArgumentException("Type '$type' is not defined");
