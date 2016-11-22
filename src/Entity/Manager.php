@@ -20,17 +20,17 @@ abstract class Manager implements ManagerInterface
     /**
      * @var ConnectionInterface
      */
-    private $connection;
+    protected $connection;
 
     /**
      * @var PoolInterface
      */
-    private $pool;
+    protected $pool;
 
     /**
      * @var LoggerInterface
      */
-    private $log;
+    protected $log;
 
     /**
      * @param PoolInterface        $pool
@@ -42,29 +42,5 @@ abstract class Manager implements ManagerInterface
         $this->connection = $connection;
         $this->pool = $pool;
         $this->log = $log;
-    }
-
-    /**
-     * @return ConnectionInterface
-     */
-    protected function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @return PoolInterface
-     */
-    protected function getPool()
-    {
-        return $this->pool;
-    }
-
-    /**
-     * @return LoggerInterface|null
-     */
-    protected function getLog()
-    {
-        return $this->log;
     }
 }

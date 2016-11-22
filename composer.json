@@ -1,7 +1,7 @@
 {
     "name": "activecollab/databaseobject",
     "type": "library",
-    "description": "Library that enables easy persistance of objects to the database",
+    "description": "Library that enables easy persistance of objects to the MySQL 5.7+ database",
     "license": "MIT",
     "prefer-stable": true,
     "keywords": [
