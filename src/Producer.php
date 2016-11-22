@@ -124,4 +124,28 @@ class Producer implements ProducerInterface, ContainerAccessInterface
             return $instance->delete();
         }
     }
+
+    /**
+     * @return ConnectionInterface
+     */
+    protected function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
+     * @return PoolInterface
+     */
+    protected function getPool()
+    {
+        return $this->pool;
+    }
+
+    /**
+     * @return LoggerInterface|null
+     */
+    protected function getLog()
+    {
+        return $this->log;
+    }
 }
