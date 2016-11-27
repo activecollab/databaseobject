@@ -71,7 +71,8 @@ class GeneratedFieldsTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Generated field is_used_on_day cannot be set by directly assigning a value
      */
     public function testGeneratedFieldCantBeSetDuringProduction()
     {
