@@ -1,22 +1,14 @@
-dist: trusty
-sudo: required
+sudo: true
 language: php
 php:
   - 5.6
   - 7
-addons:
-  apt:
-    packages:
-    - mysql-server-5.6
-    - mysql-client-core-5.6
-    - mysql-client-5.6
-mysql:
-  database: activecollab_database_object_test
-  username: root
-  encoding: utf8mb4
+services:
+  - mysql
 before_install:
   - composer self-update
 install: composer install --dev
 before_script:
+  - bash .travis.install-mysql-5.7.sh
   - mysql -u root -e 'create database activecollab_database_object_test'
 script: phpunit
