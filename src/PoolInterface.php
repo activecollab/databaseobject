@@ -160,10 +160,20 @@ interface PoolInterface
     public function getTypeTable($type, $escaped = false);
 
     /**
+     * Return a list of fields that are managed by the type.
+     *
      * @param  string $type
      * @return array
      */
     public function getTypeFields($type);
+
+    /**
+     * Return a list of generated type fields that $type is aware of.
+     *
+     * @param  string $type
+     * @return array
+     */
+    public function getGeneratedTypeFields($type);
 
     /**
      * Get a particular type property, and make it (using $callback) if it is not set already.

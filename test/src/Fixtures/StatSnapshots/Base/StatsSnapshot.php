@@ -24,20 +24,25 @@ abstract class StatsSnapshot extends Entity
     protected $table_name = 'stats_snapshots';
 
     /**
-     * All table fields.
+     * Table fields that are managed by this entity.
      *
      * @var array
      */
-    protected $fields = ['id', 'account_id', 'day', 'is_used_on_day', 'stats'];
+    protected $fields = ['id', 'account_id', 'day', 'stats'];
+
+    /**
+     * Generated fields that are loaded, but not managed by the entity.
+     *
+     * @var array
+     */
+    protected $generated_fields = ['is_used_on_day'];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_field_values = [
-       'is_used_on_day' => false,
-    ];
+    protected $default_field_values = [];
 
     /**
      * Return value of account_id field.
@@ -107,19 +112,6 @@ abstract class StatsSnapshot extends Entity
     }
 
     /**
-     * Set value of is_used_on_day field.
-     *
-     * @param  bool  $value
-     * @return $this
-     */
-    public function &setIsUsedOnDay($value)
-    {
-        $this->setFieldValue('is_used_on_day', $value);
-
-        return $this;
-    }
-
-    /**
      * Return value of stats field.
      *
      * @return mixed
@@ -175,8 +167,6 @@ abstract class StatsSnapshot extends Entity
                     return parent::setFieldValue($name, (int) $value);
                 case 'day':
                     return parent::setFieldValue($name, $this->getDateTimeValueInstanceFrom($value));
-                case 'is_used_on_day':
-                    return parent::setFieldValue($name, (bool) $value);
                 case 'stats':
                     return parent::setFieldValue($name, $this->isLoading() ? $value : json_encode($value));
                 default:

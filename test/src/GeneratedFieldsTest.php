@@ -8,6 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\StatsSnapshot;
 use ActiveCollab\DateValue\DateValue;
@@ -15,7 +16,7 @@ use ActiveCollab\DateValue\DateValue;
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
-class NonModelFieldsTest extends TestCase
+class GeneratedFieldsTest extends TestCase
 {
     /**
      * {@inheritdoc}
@@ -46,13 +47,36 @@ class NonModelFieldsTest extends TestCase
 
     public function testStatsCanBeSaved()
     {
-        $stats = $this->pool->produce(StatsSnapshot::class, [
+        $this->assertInstanceOf(StatsSnapshot::class, $this->produceSnapshot());
+    }
+
+    public function testIsUsedOnDayIsGeneratedField()
+    {
+        $this->assertNotContains('is_used_on_day', $this->pool->getTypeFields(StatsSnapshot::class));
+        $this->assertContains('is_used_on_day', $this->pool->getGeneratedTypeFields(StatsSnapshot::class));
+    }
+
+    /**
+     * @param  array|null                    $stats
+     * @return StatsSnapshot|EntityInterface
+     */
+    private function produceSnapshot(array $stats = null)
+    {
+        if ($stats === null) {
+            $stats = [
+                'users' => 2,
+                'projects' => 5,
+                'storage_used' => 1024 * 1024 * 1024,
+            ];
+        }
+
+        $snapshot = $this->pool->produce(StatsSnapshot::class, [
             'account_id' => 1,
             'day' => new DateValue(),
-            'is_used_on_day' => true,
-            'stats' => [1, 2, 3],
+            'stats' => $stats,
         ]);
+        $this->assertInstanceOf(StatsSnapshot::class, $snapshot);
 
-        $this->assertInstanceOf(StatsSnapshot::class, $stats);
+        return $snapshot;
     }
 }

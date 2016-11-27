@@ -148,9 +148,18 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function isModifiedField($field);
 
     /**
-     * Return list of fields.
+     * Return a list of fields that are managed by this entity.
+     *
+     * @return array
      */
     public function getFields();
+
+    /**
+     * Return a list of fields that this entity is aware of, but does not manage.
+     *
+     * @return array
+     */
+    public function getGeneratedFields();
 
     /**
      * Check if selected field is primary key.

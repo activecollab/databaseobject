@@ -451,12 +451,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return result by a prepared SQL statement.
-     *
-     * @param  string                                 $type
-     * @param  string                                 $sql
-     * @param  mixed                                  $arguments
-     * @return ResultInterface|EntityInterface[]|null
+     * {@inheritdoc}
      */
     public function findBySql($type, $sql, ...$arguments)
     {
@@ -484,11 +479,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return table name by type.
-     *
-     * @param  string $type
-     * @param  bool   $escaped
-     * @return string
+     * {@inheritdoc}
      */
     public function getTypeTable($type, $escaped = false)
     {
@@ -508,13 +499,24 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  string $type
-     * @return array
+     * {@inheritdoc}
      */
     public function getTypeFields($type)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
             return $this->types[$registered_type]['fields'];
+        }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGeneratedTypeFields($type)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return $this->types[$registered_type]['generated_fields'];
         }
 
         throw new InvalidArgumentException("Type '$type' is not registered");
@@ -708,6 +710,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                     $this->types[$type] = [
                         'table_name' => $default_properties['table_name'],
                         'fields' => $default_properties['fields'],
+                        'generated_fields' => $default_properties['generated_fields'],
                         'order_by' => $default_properties['order_by'],
                     ];
                 } else {

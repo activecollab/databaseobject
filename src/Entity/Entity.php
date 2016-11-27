@@ -73,11 +73,18 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     protected $order_by = ['id'];
 
     /**
-     * Array of field names.
+     * Table fields that are managed by this entity.
      *
      * @var array
      */
-    protected $fields;
+    protected $fields = [];
+
+    /**
+     * Generated fields that are loaded, but not managed by the entity.
+     *
+     * @var array
+     */
+    protected $generated_fields = [];
 
     /**
      * List of default field values.
@@ -548,7 +555,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return list of fields.
+     * {@inheritdoc}
      */
     public function getFields()
     {
@@ -556,11 +563,15 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return value of specific field and typecast it...
-     *
-     * @param  string $field   Field value
-     * @param  mixed  $default Default value that is returned in case of any error
-     * @return mixed
+     * {@inheritdoc}
+     */
+    public function getGeneratedFields()
+    {
+        return $this->generated_fields;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFieldValue($field, $default = null)
     {
