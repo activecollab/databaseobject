@@ -102,6 +102,33 @@ class GeneratedFieldsTest extends TestCase
         $this->produceSnapshot()->setFieldValue('is_used_on_day', true);
     }
 
+    public function testPoolIncludesGeneratedFieldsInTypeFieldsList()
+    {
+        $generated_type_fields = $this->pool->getGeneratedTypeFields(StatsSnapshot::class);
+        $this->assertInternalType('array', $generated_type_fields);
+        $this->assertContains('is_used_on_day', $generated_type_fields);
+
+        $escaped_type_fields = $this->pool->getEscapedTypeFields(StatsSnapshot::class);
+        $this->assertInternalType('string', $escaped_type_fields);
+        $this->assertContains('is_used_on_day', $escaped_type_fields);
+    }
+    
+    public function testGeneratedFieldsAreHydrated()
+    {
+        $insert_id = $this->connection->insert('stats_snapshots', [
+            'account_id' => 1,
+            'day' => new DateValue(),
+            'is_used_on_day' => true,
+            'stats' => json_encode(['users' => 1]),
+        ]);
+        $this->assertSame(1, $insert_id);
+
+        /** @var StatsSnapshot $snapshot */
+        $snapshot = $this->pool->getById(StatsSnapshot::class, $insert_id);
+        $this->assertInstanceOf(StatsSnapshot::class, $snapshot);
+        $this->assertTrue($snapshot->isUsedOnDay());
+    }
+
     public function testGeneratedFieldsAreRefreshedOnInsert()
     {
         $odd_day = $this->produceSnapshot(1, new DateValue('2016-11-27'));

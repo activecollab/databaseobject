@@ -170,10 +170,14 @@ abstract class StatsSnapshot extends Entity
                 case 'stats':
                     return parent::setFieldValue($name, $this->isLoading() ? $value : json_encode($value));
                 default:
-                    if ($this->isGeneratedField($name)) {
-                        throw new \LogicException("Generated field $name cannot be set by directly assigning a value");
+                    if ($this->isLoading()) {
+                        return parent::setFieldValue($name, $value);
                     } else {
-                        throw new \InvalidArgumentException("Field $name does not exist in this table");
+                        if ($this->isGeneratedField($name)) {
+                            throw new \LogicException("Generated field $name cannot be set by directly assigning a value");
+                        } else {
+                            throw new \InvalidArgumentException("Field $name does not exist in this table");
+                        }
                     }
             }
         }

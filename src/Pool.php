@@ -437,9 +437,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             }
 
             return $finder;
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
         }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**
@@ -569,9 +569,17 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->getTypeProperty($type, 'escaped_fields', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            return implode(',', array_map(function ($field_name) use ($table_name) {
-                return $table_name . '.' . $this->connection->escapeFieldName($field_name);
-            }, $this->getTypeFields($type)));
+            $escaped_field_names = [];
+
+            foreach ($this->getTypeFields($type) as $field_name) {
+                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+            }
+
+            foreach ($this->getGeneratedTypeFields($type) as $field_name) {
+                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+            }
+
+            return implode(',', $escaped_field_names);
         });
     }
 

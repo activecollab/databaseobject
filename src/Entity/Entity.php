@@ -630,7 +630,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function &setFieldValue($field, $value)
     {
-        if (in_array($field, $this->fields)) {
+        if ($this->fieldExists($field)) {
             if ($field === 'id') {
                 $value = $value === null ? null : (int) $value;
             }
