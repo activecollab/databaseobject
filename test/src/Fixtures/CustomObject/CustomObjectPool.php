@@ -11,7 +11,7 @@ namespace ActiveCollab\DatabaseObject\Test\Fixtures\CustomObject;
 use ActiveCollab\DatabaseObject\Pool;
 
 /**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\CustomFinder
+ * @package ActiveCollab\DatabaseObject\Test\Fixtures\CustomObject
  */
 class CustomObjectPool extends Pool
 {

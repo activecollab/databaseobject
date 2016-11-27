@@ -21,6 +21,16 @@ use JsonSerializable;
 interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 {
     /**
+     * Load data from database row.
+     *
+     * If $cache_row is set to true row data will be added to cache
+     *
+     * @param  array                    $row
+     * @throws InvalidArgumentException
+     */
+    public function loadFromRow(array $row);
+
+    /**
      * Validate object properties before object is saved.
      *
      * This method is called before the item is saved and can be used to fetch
@@ -31,6 +41,30 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
      * @param ValidatorInterface $validator
      */
     public function validate(ValidatorInterface &$validator);
+
+    /**
+     * Save object into database (insert or update).
+     *
+     * @return $this
+     * @throws ValidationException
+     */
+    public function &save();
+
+    /**
+     * Create a copy of this object and optionally save it.
+     *
+     * @param  bool            $save
+     * @return EntityInterface
+     */
+    public function copy($save = false);
+
+    /**
+     * Delete specific object (and related objects if neccecery).
+     *
+     * @param  bool  $bulk
+     * @return $this
+     */
+    public function &delete($bulk = false);
 
     /**
      * Return primary key columns.
@@ -45,44 +79,6 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
      * @return string
      */
     public function getTableName();
-
-    // ---------------------------------------------------
-    //  CRUD methods
-    // ---------------------------------------------------
-
-    /**
-     * Load data from database row.
-     *
-     * If $cache_row is set to true row data will be added to cache
-     *
-     * @param  array                    $row
-     * @throws InvalidArgumentException
-     */
-    public function loadFromRow(array $row);
-
-    /**
-     * Save object into database (insert or update).
-     *
-     * @return $this
-     * @throws ValidationException
-     */
-    public function &save();
-
-    /**
-     * Delete specific object (and related objects if neccecery).
-     *
-     * @param  bool  $bulk
-     * @return $this
-     */
-    public function &delete($bulk = false);
-
-    /**
-     * Create a copy of this object and optionally save it.
-     *
-     * @param  bool   $save
-     * @return object
-     */
-    public function copy($save = false);
 
     // ---------------------------------------------------
     //  Flags
@@ -123,18 +119,25 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function fieldExists($field);
 
     /**
-     * Return array of modified fields.
-     *
-     * @return array
-     */
-    public function getModifiedFields();
-
-    /**
      * Check if this object has modified columns.
      *
      * @return bool
      */
     public function isModified();
+
+    /**
+     * Return modificications indexed by field name, with value composed of an old and new value.
+     *
+     * @return array
+     */
+    public function getModifications();
+
+    /**
+     * Return array of modified fields.
+     *
+     * @return array
+     */
+    public function getModifiedFields();
 
     /**
      * Returns true if specific field is modified.
@@ -145,25 +148,9 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function isModifiedField($field);
 
     /**
-     * Return modificications indexed by field name, with value composed of an old and new value.
-     *
-     * @return array
+     * Return list of fields.
      */
-    public function getModifications();
-
-    /**
-     * Return true if primary key is modified.
-     *
-     * @return bool
-     */
-    public function isPrimaryKeyModified();
-
-    /**
-     * Revert field to old value.
-     *
-     * @param $field
-     */
-    public function revertField($field);
+    public function getFields();
 
     /**
      * Check if selected field is primary key.
@@ -174,9 +161,11 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function isPrimaryKey($field);
 
     /**
-     * Return list of fields.
+     * Return true if primary key is modified.
+     *
+     * @return bool
      */
-    public function getFields();
+    public function isPrimaryKeyModified();
 
     /**
      * Return value of specific field and typecast it...
@@ -201,6 +190,13 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
      * @return mixed
      */
     public function getOldFieldValue($field);
+
+    /**
+     * Revert field to old value.
+     *
+     * @param string $field
+     */
+    public function revertField($field);
 
     /**
      * Set specific field value.

@@ -12,7 +12,7 @@ use ActiveCollab\DatabaseObject\Entity\Entity;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 
 /**
- * @package ActiveCollab\Id\Model\Base
+ * @package ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base
  */
 abstract class User extends Entity
 {
