@@ -70,7 +70,7 @@ abstract class StatsSnapshot extends Entity
     /**
      * Return value of day field.
      *
-     * @return \ActiveCollab\DateValue\DateTimeValueInterface|null
+     * @return \ActiveCollab\DateValue\DateValueInterface|null
      */
     public function getDay()
     {
@@ -80,7 +80,7 @@ abstract class StatsSnapshot extends Entity
     /**
      * Set value of day field.
      *
-     * @param  \ActiveCollab\DateValue\DateTimeValueInterface|null $value
+     * @param  \ActiveCollab\DateValue\DateValueInterface|null $value
      * @return $this
      */
     public function &setDay($value)

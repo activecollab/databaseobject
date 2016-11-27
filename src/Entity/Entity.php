@@ -376,7 +376,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function isNew()
     {
-        return (boolean) $this->is_new;
+        return (bool) $this->is_new;
     }
 
     /**
@@ -492,7 +492,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function isModified()
     {
-        return (boolean) count($this->modified_fields);
+        return (bool) count($this->modified_fields);
     }
 
     /**
@@ -632,7 +632,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     {
         if (in_array($field, $this->fields)) {
             if ($field === 'id') {
-                $value = $value === null ? null : (integer) $value;
+                $value = $value === null ? null : (int) $value;
             }
 
             if ($value === null && array_key_exists($field, $this->default_field_values)) {
@@ -770,6 +770,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             $this->values[$this->auto_increment] = $last_insert_id;
         }
 
+        $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($last_insert_id));
         $this->setAsLoaded();
     }
 
@@ -797,8 +798,30 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
 
+            $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($this->getId()));
             $this->setAsLoaded();
         }
+    }
+
+    /**
+     * Return an array with potentially refreshed values of generated fields.
+     *
+     * @param  int   $id
+     * @return array
+     */
+    private function refreshGeneratedFieldValues($id)
+    {
+        $result = [];
+
+        if (!empty($this->generated_fields)) {
+            $result = $this->connection->selectFirstRow($this->getTableName(), $this->generated_fields, $this->getWherePartById($id));
+
+            if (empty($result)) {
+                $result = [];
+            }
+        }
+
+        return $result;
     }
 
     /**
