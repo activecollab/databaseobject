@@ -50,10 +50,48 @@ class GeneratedFieldsTest extends TestCase
         $this->assertInstanceOf(StatsSnapshot::class, $this->produceSnapshot());
     }
 
+    public function testFieldsVsGeneratedFieldsChecks()
+    {
+        $snapshot = $this->produceSnapshot();
+
+        $this->assertTrue($snapshot->fieldExists('account_id'));
+        $this->assertTrue($snapshot->fieldExists('is_used_on_day'));
+
+        $this->assertFalse($snapshot->generatedFieldExists('account_id'));
+        $this->assertTrue($snapshot->generatedFieldExists('is_used_on_day'));
+
+        $this->assertFalse($snapshot->isGeneratedField('account_id'));
+        $this->assertTrue($snapshot->isGeneratedField('is_used_on_day'));
+    }
+
     public function testIsUsedOnDayIsGeneratedField()
     {
         $this->assertNotContains('is_used_on_day', $this->pool->getTypeFields(StatsSnapshot::class));
         $this->assertContains('is_used_on_day', $this->pool->getGeneratedTypeFields(StatsSnapshot::class));
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testGeneratedFieldCantBeSetDuringProduction()
+    {
+        $this->pool->produce(StatsSnapshot::class, [
+            'account_id' => 1,
+            'day' => new DateValue(),
+            'is_used_on_day' => true,
+            'stats' => [
+                'users' => 1,
+            ],
+        ]);
+    }
+
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage Generated field is_used_on_day cannot be set by directly assigning a value
+     */
+    public function testGeneratedFieldCantBeSetUsingSetField()
+    {
+        $this->produceSnapshot()->setFieldValue('is_used_on_day', true);
     }
 
     /**

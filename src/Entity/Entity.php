@@ -457,17 +457,6 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if specific field is defined.
-     *
-     * @param  string $field Field name
-     * @return bool
-     */
-    public function fieldExists($field)
-    {
-        return in_array($field, $this->fields);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getModifiedFields()
@@ -565,9 +554,33 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * {@inheritdoc}
      */
+    public function fieldExists($field)
+    {
+        return in_array($field, $this->fields) || in_array($field, $this->generated_fields);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getGeneratedFields()
     {
         return $this->generated_fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generatedFieldExists($field)
+    {
+        return in_array($field, $this->generated_fields);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGeneratedField($field)
+    {
+        return $this->generatedFieldExists($field);
     }
 
     /**

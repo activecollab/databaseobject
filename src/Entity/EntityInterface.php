@@ -111,14 +111,6 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function &setId($value);
 
     /**
-     * Check if specific field is defined.
-     *
-     * @param  string $field Field name
-     * @return bool
-     */
-    public function fieldExists($field);
-
-    /**
      * Check if this object has modified columns.
      *
      * @return bool
@@ -155,11 +147,35 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function getFields();
 
     /**
+     * Return true if $field exists (both generated and non-generated fields are checked).
+     *
+     * @param  string $field Field name
+     * @return bool
+     */
+    public function fieldExists($field);
+
+    /**
      * Return a list of fields that this entity is aware of, but does not manage.
      *
      * @return array
      */
     public function getGeneratedFields();
+
+    /**
+     * Check if generated field exists.
+     *
+     * @param  string $field Field name
+     * @return bool
+     */
+    public function generatedFieldExists($field);
+
+    /**
+     * Return true if $field is generated field.
+     *
+     * @param  string $field
+     * @return bool
+     */
+    public function isGeneratedField($field);
 
     /**
      * Check if selected field is primary key.
