@@ -8,7 +8,6 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
-use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;

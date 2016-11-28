@@ -986,7 +986,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     {
         $result = [
             'id' => $this->getId(),
-            'type' => get_class($this)
+            'type' => get_class($this),
         ];
 
         $this->triggerEvent('on_json_serialize', [&$result]);

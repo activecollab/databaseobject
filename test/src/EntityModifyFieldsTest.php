@@ -11,9 +11,6 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
-use ActiveCollab\DateValue\DateTimeValueInterface;
-use ActiveCollab\DateValue\DateValue;
-use ActiveCollab\DateValue\DateValueInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test

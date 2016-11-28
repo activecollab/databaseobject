@@ -85,6 +85,102 @@ foreach ($pool->find(Writer::class)->all() as $writer) {
 }
 ```
 
+## Generated Fields
+
+Generated fields are fields that exist in tables, but they are not controlled or managed by the entity class itself. Instead, values of these models are set elsewhere:
+
+1. They are specifief as generated columns in table's definition,
+1. Trigger set the values,
+1. Values are set by external systems or processes.
+
+Library provides access to values of these fields, via accessors methods, but these values can't be set using setter methods:
+
+```php
+class StatsSnapshot extends Entity
+{
+    /**
+     * Generated fields that are loaded, but not managed by the entity.
+     *
+     * @var array
+     */
+    protected $generated_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this->setGeneratedFieldsValueCaster(new ValueCaster([
+            'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
+            'plan_name' => ValueCasterInterface::CAST_STRING,
+            'number_of_users' => ValueCasterInterface::CAST_INT,
+        ]));
+    }
+    
+    /**
+     * Return value of is_used_on_day field.
+     *
+     * @return bool
+     */
+    public function isUsedOnDay()
+    {
+        return $this->getFieldValue('is_used_on_day');
+    }
+
+    /**
+     * Return value of is_used_on_day field.
+     *
+     * @return bool
+     * @deprecated use isUsedOnDay()
+     */
+    public function getIsUsedOnDay()
+    {
+        return $this->getFieldValue('is_used_on_day');
+    }
+
+    /**
+     * Return value of plan_name field.
+     *
+     * @return string
+     */
+    public function getPlanName()
+    {
+        return $this->getFieldValue('plan_name');
+    }
+
+    /**
+     * Return value of number_of_users field.
+     *
+     * @return int
+     */
+    public function getNumberOfUsers()
+    {
+        return $this->getFieldValue('number_of_users');
+    }
+}
+```
+
+Value casting can be set during entity configuration:
+
+```php
+class StatsSnapshot extends Entity
+{
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this->setGeneratedFieldsValueCaster(new ValueCaster([
+            'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
+            'plan_name' => ValueCasterInterface::CAST_STRING,
+            'number_of_users' => ValueCasterInterface::CAST_INT,
+        ]));
+    }
+}
+```
+
+Entity class also refreshes the values of these fields on object save so fresh values are instantly available in case they are recalculated in the background (by a trigger or generated field expression).
+
 ## To Do
 
 1. Caching,
