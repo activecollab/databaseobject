@@ -46,6 +46,22 @@ class UrlValidatorTest extends TestCase
         $this->assertCount(0, $url_errors);
     }
 
+    public function testNoUrlFailsValidation()
+    {
+        $validator = new Validator($this->connection, 'users', null, null, []);
+
+        $is_valid_url = $validator->url('homepage_url');
+
+        $this->assertFalse($is_valid_url);
+        $this->assertTrue($validator->hasErrors());
+
+        $url_errors = $validator->getFieldErrors('homepage_url');
+
+        $this->assertInternalType('array', $url_errors);
+        $this->assertCount(1, $url_errors);
+        $this->assertContains("Value of 'homepage_url' is required", $url_errors);
+    }
+
     /**
      * Test if invalid url address does not pass url validation.
      */
@@ -62,6 +78,7 @@ class UrlValidatorTest extends TestCase
 
         $this->assertInternalType('array', $url_errors);
         $this->assertCount(1, $url_errors);
+        $this->assertContains("Value of 'homepage_url' is not a valid URL", $url_errors);
     }
 
     /**
@@ -98,5 +115,6 @@ class UrlValidatorTest extends TestCase
 
         $this->assertInternalType('array', $url_errors);
         $this->assertCount(1, $url_errors);
+        $this->assertContains("Value of 'homepage_url' is required", $url_errors);
     }
 }
