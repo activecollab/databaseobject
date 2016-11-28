@@ -7,6 +7,7 @@
  */
 
 namespace ActiveCollab\DatabaseObject;
+
 use ActiveCollab\DatabaseObject\Entity\Entity;
 
 /**

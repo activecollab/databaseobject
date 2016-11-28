@@ -37,12 +37,23 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Database row expected
+     */
+    public function testCantLoadFromEmptyRow()
+    {
+        $writer = new Writer($this->connection, $this->pool);
+        $writer->loadFromRow([]);
+    }
+
+    /**
      * Test if ID is primary key.
      */
     public function testIdIsPrimaryKey()
     {
         $unknown_writer = new Writer($this->connection, $this->pool);
 
+        $this->assertSame('id', $unknown_writer->getPrimaryKey());
         $this->assertTrue($unknown_writer->isPrimaryKey('id'));
         $this->assertFalse($unknown_writer->isPrimaryKey('name'));
     }
@@ -121,6 +132,17 @@ class CrudTest extends WritersTypeTestCase
         $this->assertSame(4, $chekhov->getId());
         $this->assertSame('Anton Chekhov', $chekhov->getName());
         $this->assertEquals('1860-01-29', $chekhov->getBirthday()->format('Y-m-d'));
+    }
+
+    /**
+     * @expectedException \ActiveCollab\DatabaseObject\Exception\ValidationException
+     * @expectedExceptionMessage Value of 'birthday' is required
+     */
+    public function testExceptionOnInvalidCreate()
+    {
+        (new Writer($this->connection, $this->pool))
+            ->setName('Anton Chekhov')
+            ->save();
     }
 
     /**

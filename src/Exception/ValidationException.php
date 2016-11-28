@@ -136,7 +136,7 @@ class ValidationException extends Exception
      */
     public function hasErrors()
     {
-        return (boolean) count($this->errors);
+        return (bool) count($this->errors);
     }
 
     /**

@@ -11,7 +11,6 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
 use InvalidArgumentException;
@@ -235,7 +234,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     public function &getById($type, $id, $use_cache = true)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -313,7 +312,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     public function isInPool($type, $id)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -371,7 +370,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             $ids_to_forget = (array) $id;
 
             foreach ($ids_to_forget as $id_to_forget) {
-                $id_to_forget = (integer) $id_to_forget;
+                $id_to_forget = (int) $id_to_forget;
 
                 if ($id_to_forget < 1) {
                     throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -415,7 +414,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function exists($type, $id)
     {
-        return (boolean) $this->count($type, ['`id` = ?', $id]);
+        return (bool) $this->count($type, ['`id` = ?', $id]);
     }
 
     /**
@@ -437,9 +436,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             }
 
             return $finder;
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
         }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
     }
 
     /**
@@ -451,12 +450,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return result by a prepared SQL statement.
-     *
-     * @param  string                                 $type
-     * @param  string                                 $sql
-     * @param  mixed                                  $arguments
-     * @return ResultInterface|EntityInterface[]|null
+     * {@inheritdoc}
      */
     public function findBySql($type, $sql, ...$arguments)
     {
@@ -484,11 +478,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Return table name by type.
-     *
-     * @param  string $type
-     * @param  bool   $escaped
-     * @return string
+     * {@inheritdoc}
      */
     public function getTypeTable($type, $escaped = false)
     {
@@ -508,13 +498,24 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  string $type
-     * @return array
+     * {@inheritdoc}
      */
     public function getTypeFields($type)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
             return $this->types[$registered_type]['fields'];
+        }
+
+        throw new InvalidArgumentException("Type '$type' is not registered");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGeneratedTypeFields($type)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return $this->types[$registered_type]['generated_fields'];
         }
 
         throw new InvalidArgumentException("Type '$type' is not registered");
@@ -567,9 +568,17 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->getTypeProperty($type, 'escaped_fields', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
 
-            return implode(',', array_map(function ($field_name) use ($table_name) {
-                return $table_name . '.' . $this->connection->escapeFieldName($field_name);
-            }, $this->getTypeFields($type)));
+            $escaped_field_names = [];
+
+            foreach ($this->getTypeFields($type) as $field_name) {
+                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+            }
+
+            foreach ($this->getGeneratedTypeFields($type) as $field_name) {
+                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+            }
+
+            return implode(',', $escaped_field_names);
         });
     }
 
@@ -673,7 +682,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function isTypeRegistered($type)
     {
-        return (boolean) $this->getRegisteredType($type);
+        return (bool) $this->getRegisteredType($type);
     }
 
     /**
@@ -708,6 +717,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                     $this->types[$type] = [
                         'table_name' => $default_properties['table_name'],
                         'fields' => $default_properties['fields'],
+                        'generated_fields' => $default_properties['generated_fields'],
                         'order_by' => $default_properties['order_by'],
                     ];
                 } else {

@@ -11,13 +11,16 @@ namespace ActiveCollab\DatabaseObject\Entity;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Pool;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 use ActiveCollab\DateValue\DateTimeValue;
+use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValue;
+use ActiveCollab\DateValue\DateValueInterface;
 use DateTime;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
@@ -73,11 +76,18 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     protected $order_by = ['id'];
 
     /**
-     * Array of field names.
+     * Table fields that are managed by this entity.
      *
      * @var array
      */
-    protected $fields;
+    protected $fields = [];
+
+    /**
+     * Generated fields that are loaded, but not managed by the entity.
+     *
+     * @var array
+     */
+    protected $generated_fields = [];
 
     /**
      * List of default field values.
@@ -106,6 +116,15 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 }
             }
         }
+
+        $this->configure();
+    }
+
+    /**
+     * Execute post-construction configuration.
+     */
+    protected function configure()
+    {
     }
 
     // ---------------------------------------------------
@@ -183,7 +202,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
             } else {
                 foreach ($this->getFields() as $field_name) {
-                    if (!$object->fieldExists($field_name) || $this->getFieldValue($field_name) !== $object->getFieldValue($field_name)) {
+                    if (!$object->fieldExists($field_name) || !$this->areFieldValuesSame($this->getFieldValue($field_name), $object->getFieldValue($field_name))) {
                         return false;
                     }
                 }
@@ -196,9 +215,23 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return primary key columns.
+     * Return true if field values match.
      *
-     * @return array
+     * @param  mixed $value_1
+     * @param  mixed $value_2
+     * @return bool
+     */
+    private function areFieldValuesSame($value_1, $value_2)
+    {
+        if (($value_1 instanceof DateValueInterface && $value_2 instanceof DateValueInterface) || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)) {
+            return $value_1->getTimestamp() == $value_2->getTimestamp();
+        } else {
+            return $value_1 === $value_2;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getPrimaryKey()
     {
@@ -206,9 +239,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return value of table name.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableName()
     {
@@ -230,13 +261,33 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     public function loadFromRow(array $row)
     {
         if (empty($row)) {
-            throw new InvalidArgumentException('$row is expected to be loaded database row');
+            throw new InvalidArgumentException('Database row expected');
         }
 
         $this->startLoading();
 
+        $found_generated_fields = [];
+
         foreach ($row as $k => $v) {
-            if ($this->fieldExists($k)) {
+            if ($this->isGeneratedField($k)) {
+                $found_generated_fields[] = $k;
+            } elseif ($this->fieldExists($k)) {
+                $this->setFieldValue($k, $v);
+            }
+        }
+
+        if (!empty($found_generated_fields)) {
+            $generated_field_values = [];
+
+            $value_caster = $this->getGeneratedFieldsValueCaster();
+
+            if ($value_caster instanceof ValueCasterInterface) {
+                $generated_field_values = array_intersect_key($row, array_flip($found_generated_fields));
+
+                $value_caster->castRowValues($generated_field_values);
+            }
+
+            foreach ($generated_field_values as $k => $v) {
                 $this->setFieldValue($k, $v);
             }
         }
@@ -343,12 +394,14 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         $object_class = get_class($this);
 
         /** @var EntityInterface $copy */
-        $copy = new $object_class();
+        $copy = new $object_class($this->connection, $this->pool, $this->log);
 
-        foreach ($this->fields as $field) {
-            if (!in_array($field, $this->primary_key)) {
-                $copy->setFieldValue($field, $this->getFieldValue($field));
+        foreach ($this->getFields() as $field) {
+            if ($this->isPrimaryKey($field)) {
+                continue;
             }
+
+            $copy->setFieldValue($field, $this->getFieldValue($field));
         }
 
         if ($save) {
@@ -369,7 +422,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function isNew()
     {
-        return (boolean) $this->is_new;
+        return (bool) $this->is_new;
     }
 
     /**
@@ -450,17 +503,6 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if specific field is defined.
-     *
-     * @param  string $field Field name
-     * @return bool
-     */
-    public function fieldExists($field)
-    {
-        return in_array($field, $this->fields);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getModifiedFields()
@@ -496,7 +538,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function isModified()
     {
-        return (boolean) count($this->modified_fields);
+        return (bool) count($this->modified_fields);
     }
 
     /**
@@ -548,7 +590,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return list of fields.
+     * {@inheritdoc}
      */
     public function getFields()
     {
@@ -556,11 +598,65 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return value of specific field and typecast it...
+     * {@inheritdoc}
+     */
+    public function fieldExists($field)
+    {
+        return in_array($field, $this->fields) || in_array($field, $this->generated_fields);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getGeneratedFields()
+    {
+        return $this->generated_fields;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function generatedFieldExists($field)
+    {
+        return in_array($field, $this->generated_fields);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isGeneratedField($field)
+    {
+        return $this->generatedFieldExists($field);
+    }
+
+    /**
+     * @var ValueCasterInterface
+     */
+    private $generated_fields_value_caster;
+
+    /**
+     * @return ValueCasterInterface
+     */
+    private function getGeneratedFieldsValueCaster()
+    {
+        return $this->generated_fields_value_caster;
+    }
+
+    /**
+     * Set generated fields value caster.
      *
-     * @param  string $field   Field value
-     * @param  mixed  $default Default value that is returned in case of any error
-     * @return mixed
+     * @param  ValueCasterInterface|null $value_caster
+     * @return $this
+     */
+    protected function &setGeneratedFieldsValueCaster(ValueCasterInterface $value_caster = null)
+    {
+        $this->generated_fields_value_caster = $value_caster;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
      */
     public function getFieldValue($field, $default = null)
     {
@@ -606,9 +702,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function &setFieldValue($field, $value)
     {
-        if (in_array($field, $this->fields)) {
+        if ($this->fieldExists($field)) {
             if ($field === 'id') {
-                $value = $value === null ? null : (integer) $value;
+                $value = $value === null ? null : (int) $value;
             }
 
             if ($value === null && array_key_exists($field, $this->default_field_values)) {
@@ -746,6 +842,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             $this->values[$this->auto_increment] = $last_insert_id;
         }
 
+        $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($last_insert_id));
         $this->setAsLoaded();
     }
 
@@ -773,8 +870,36 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
             }
 
+            $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($this->getId()));
             $this->setAsLoaded();
         }
+    }
+
+    /**
+     * Return an array with potentially refreshed values of generated fields.
+     *
+     * @param  int   $id
+     * @return array
+     */
+    private function refreshGeneratedFieldValues($id)
+    {
+        $result = [];
+
+        if (!empty($this->generated_fields)) {
+            $result = $this->connection->selectFirstRow($this->getTableName(), $this->generated_fields, $this->getWherePartById($id));
+
+            if (empty($result)) {
+                $result = [];
+            }
+        }
+
+        $value_caster = $this->getGeneratedFieldsValueCaster();
+
+        if ($value_caster instanceof ValueCasterInterface) {
+            $value_caster->castRowValues($result);
+        }
+
+        return $result;
     }
 
     /**
@@ -842,16 +967,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Trigger an internal event.
      *
-     * @param string     $event
-     * @param array|null $event_parameters
+     * @param string $event
+     * @param array  $event_parameters
      */
-    protected function triggerEvent($event, array $event_parameters = null)
+    protected function triggerEvent($event, array $event_parameters = [])
     {
         if (isset($this->event_handlers[$event])) {
-            if (empty($event_parameters)) {
-                $event_parameters = [];
-            }
-
             foreach ($this->event_handlers[$event] as $handler) {
                 call_user_func_array($handler, $event_parameters);
             }
@@ -863,7 +984,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function jsonSerialize()
     {
-        $result = ['id' => $this->getId(), 'type' => get_class($this)];
+        $result = [
+            'id' => $this->getId(),
+            'type' => get_class($this),
+        ];
+
         $this->triggerEvent('on_json_serialize', [&$result]);
 
         return $result;

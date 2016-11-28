@@ -6,7 +6,7 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
-$header = <<<EOF
+$header = <<<'EOF'
 This file is part of the Active Collab DatabaseObject project.
 
 (c) A51 doo <info@activecollab.com>. All rights reserved.

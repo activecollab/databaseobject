@@ -57,7 +57,7 @@ abstract class User extends Entity
      * @param  string $value
      * @return $this
      */
-    public function &setType($value)
+    public function &settype($value)
     {
         $this->setFieldValue('type', $value);
 
@@ -194,7 +194,7 @@ abstract class User extends Entity
         } else {
             switch ($name) {
                 case 'id':
-                    return parent::setFieldValue($name, (integer) $value);
+                    return parent::setFieldValue($name, (int) $value);
                 case 'type':
                 case 'first_name':
                 case 'last_name':

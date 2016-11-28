@@ -59,6 +59,11 @@ class Writer extends BaseWriter implements ScrapInterface
                 $this->custom_attribute_value = $value;
             }
         });
+
+        $this->registerEventHandler('on_json_serialize', function (array &$result) {
+            $result['name'] = $this->getName();
+            $result['birthday'] = $this->getBirthday();
+        });
     }
 
     /**

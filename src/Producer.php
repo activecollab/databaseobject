@@ -49,12 +49,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Produce new instance of $type.
-     *
-     * @param  string          $type
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
+     * {@inheritdoc}
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
@@ -83,12 +78,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Update an instance.
-     *
-     * @param  EntityInterface $instance
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
+     * {@inheritdoc}
      */
     public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
     {
@@ -110,11 +100,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * Scrap an instance (move it to trash, if object can be trashed, or delete it).
-     *
-     * @param  EntityInterface $instance
-     * @param  bool            $force_delete
-     * @return EntityInterface
+     * {@inheritdoc}
      */
     public function &scrap(EntityInterface &$instance, $force_delete = false)
     {

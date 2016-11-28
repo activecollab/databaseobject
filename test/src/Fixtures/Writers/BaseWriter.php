@@ -158,7 +158,7 @@ abstract class BaseWriter extends Entity implements EntityInterface
         } else {
             switch ($name) {
                 case 'id':
-                    parent::setFieldValue($name, (integer) $value);
+                    parent::setFieldValue($name, (int) $value);
                     break;
                 case 'name':
                     parent::setFieldValue($name, (string) $value);
