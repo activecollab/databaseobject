@@ -11,7 +11,6 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
 use InvalidArgumentException;
@@ -235,7 +234,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     public function &getById($type, $id, $use_cache = true)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -313,7 +312,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     public function isInPool($type, $id)
     {
         if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (integer) $id;
+            $id = (int) $id;
 
             if ($id < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -371,7 +370,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             $ids_to_forget = (array) $id;
 
             foreach ($ids_to_forget as $id_to_forget) {
-                $id_to_forget = (integer) $id_to_forget;
+                $id_to_forget = (int) $id_to_forget;
 
                 if ($id_to_forget < 1) {
                     throw new InvalidArgumentException('ID is expected to be a number larger than 0');
@@ -415,7 +414,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function exists($type, $id)
     {
-        return (boolean) $this->count($type, ['`id` = ?', $id]);
+        return (bool) $this->count($type, ['`id` = ?', $id]);
     }
 
     /**
@@ -683,7 +682,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function isTypeRegistered($type)
     {
-        return (boolean) $this->getRegisteredType($type);
+        return (bool) $this->getRegisteredType($type);
     }
 
     /**

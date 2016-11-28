@@ -11,6 +11,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\StatsSnapshot;
+use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use ActiveCollab\DateValue\DateValueInterface;
 
@@ -102,6 +103,12 @@ class GeneratedFieldsTest extends TestCase
         $this->produceSnapshot()->setFieldValue('is_used_on_day', true);
     }
 
+    public function testPoolUsesTheCorrectListOfGeneratedFields()
+    {
+        $snapshot = $this->produceSnapshot();
+        $this->assertSame($snapshot->getGeneratedFields(), $this->pool->getGeneratedTypeFields(StatsSnapshot::class));
+    }
+
     public function testPoolIncludesGeneratedFieldsInTypeFieldsList()
     {
         $generated_type_fields = $this->pool->getGeneratedTypeFields(StatsSnapshot::class);
@@ -112,16 +119,22 @@ class GeneratedFieldsTest extends TestCase
         $this->assertInternalType('string', $escaped_type_fields);
         $this->assertContains('is_used_on_day', $escaped_type_fields);
     }
-    
+
     public function testGeneratedFieldsAreHydrated()
     {
+        $this->assertSame(0, $this->connection->count('stats_snapshots'));
         $insert_id = $this->connection->insert('stats_snapshots', [
             'account_id' => 1,
-            'day' => new DateValue(),
+            'day' => new DateTimeValue('2016-11-27'),
             'is_used_on_day' => true,
             'stats' => json_encode(['users' => 1]),
         ]);
         $this->assertSame(1, $insert_id);
+
+        $row = $this->connection->executeFirstRow('SELECT * FROM stats_snapshots WHERE id = ?', $insert_id);
+        $this->assertInternalType('array', $row);
+        $this->assertArrayHasKey('is_used_on_day', $row);
+        $this->assertTrue($row['is_used_on_day']);
 
         /** @var StatsSnapshot $snapshot */
         $snapshot = $this->pool->getById(StatsSnapshot::class, $insert_id);

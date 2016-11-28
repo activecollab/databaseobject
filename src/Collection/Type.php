@@ -61,7 +61,7 @@ abstract class Type extends Collection
      */
     public function canBeEtagged()
     {
-        return (boolean) $this->getTimestampField();
+        return (bool) $this->getTimestampField();
     }
 
     /**
@@ -270,7 +270,7 @@ abstract class Type extends Collection
         $conditions = $this->getConditions() ? " WHERE {$this->getConditions()}" : '';
 
         if ($join_expression = $this->getJoinExpression()) {
-            return (integer) $this->connection->executeFirstCell("SELECT COUNT($table_name.`id`) FROM $table_name $join_expression $conditions");
+            return (int) $this->connection->executeFirstCell("SELECT COUNT($table_name.`id`) FROM $table_name $join_expression $conditions");
         } else {
             return $this->connection->executeFirstCell("SELECT COUNT(`id`) AS 'row_count' FROM $table_name $conditions");
         }
@@ -367,7 +367,7 @@ abstract class Type extends Collection
                     $this->conditions_as_string = $this->conditions[0];
                     break;
                 default:
-                    $this->conditions_as_string = implode(' AND ', array_map(function($condition) {
+                    $this->conditions_as_string = implode(' AND ', array_map(function ($condition) {
                         return "($condition)";
                     }, $this->conditions));
             }
