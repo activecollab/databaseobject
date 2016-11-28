@@ -69,7 +69,7 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     /**
      * Return primary key columns.
      *
-     * @return array
+     * @return string
      */
     public function getPrimaryKey();
 

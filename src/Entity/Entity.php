@@ -231,9 +231,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return primary key columns.
-     *
-     * @return array
+     * {@inheritdoc}
      */
     public function getPrimaryKey()
     {
@@ -241,9 +239,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Return value of table name.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getTableName()
     {
@@ -265,7 +261,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     public function loadFromRow(array $row)
     {
         if (empty($row)) {
-            throw new InvalidArgumentException('$row is expected to be loaded database row');
+            throw new InvalidArgumentException('Database row expected');
         }
 
         $this->startLoading();
@@ -398,12 +394,14 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         $object_class = get_class($this);
 
         /** @var EntityInterface $copy */
-        $copy = new $object_class();
+        $copy = new $object_class($this->connection, $this->pool, $this->log);
 
-        foreach ($this->fields as $field) {
-            if (!in_array($field, $this->primary_key)) {
-                $copy->setFieldValue($field, $this->getFieldValue($field));
+        foreach ($this->getFields() as $field) {
+            if ($this->isPrimaryKey($field)) {
+                continue;
             }
+
+            $copy->setFieldValue($field, $this->getFieldValue($field));
         }
 
         if ($save) {
@@ -969,16 +967,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Trigger an internal event.
      *
-     * @param string     $event
-     * @param array|null $event_parameters
+     * @param string $event
+     * @param array  $event_parameters
      */
-    protected function triggerEvent($event, array $event_parameters = null)
+    protected function triggerEvent($event, array $event_parameters = [])
     {
         if (isset($this->event_handlers[$event])) {
-            if (empty($event_parameters)) {
-                $event_parameters = [];
-            }
-
             foreach ($this->event_handlers[$event] as $handler) {
                 call_user_func_array($handler, $event_parameters);
             }
@@ -990,7 +984,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function jsonSerialize()
     {
-        $result = ['id' => $this->getId(), 'type' => get_class($this)];
+        $result = [
+            'id' => $this->getId(),
+            'type' => get_class($this)
+        ];
+
         $this->triggerEvent('on_json_serialize', [&$result]);
 
         return $result;
