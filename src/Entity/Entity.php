@@ -11,13 +11,16 @@ namespace ActiveCollab\DatabaseObject\Entity;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Pool;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 use ActiveCollab\DateValue\DateTimeValue;
+use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValue;
+use ActiveCollab\DateValue\DateValueInterface;
 use DateTime;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
@@ -113,6 +116,15 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 }
             }
         }
+
+        $this->configure();
+    }
+
+    /**
+     * Execute post-construction configuration.
+     */
+    protected function configure()
+    {
     }
 
     // ---------------------------------------------------
@@ -190,7 +202,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
             } else {
                 foreach ($this->getFields() as $field_name) {
-                    if (!$object->fieldExists($field_name) || $this->getFieldValue($field_name) !== $object->getFieldValue($field_name)) {
+                    if (!$object->fieldExists($field_name) || !$this->areFieldValuesSame($this->getFieldValue($field_name), $object->getFieldValue($field_name))) {
                         return false;
                     }
                 }
@@ -200,6 +212,22 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         }
 
         return false;
+    }
+
+    /**
+     * Return true if field values match.
+     *
+     * @param  mixed $value_1
+     * @param  mixed $value_2
+     * @return bool
+     */
+    private function areFieldValuesSame($value_1, $value_2)
+    {
+        if (($value_1 instanceof DateValueInterface && $value_2 instanceof DateValueInterface) || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)) {
+            return $value_1->getTimestamp() == $value_2->getTimestamp();
+        } else {
+            return $value_1 === $value_2;
+        }
     }
 
     /**
@@ -242,8 +270,28 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
         $this->startLoading();
 
+        $found_generated_fields = [];
+
         foreach ($row as $k => $v) {
-            if ($this->fieldExists($k)) {
+            if ($this->isGeneratedField($k)) {
+                $found_generated_fields[] = $k;
+            } elseif ($this->fieldExists($k)) {
+                $this->setFieldValue($k, $v);
+            }
+        }
+
+        if (!empty($found_generated_fields)) {
+            $generated_field_values = [];
+
+            $value_caster = $this->getGeneratedFieldsValueCaster();
+
+            if ($value_caster instanceof ValueCasterInterface) {
+                $generated_field_values = array_intersect_key($row, array_flip($found_generated_fields));
+
+                $value_caster->castRowValues($generated_field_values);
+            }
+
+            foreach ($generated_field_values as $k => $v) {
                 $this->setFieldValue($k, $v);
             }
         }
@@ -584,6 +632,32 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
+     * @var ValueCasterInterface
+     */
+    private $generated_fields_value_caster;
+
+    /**
+     * @return ValueCasterInterface
+     */
+    private function getGeneratedFieldsValueCaster()
+    {
+        return $this->generated_fields_value_caster;
+    }
+
+    /**
+     * Set generated fields value caster.
+     *
+     * @param  ValueCasterInterface|null $value_caster
+     * @return $this
+     */
+    protected function &setGeneratedFieldsValueCaster(ValueCasterInterface $value_caster = null)
+    {
+        $this->generated_fields_value_caster = $value_caster;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getFieldValue($field, $default = null)
@@ -819,6 +893,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             if (empty($result)) {
                 $result = [];
             }
+        }
+
+        $value_caster = $this->getGeneratedFieldsValueCaster();
+
+        if ($value_caster instanceof ValueCasterInterface) {
+            $value_caster->castRowValues($result);
         }
 
         return $result;
