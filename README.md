@@ -96,6 +96,10 @@ Generated fields are fields that exist in tables, but they are not controlled or
 Library provides access to values of these fields, via accessors methods, but these values can't be set using setter methods:
 
 ```php
+<?php
+
+use ActiveCollab\DatabaseObject\Entity\Entity;
+
 class StatsSnapshot extends Entity
 {
     /**
@@ -104,18 +108,6 @@ class StatsSnapshot extends Entity
      * @var array
      */
     protected $generated_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
-    {
-        $this->setGeneratedFieldsValueCaster(new ValueCaster([
-            'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
-            'plan_name' => ValueCasterInterface::CAST_STRING,
-            'number_of_users' => ValueCasterInterface::CAST_INT,
-        ]));
-    }
     
     /**
      * Return value of is_used_on_day field.
@@ -163,6 +155,12 @@ class StatsSnapshot extends Entity
 Value casting can be set during entity configuration:
 
 ```php
+<?php
+
+use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
+use ActiveCollab\DatabaseObject\Entity\Entity;
+
 class StatsSnapshot extends Entity
 {
     /**
