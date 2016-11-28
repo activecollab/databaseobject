@@ -8,6 +8,8 @@
 
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\Base;
 
+use ActiveCollab\DatabaseConnection\Record\ValueCaster;
+use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseObject\Entity\Entity;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 
@@ -35,7 +37,7 @@ abstract class StatsSnapshot extends Entity
      *
      * @var array
      */
-    protected $generated_fields = ['is_used_on_day'];
+    protected $generated_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
 
     /**
      * List of default field values.
@@ -43,6 +45,18 @@ abstract class StatsSnapshot extends Entity
      * @var array
      */
     protected $default_field_values = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configure()
+    {
+        $this->setGeneratedFieldsValueCaster(new ValueCaster([
+            'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
+            'plan_name' => ValueCasterInterface::CAST_STRING,
+            'number_of_users' => ValueCasterInterface::CAST_INT,
+        ]));
+    }
 
     /**
      * Return value of account_id field.
@@ -109,6 +123,26 @@ abstract class StatsSnapshot extends Entity
     public function getIsUsedOnDay()
     {
         return $this->getFieldValue('is_used_on_day');
+    }
+
+    /**
+     * Return value of plan_name field.
+     *
+     * @return string
+     */
+    public function getPlanName()
+    {
+        return $this->getFieldValue('plan_name');
+    }
+
+    /**
+     * Return value of number_of_users field.
+     *
+     * @return int
+     */
+    public function getNumberOfUsers()
+    {
+        return $this->getFieldValue('number_of_users');
     }
 
     /**

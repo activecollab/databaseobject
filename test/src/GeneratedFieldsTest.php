@@ -33,6 +33,8 @@ class GeneratedFieldsTest extends TestCase
             `day` DATE DEFAULT NULL,
             `is_used_on_day` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `stats` JSON DEFAULT NULL,
+            `plan_name` VARCHAR(191) AS (`stats`->>'$.plan_name'),
+            `number_of_users` INT AS (`stats`->>'$.users'),
             PRIMARY KEY (`id`),
             INDEX `account_id` (`account_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
@@ -158,6 +160,79 @@ class GeneratedFieldsTest extends TestCase
 
         $odd_day->setDay(new DateValue('2016-11-28'))->save();
         $this->assertFalse($odd_day->isUsedOnDay());
+    }
+
+    public function testJsonExtractionsDefaultToNull()
+    {
+        /** @var StatsSnapshot $snapshot */
+        $snapshot = $this->pool->produce(StatsSnapshot::class, [
+            'account_id' => 1,
+            'day' => new DateValue(),
+            'stats' => [],
+        ]);
+        $this->assertInstanceOf(StatsSnapshot::class, $snapshot);
+
+        $this->assertNull($snapshot->getPlanName());
+        $this->assertNull($snapshot->getNumberOfUsers());
+    }
+
+    public function testJsonExtractionsAreCastedOnHydation()
+    {
+        $insert_id = $this->connection->insert('stats_snapshots', [
+            'account_id' => 1,
+            'day' => new DateTimeValue('2016-11-27'),
+            'is_used_on_day' => true,
+            'stats' => json_encode([
+                'plan_name' => 'MEGA',
+                'users' => 10,
+            ]),
+        ]);
+        $this->assertSame(1, $insert_id);
+
+        /** @var StatsSnapshot $snapshot */
+        $snapshot = $this->pool->getById(StatsSnapshot::class, $insert_id);
+
+        $this->assertSame('MEGA', $snapshot->getPlanName());
+        $this->assertSame(10, $snapshot->getNumberOfUsers());
+    }
+
+    public function testJsonExtractionsAreCastedOnInsert()
+    {
+        /** @var StatsSnapshot $snapshot */
+        $snapshot = $this->pool->produce(StatsSnapshot::class, [
+            'account_id' => 1,
+            'day' => new DateValue(),
+            'stats' => [
+                'plan_name' => 'MEGA',
+                'users' => 10,
+            ],
+        ]);
+        $this->assertInstanceOf(StatsSnapshot::class, $snapshot);
+
+        $this->assertSame('MEGA', $snapshot->getPlanName());
+        $this->assertSame(10, $snapshot->getNumberOfUsers());
+    }
+
+    public function testJsonExtractionsAreCastedOnUpdate()
+    {
+        /** @var StatsSnapshot $snapshot */
+        $snapshot = $this->pool->produce(StatsSnapshot::class, [
+            'account_id' => 1,
+            'day' => new DateValue(),
+            'stats' => [],
+        ]);
+        $this->assertInstanceOf(StatsSnapshot::class, $snapshot);
+
+        $this->assertNull($snapshot->getPlanName());
+        $this->assertNull($snapshot->getNumberOfUsers());
+
+        $snapshot->setStats([
+            'plan_name' => 'MEGA',
+            'users' => 10,
+        ])->save();
+
+        $this->assertSame('MEGA', $snapshot->getPlanName());
+        $this->assertSame(10, $snapshot->getNumberOfUsers());
     }
 
     /**
