@@ -178,7 +178,7 @@ abstract class Type extends Collection
                 } else {
                     $escaped_ids = $this->connection->escapeValue($ids);
 
-                    $sql = 'SELECT * FROM ' . $this->getTableName() . " WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)";
+                    $sql = "SELECT * FROM {$this->getTableName()} WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)";
                 }
 
                 return $this->pool->findBySql($this->getType(), $sql);
