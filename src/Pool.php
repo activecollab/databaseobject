@@ -471,7 +471,12 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 $return_by_value = $type;
             }
 
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
+            if ($this->hasContainer()) {
+                return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log], $this->getContainer());
+            } else {
+                return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
+            }
+
         } else {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
