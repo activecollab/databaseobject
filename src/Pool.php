@@ -61,21 +61,19 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            $object = $this->getProducerForRegisteredType($registered_type)->produce($type, $attributes, $save);
+        $registered_type = $this->requireRegisteredType($type);
 
-            if ($object instanceof EntityInterface) {
-                if ($object->isLoaded()) {
-                    $this->objects_pool[$registered_type][$object->getId()] = $object;
-                }
+        $object = $this->getProducerForRegisteredType($registered_type)->produce($type, $attributes, $save);
 
-                return $object;
-            } else {
-                throw new RuntimeException("Failed to produce an instance of '$type'");
+        if ($object instanceof EntityInterface) {
+            if ($object->isLoaded()) {
+                $this->objects_pool[$registered_type][$object->getId()] = $object;
             }
-        }
 
-        throw new InvalidArgumentException("Type '$type' is not registered");
+            return $object;
+        } else {
+            throw new RuntimeException("Failed to produce an instance of '$type'");
+        }
     }
 
     /**
@@ -92,19 +90,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             throw new RuntimeException('Only objects that are saved to database can be modified');
         }
 
-        $instance_type = get_class($instance);
+        $registered_type = $this->requireRegisteredType(get_class($instance));
 
-        if ($registered_type = $this->getRegisteredType($instance_type)) {
-            $instance = $this->getProducerForRegisteredType($registered_type)->modify($instance, $attributes, $save);
+        $instance = $this->getProducerForRegisteredType($registered_type)->modify($instance, $attributes, $save);
 
-            if ($instance instanceof EntityInterface) {
-                $this->objects_pool[$registered_type][$instance->getId()] = $instance;
-            }
-
-            return $instance;
+        if ($instance instanceof EntityInterface) {
+            $this->objects_pool[$registered_type][$instance->getId()] = $instance;
         }
 
-        throw new InvalidArgumentException("Type '$instance_type' is not registered");
+        return $instance;
     }
 
     /**
@@ -120,21 +114,16 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             throw new RuntimeException('Only objects that are saved to database can be modified');
         }
 
-        $instance_type = get_class($instance);
+        $registered_type = $this->requireRegisteredType(get_class($instance));
 
-        if ($registered_type = $this->getRegisteredType($instance_type)) {
-            $instance_id = $instance->getId();
+        $instance_id = $instance->getId();
+        $instance = $this->getProducerForRegisteredType($registered_type)->scrap($instance, $force_delete);
 
-            $instance = $this->getProducerForRegisteredType($registered_type)->scrap($instance, $force_delete);
-
-            if ($instance->isNew() && !empty($this->objects_pool[$registered_type][$instance_id])) {
-                unset($this->objects_pool[$registered_type][$instance_id]);
-            }
-
-            return $instance;
+        if ($instance->isNew() && !empty($this->objects_pool[$registered_type][$instance_id])) {
+            unset($this->objects_pool[$registered_type][$instance_id]);
         }
 
-        throw new InvalidArgumentException("Type '$instance_type' is not registered");
+        return $instance;
     }
 
     /**
@@ -188,18 +177,16 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function registerProducer($type, ProducerInterface $producer)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            if (empty($this->producers[$registered_type])) {
-                if ($producer instanceof ContainerAccessInterface && $this->hasContainer()) {
-                    $producer->setContainer($this->getContainer());
-                }
+        $registered_type = $this->requireRegisteredType($type);
 
-                $this->producers[$registered_type] = $producer;
-            } else {
-                throw new LogicException("Producer for '$type' is already registered");
+        if (empty($this->producers[$registered_type])) {
+            if ($producer instanceof ContainerAccessInterface && $this->hasContainer()) {
+                $producer->setContainer($this->getContainer());
             }
+
+            $this->producers[$registered_type] = $producer;
         } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+            throw new LogicException("Producer for '$type' is already registered");
         }
     }
 
@@ -233,40 +220,38 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function &getById($type, $id, $use_cache = true)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (int) $id;
+        $registered_type = $this->requireRegisteredType($type);
 
-            if ($id < 1) {
-                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
-            }
+        $id = (int) $id;
 
-            if (isset($this->objects_pool[$registered_type][$id]) && $use_cache) {
-                return $this->objects_pool[$registered_type][$id];
-            } else {
-                $type_fields = $this->getTypeFields($registered_type);
-
-                if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
-                    $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
-
-                    /** @var object|EntityInterface $object */
-                    $object = new $object_class($this->connection, $this, $this->log);
-
-                    if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
-                        $object->setContainer($this->getContainer());
-                    }
-
-                    $object->loadFromRow($row);
-
-                    return $this->addToObjectPool($registered_type, $id, $object);
-                } else {
-                    $object = null;
-
-                    return $this->addToObjectPool($registered_type, $id, $object);
-                }
-            }
+        if ($id < 1) {
+            throw new InvalidArgumentException('ID is expected to be a number larger than 0');
         }
 
-        throw new InvalidArgumentException("Type '$type' is not registered");
+        if (isset($this->objects_pool[$registered_type][$id]) && $use_cache) {
+            return $this->objects_pool[$registered_type][$id];
+        } else {
+            $type_fields = $this->getTypeFields($registered_type);
+
+            if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
+                $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
+
+                /** @var object|EntityInterface $object */
+                $object = new $object_class($this->connection, $this, $this->log);
+
+                if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
+                    $object->setContainer($this->getContainer());
+                }
+
+                $object->loadFromRow($row);
+
+                return $this->addToObjectPool($registered_type, $id, $object);
+            } else {
+                $object = null;
+
+                return $this->addToObjectPool($registered_type, $id, $object);
+            }
+        }
     }
 
     /**
@@ -311,17 +296,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function isInPool($type, $id)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            $id = (int) $id;
+        $this->requireRegisteredType($type);
 
-            if ($id < 1) {
-                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
-            }
+        $id = (int) $id;
 
-            return isset($this->objects_pool[$type][$id]);
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+        if ($id < 1) {
+            throw new InvalidArgumentException('ID is expected to be a number larger than 0');
         }
+
+        return isset($this->objects_pool[$type][$id]);
     }
 
     /**
@@ -351,11 +334,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     public function remember(EntityInterface &$object)
     {
         if ($object->isLoaded()) {
-            if ($registered_type = $this->getRegisteredType(get_class($object))) {
-                $this->addToObjectPool($registered_type, $object->getId(), $object);
-            } else {
-                throw new InvalidArgumentException("Type '" . get_class($object) . "' is not registered");
-            }
+            $this->addToObjectPool($this->requireRegisteredType(get_class($object)), $object->getId(), $object);
         } else {
             throw new InvalidArgumentException('Object needs to be saved in the database to be remembered');
         }
@@ -366,22 +345,20 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function forget($type, $id)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            $ids_to_forget = (array) $id;
+        $this->requireRegisteredType($type);
 
-            foreach ($ids_to_forget as $id_to_forget) {
-                $id_to_forget = (int) $id_to_forget;
+        $ids_to_forget = (array) $id;
 
-                if ($id_to_forget < 1) {
-                    throw new InvalidArgumentException('ID is expected to be a number larger than 0');
-                }
+        foreach ($ids_to_forget as $id_to_forget) {
+            $id_to_forget = (int) $id_to_forget;
 
-                if (isset($this->objects_pool[$type][$id_to_forget])) {
-                    unset($this->objects_pool[$type][$id_to_forget]);
-                }
+            if ($id_to_forget < 1) {
+                throw new InvalidArgumentException('ID is expected to be a number larger than 0');
             }
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+
+            if (isset($this->objects_pool[$type][$id_to_forget])) {
+                unset($this->objects_pool[$type][$id_to_forget]);
+            }
         }
     }
 
@@ -394,15 +371,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function count($type, $conditions = null)
     {
-        if ($this->isTypeRegistered($type)) {
-            if ($conditions = $this->connection->prepareConditions($conditions)) {
-                return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
-            } else {
-                return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
-            }
-        }
+        $this->requireRegisteredType($type);
 
-        throw new InvalidArgumentException("Type '$type' is not registered");
+        if ($conditions = $this->connection->prepareConditions($conditions)) {
+            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
+        } else {
+            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
+        }
     }
 
     /**
@@ -425,20 +400,18 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function find($type)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            $default_finder_class = $this->getDefaultFinderClass();
+        $registered_type = $this->requireRegisteredType($type);
 
-            /** @var Finder $finder */
-            $finder = new $default_finder_class($this->connection, $this, $this->log, $registered_type);
+        $default_finder_class = $this->getDefaultFinderClass();
 
-            if ($finder instanceof ContainerAccessInterface && $this->hasContainer()) {
-                $finder->setContainer($this->getContainer());
-            }
+        /** @var Finder $finder */
+        $finder = new $default_finder_class($this->connection, $this, $this->log, $registered_type);
 
-            return $finder;
+        if ($finder instanceof ContainerAccessInterface && $this->hasContainer()) {
+            $finder->setContainer($this->getContainer());
         }
 
-        throw new InvalidArgumentException("Type '$type' is not registered");
+        return $finder;
     }
 
     /**
@@ -462,23 +435,20 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             throw new InvalidArgumentException('SQL statement is required');
         }
 
-        if ($registered_type = $this->getRegisteredType($type)) {
-            if (in_array('type', $this->getTypeFields($type))) {
-                $return_by = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
-                $return_by_value = 'type';
-            } else {
-                $return_by = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
-                $return_by_value = $type;
-            }
+        $this->requireRegisteredType($type);
 
-            if ($this->hasContainer()) {
-                return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log], $this->getContainer());
-            } else {
-                return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
-            }
-
+        if (in_array('type', $this->getTypeFields($type))) {
+            $return_by = ConnectionInterface::RETURN_OBJECT_BY_FIELD;
+            $return_by_value = 'type';
         } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+            $return_by = ConnectionInterface::RETURN_OBJECT_BY_CLASS;
+            $return_by_value = $type;
+        }
+
+        if ($this->hasContainer()) {
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log], $this->getContainer());
+        } else {
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
         }
     }
 
@@ -487,18 +457,16 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTypeTable($type, $escaped = false)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            if ($escaped) {
-                if (empty($this->types[$registered_type]['escaped_table_name'])) {
-                    $this->types[$registered_type]['escaped_table_name'] = $this->connection->escapeTableName($this->types[$registered_type]['table_name']);
-                }
+        $registered_type = $this->requireRegisteredType($type);
 
-                return $this->types[$registered_type]['escaped_table_name'];
-            } else {
-                return $this->types[$registered_type]['table_name'];
+        if ($escaped) {
+            if (empty($this->types[$registered_type]['escaped_table_name'])) {
+                $this->types[$registered_type]['escaped_table_name'] = $this->connection->escapeTableName($this->types[$registered_type]['table_name']);
             }
+
+            return $this->types[$registered_type]['escaped_table_name'];
         } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+            return $this->types[$registered_type]['table_name'];
         }
     }
 
@@ -507,11 +475,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTypeFields($type)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            return $this->types[$registered_type]['fields'];
-        }
-
-        throw new InvalidArgumentException("Type '$type' is not registered");
+        return $this->types[$this->requireRegisteredType($type)]['fields'];
     }
 
     /**
@@ -519,11 +483,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getGeneratedTypeFields($type)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            return $this->types[$registered_type]['generated_fields'];
-        }
-
-        throw new InvalidArgumentException("Type '$type' is not registered");
+        return $this->types[$this->requireRegisteredType($type)]['generated_fields'];
     }
 
     /**
@@ -536,15 +496,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTypeProperty($type, $property, callable $callback)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            if (!array_key_exists($property, $this->types[$registered_type])) {
-                $this->types[$registered_type][$property] = call_user_func($callback, $registered_type, $property);
-            }
+        $registered_type = $this->requireRegisteredType($type);
 
-            return $this->types[$registered_type][$property];
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
+        if (!array_key_exists($property, $this->types[$registered_type])) {
+            $this->types[$registered_type][$property] = call_user_func($callback, $registered_type, $property);
         }
+
+        return $this->types[$registered_type][$property];
     }
 
     /**
@@ -595,11 +553,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTypeOrderBy($type)
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            return $this->types[$registered_type]['order_by'];
-        } else {
-            throw new InvalidArgumentException("Type '$type' is not registered");
-        }
+        return $this->types[$this->requireRegisteredType($type)]['order_by'];
     }
 
     /**
@@ -677,6 +631,18 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
 
         return $this->known_types[$type];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function requireRegisteredType($type)
+    {
+        if ($registered_type = $this->getRegisteredType($type)) {
+            return $registered_type;
+        } else {
+            throw new InvalidArgumentException("Type '$type' is not registered");
+        }
     }
 
     /**

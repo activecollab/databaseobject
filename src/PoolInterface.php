@@ -223,6 +223,14 @@ interface PoolInterface
     public function getRegisteredType($type);
 
     /**
+     * Get registered type's class, or throw an execption if type is not regiestered.
+     *
+     * @param  string $type
+     * @return string
+     */
+    public function requireRegisteredType($type);
+
+    /**
      * Return true if $type is registered.
      *
      * @param  string $type
