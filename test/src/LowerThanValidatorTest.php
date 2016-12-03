@@ -34,6 +34,16 @@ class LowerThanValidatorTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Value '' is not a valid field name
+     */
+    public function testFieldNameIsRequired()
+    {
+        $validator = new Validator($this->connection, 'users', null, null, []);
+        $validator->lowerThan('', 123);
+    }
+
+    /**
      * Test if value that is lower than reference value passes validation.
      */
     public function testValueLowerThanPassesValidation()

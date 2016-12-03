@@ -34,6 +34,16 @@ class GreaterThanOrEqualsValidatorTest extends TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Value '' is not a valid field name
+     */
+    public function testFieldNameIsRequired()
+    {
+        $validator = new Validator($this->connection, 'users', null, null, []);
+        $validator->greaterThanOrEquals('', 123);
+    }
+
+    /**
      * Test if value that is greater than reference value passes validation.
      */
     public function testValueGreaterThanPassesValidation()

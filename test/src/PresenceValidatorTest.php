@@ -17,6 +17,16 @@ use ActiveCollab\DatabaseObject\Validator;
 class PresenceValidatorTest extends WritersTypeTestCase
 {
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Value '' is not a valid field name
+     */
+    public function testFieldNameIsRequired()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, []);
+        $validator->present('');
+    }
+
+    /**
      * Test validation pass.
      */
     public function testPass()

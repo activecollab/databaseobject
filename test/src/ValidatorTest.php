@@ -37,4 +37,32 @@ class ValidatorTest extends WritersTypeTestCase
         $this->assertTrue($exception->hasError('name'));
         $this->assertFalse($exception->hasError('unknown_column_here'));
     }
+
+    public function testValidatorReturnsAllErrors()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, [
+            'name' => 'Leo Tolstoy',
+            'birthday' => null,
+        ]);
+
+        $validator->unique('name');
+        $validator->present('birthday');
+
+        $this->assertTrue($validator->hasErrors());
+
+        $errors = $validator->getErrors();
+
+        $this->assertInternalType('array', $errors);
+        $this->assertCount(2, $errors);
+
+        $this->assertArrayHasKey('name', $errors);
+        $this->assertInternalType('array', $errors['name']);
+        $this->assertCount(1, $errors['name']);
+        $this->assertEquals("Value of 'name' needs to be unique", $errors['name'][0]);
+
+        $this->assertArrayHasKey('birthday', $errors);
+        $this->assertInternalType('array', $errors['birthday']);
+        $this->assertCount(1, $errors['birthday']);
+        $this->assertEquals("Value of 'birthday' is required", $errors['birthday'][0]);
+    }
 }
