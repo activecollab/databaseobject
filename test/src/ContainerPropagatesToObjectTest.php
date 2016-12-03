@@ -8,6 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Container;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
@@ -66,6 +67,20 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
             'name' => 'Special Writer',
             'birthday' => '2013-10-02',
         ]);
+
+        $this->assertInstanceOf(Writer::class, $special_writer);
+        $this->assertTrue($special_writer->is_special);
+    }
+
+    public function testFindBySql()
+    {
+        /** @var Writer[] $writers */
+        $writers = $this->pool->findBySql(Writer::class, 'SELECT * FROM `writers` WHERE `id` = ?', 1);
+
+        $this->assertInstanceOf(ResultInterface::class, $writers);
+        $this->assertCount(1, $writers);
+
+        $special_writer = $writers[0];
 
         $this->assertInstanceOf(Writer::class, $special_writer);
         $this->assertTrue($special_writer->is_special);
