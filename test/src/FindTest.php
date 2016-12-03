@@ -84,6 +84,14 @@ class FindTest extends WritersTypeTestCase
         $this->assertEquals('Alexander Pushkin', $should_be_pushkin->getName());
     }
 
+    public function testFindFirstNoMatch()
+    {
+        $this->connection->execute('TRUNCATE TABLE `writers`');
+        $this->assertEmpty($this->connection->count('writers'));
+
+        $this->assertNull($this->pool->find(Writer::class)->orderBy('`birthday`')->first());
+    }
+
     /**
      * Test find all ID-s.
      */

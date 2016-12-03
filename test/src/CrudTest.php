@@ -74,6 +74,15 @@ class CrudTest extends WritersTypeTestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage ID is expected to be a number larger than 0
+     */
+    public function testGetByIdOnInvalidIdException()
+    {
+        $this->pool->getById(Writer::class, 0);
+    }
+
+    /**
      * Test if Pool::getById() properly returns NULL when record was not found.
      */
     public function testGetByIdForNonExistingRecord()

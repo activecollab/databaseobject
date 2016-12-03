@@ -108,6 +108,15 @@ class ProducerTest extends WritersTypeTestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Class 'stdClass' does not implement 'ActiveCollab\DatabaseObject\ProducerInterface' interface
+     */
+    public function testCustomProducerRequiresProducerInterface()
+    {
+        $this->pool->registerProducerByClass(Writer::class, \stdClass::class);
+    }
+
+    /**
      * @expectedException \RuntimeException
      */
     public function testUnsavedObjectsCantBeModified()
