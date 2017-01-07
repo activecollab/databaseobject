@@ -63,6 +63,39 @@ class PresenceValidatorTest extends WritersTypeTestCase
     }
 
     /**
+     * @dataProvider provideBooleanValues
+     * @param bool $value_to_check
+     */
+    public function testBooleanPresencePass(bool $value_to_check)
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, ['is_alive' => $value_to_check]);
+
+        $this->assertTrue($validator->present('is_alive'));
+        $this->assertFalse($validator->hasErrors());
+    }
+
+    public function provideBooleanValues()
+    {
+        return [
+            [true],
+            [false],
+        ];
+    }
+
+    public function testBooleanPresenceFail()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, ['is_alive' => null]);
+
+        $this->assertFalse($validator->present('is_alive'));
+        $this->assertTrue($validator->hasErrors());
+
+        $is_alive_errors = $validator->getFieldErrors('is_alive');
+
+        $this->assertInternalType('array', $is_alive_errors);
+        $this->assertCount(1, $is_alive_errors);
+    }
+
+    /**
      * Test fail because there is no value.
      */
     public function testFailBecauseTheresNoValue()

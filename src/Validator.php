@@ -85,6 +85,8 @@ class Validator implements ValidatorInterface
                 } else {
                     return $this->failPresenceValidation($field_name);
                 }
+            } elseif (is_bool($this->field_values[$field_name])) {
+                return true;
             } else {
                 if (empty($this->field_values[$field_name])) {
                     return $this->failPresenceValidation($field_name);
