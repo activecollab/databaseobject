@@ -46,6 +46,30 @@ interface PoolInterface
     public function &scrap(EntityInterface &$instance, $force_delete = false);
 
     /**
+     * @return string
+     */
+    public function getDefaultProducerClass();
+
+    /**
+     * @return ProducerInterface
+     */
+    public function &getDefaultProducer(): ProducerInterface;
+
+    /**
+     * @param  ProducerInterface $producer
+     * @return $this
+     */
+    public function &setDefaultProducer(ProducerInterface $producer);
+
+    /**
+     * Set default producer class.
+     *
+     * @param  string $default_producer_class
+     * @return $this
+     */
+    public function setDefaultProducerClass($default_producer_class);
+
+    /**
      * Register producer instance for the given type.
      *
      * @param string            $type
@@ -263,9 +287,4 @@ interface PoolInterface
      * @return string
      */
     public function getDefaultFinderClass();
-
-    /**
-     * @return string
-     */
-    public function getDefaultProducerClass();
 }

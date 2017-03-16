@@ -126,10 +126,67 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
+    private $default_producer_class = Producer::class;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultProducerClass()
+    {
+        return $this->default_producer_class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setDefaultProducerClass($default_producer_class)
+    {
+        if (!class_exists($default_producer_class, true)) {
+            throw new InvalidArgumentException('Producer class not found.');
+        }
+        
+        if (!(new ReflectionClass($default_producer_class))->implementsInterface(ProducerInterface::class)) {
+            throw new InvalidArgumentException('Producer class does not implement producer interface.');
+        }
+        
+        $this->default_producer_class = $default_producer_class;
+        $this->default_producer = null;
+
+        return $this;
+    }
+
     /**
      * @var ProducerInterface
      */
     private $default_producer;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &getDefaultProducer(): ProducerInterface
+    {
+        if (empty($this->default_producer)) {
+            $default_producer_class = $this->getDefaultProducerClass();
+
+            $this->default_producer = new $default_producer_class($this->connection, $this);
+
+            if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
+                $this->default_producer->setContainer($this->getContainer());
+            }
+        }
+
+        return $this->default_producer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setDefaultProducer(ProducerInterface $producer)
+    {
+        $this->default_producer = $producer;
+
+        return $this;
+    }
 
     /**
      * @var ProducerInterface[]
@@ -145,28 +202,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     protected function &getProducerForRegisteredType($registered_type)
     {
         if (empty($this->producers[$registered_type])) {
-            if (empty($this->default_producer)) {
-                $default_producer_class = $this->getDefaultProducerClass();
-
-                $this->default_producer = new $default_producer_class($this->connection, $this);
-
-                if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
-                    $this->default_producer->setContainer($this->getContainer());
-                }
-            }
-
-            return $this->default_producer;
+            return $this->getDefaultProducer();
         } else {
             return $this->producers[$registered_type];
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultProducerClass()
-    {
-        return Producer::class;
     }
 
     /**
