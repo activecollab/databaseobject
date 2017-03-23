@@ -98,7 +98,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * Set finder  .
      *
-     * @param string $pattern
+     * @param  string $pattern
      * @param  mixed  ...$arguments
      * @return $this
      */

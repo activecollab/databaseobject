@@ -144,11 +144,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         if (!class_exists($default_producer_class, true)) {
             throw new InvalidArgumentException('Producer class not found.');
         }
-        
+
         if (!(new ReflectionClass($default_producer_class))->implementsInterface(ProducerInterface::class)) {
             throw new InvalidArgumentException('Producer class does not implement producer interface.');
         }
-        
+
         $this->default_producer_class = $default_producer_class;
         $this->default_producer = null;
 
@@ -696,6 +696,34 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
+     * @var string|null
+     */
+    private $polymorph_type_interface;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPolymorphTypeInterface()
+    {
+        return $this->polymorph_type_interface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setPolymorphTypeInterface($value)
+    {
+        $this->polymorph_type_interface = $value;
+
+        return $this;
+    }
+
+    /**
+     * @var array
+     */
+    private $polymorph_types = [];
+
+    /**
      * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
      *
      * @param  string $type
@@ -703,7 +731,22 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function isTypePolymorph($type)
     {
-        return in_array('type', $this->getTypeFields($type));
+        $registered_type = $this->getRegisteredType($type);
+
+        if (!array_key_exists($registered_type, $this->polymorph_types)) {
+
+            // Use polymorph interface to detect type.
+            if ($this->getPolymorphTypeInterface()) {
+                $this->polymorph_types[$registered_type] = (new ReflectionClass($registered_type))
+                    ->implementsInterface($this->polymorph_type_interface);
+
+            // Check for type field (legacy).
+            } else {
+                $this->polymorph_types[$registered_type] = in_array('type', $this->getTypeFields($type));
+            }
+        }
+
+        return $this->polymorph_types[$registered_type];
     }
 
     /**

@@ -263,6 +263,21 @@ interface PoolInterface
     public function isTypeRegistered($type);
 
     /**
+     * Return interface that is used to detect if type is polymorph.
+     *
+     * @return string|null
+     */
+    public function getPolymorphTypeInterface();
+
+    /**
+     * Set interface that is used to detect if type is polymorph.
+     *
+     * @param  string|null $value
+     * @return $this
+     */
+    public function &setPolymorphTypeInterface($value);
+
+    /**
      * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
      *
      * @param  string $type

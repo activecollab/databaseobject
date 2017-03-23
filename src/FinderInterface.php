@@ -27,7 +27,7 @@ interface FinderInterface
     /**
      * Set finder conditions.
      *
-     * @param string $pattern
+     * @param  string $pattern
      * @param  mixed  ...$arguments
      * @return $this
      */
