@@ -13,6 +13,8 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as Cont
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolver;
+use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolverInterface;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -783,9 +785,21 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
-     * @var array
+     * @var TraitsResolverInterface
      */
-    private $subtype_traits = [];
+    private $traits_resolver;
+
+    /**
+     * @return TraitsResolverInterface
+     */
+    private function &getTraitsResolver()
+    {
+        if (empty($this->traits_resolver)) {
+            $this->traits_resolver = new TraitsResolver();
+        }
+
+        return $this->traits_resolver;
+    }
 
     /**
      * Return trait names by object.
@@ -798,37 +812,6 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTraitNamesByType($type)
     {
-        if (array_key_exists($type, $this->types)) {
-            if (empty($this->types[$type]['traits'])) {
-                $this->types[$type]['traits'] = [];
-
-                $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[ $type ]['traits']);
-            }
-
-            return $this->types[$type]['traits'];
-        } else {
-            if (empty($this->subtype_traits[$type]['traits'])) {
-                $this->subtype_traits[$type]['traits'] = [];
-
-                $this->recursiveGetTraitNames(new ReflectionClass($type), $this->subtype_traits[ $type ]['traits']);
-            }
-
-            return $this->subtype_traits[$type]['traits'];
-        }
-    }
-
-    /**
-     * Recursively get trait names for the given class.
-     *
-     * @param ReflectionClass $class
-     * @param array           $trait_names
-     */
-    private function recursiveGetTraitNames(ReflectionClass $class, array &$trait_names)
-    {
-        $trait_names = array_merge($trait_names, $class->getTraitNames());
-
-        if ($class->getParentClass()) {
-            $this->recursiveGetTraitNames($class->getParentClass(), $trait_names);
-        }
+        return $this->getTraitsResolver()->getClassTraits($type);
     }
 }
