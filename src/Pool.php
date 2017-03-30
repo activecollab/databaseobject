@@ -783,6 +783,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
+     * @var array
+     */
+    private $subtype_traits = [];
+
+    /**
      * Return trait names by object.
      *
      * Note: $type does not need to be directly registered, because we need to support subclasses, which call can have
@@ -793,13 +798,23 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTraitNamesByType($type)
     {
-        if (empty($this->types[$type]['traits'])) {
-            $this->types[$type]['traits'] = [];
+        if (array_key_exists($type, $this->types)) {
+            if (empty($this->types[$type]['traits'])) {
+                $this->types[$type]['traits'] = [];
 
-            $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[ $type ]['traits']);
+                $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[ $type ]['traits']);
+            }
+
+            return $this->types[$type]['traits'];
+        } else {
+            if (empty($this->subtype_traits[$type]['traits'])) {
+                $this->subtype_traits[$type]['traits'] = [];
+
+                $this->recursiveGetTraitNames(new ReflectionClass($type), $this->subtype_traits[ $type ]['traits']);
+            }
+
+            return $this->subtype_traits[$type]['traits'];
         }
-
-        return $this->types[$type]['traits'];
     }
 
     /**
