@@ -12,6 +12,8 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -204,11 +206,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     // ---------------------------------------------------
 
     /**
-     * Return number of records that match the given criteria.
-     *
-     * @return int
+     * {@inheritdoc}
      */
-    public function count()
+    public function count(): int
     {
         $table_name = $this->getEscapedTableName();
 
@@ -226,21 +226,17 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return all records that match the given criteria.
-     *
-     * @return Result|object[]|null
+     * {@inheritdoc}
      */
-    public function all()
+    public function all(): ?iterable
     {
         return $this->execute();
     }
 
     /**
-     * Return first record that matches the given criteria.
-     *
-     * @return object|null
+     * {@inheritdoc}
      */
-    public function first()
+    public function first(): ?EntityInterface
     {
         if ($this->offset === null) {
             $this->offset = 0;
@@ -256,11 +252,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array of ID-s that match the given criteria.
-     *
-     * @return int[]
+     * {@inheritdoc}
      */
-    public function ids()
+    public function ids(): ?iterable
     {
         $ids = $this->connection->executeFirstColumn($this->getSelectIdsSql());
 
@@ -268,9 +262,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Prepare SQL and load one or more records.
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function execute()
     {
@@ -285,9 +277,32 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
 
         if ($this->hasContainer()) {
-            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log], $this->getContainer());
+            return $this->connection->advancedExecute(
+                $select_sql,
+                null,
+                ConnectionInterface::LOAD_ALL_ROWS,
+                $return_by,
+                $return_by_value,
+                [
+                    &$this->connection,
+                    &$this->pool,
+                    &$this->log
+                ],
+                $this->getContainer()
+            );
         } else {
-            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
+            return $this->connection->advancedExecute(
+                $select_sql,
+                null,
+                ConnectionInterface::LOAD_ALL_ROWS,
+                $return_by,
+                $return_by_value,
+                [
+                    &$this->connection,
+                    &$this->pool,
+                    &$this->log
+                ]
+            );
         }
     }
 

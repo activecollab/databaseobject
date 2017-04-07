@@ -8,6 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 /**
@@ -69,28 +70,28 @@ interface FinderInterface
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Return all records that match the given criteria.
      *
-     * @return \ActiveCollab\DatabaseConnection\Result\Result|EntityInterface[]|null
+     * @return ResultInterface|EntityInterface[]|iterable|null
      */
-    public function all();
+    public function all(): ?iterable;
 
     /**
      * Return first record that matches the given criteria.
      *
      * @return EntityInterface|null
      */
-    public function first();
+    public function first(): ?EntityInterface;
 
     /**
      * Return array of ID-s that match the given criteria.
      *
-     * @return int[]
+     * @return int[]|iterable|null
      */
-    public function ids();
+    public function ids(): ?iterable;
 
     /**
      * Prepare SQL and load one or more records.
