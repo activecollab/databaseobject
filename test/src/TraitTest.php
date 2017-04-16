@@ -8,12 +8,12 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
-use ActiveCollab\DatabaseObject\Test\Base\TestCase;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
-use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolver;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation;
+use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
+use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolver;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test

@@ -51,7 +51,7 @@ class DefaultProducerTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Producer class does not implement producer interface.
      */
-    public function testDefaultProducerClassNeedsToImlementProducerInterface() 
+    public function testDefaultProducerClassNeedsToImlementProducerInterface()
     {
         $this->pool->setDefaultProducerClass(Validator::class);
     }

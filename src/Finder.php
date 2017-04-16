@@ -11,8 +11,6 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Result\Result;
-use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
@@ -286,7 +284,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
                 [
                     &$this->connection,
                     &$this->pool,
-                    &$this->log
+                    &$this->log,
                 ],
                 $this->getContainer()
             );
@@ -300,7 +298,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
                 [
                     &$this->connection,
                     &$this->pool,
-                    &$this->log
+                    &$this->log,
                 ]
             );
         }
