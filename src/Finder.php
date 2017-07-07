@@ -93,6 +93,21 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->type;
     }
 
+    public function getSelectSql(): string
+    {
+        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
+    }
+
+    public function getSelectIdsSql(): string
+    {
+        return $this->getSelectFieldsSql($this->getEscapedTableName() . '.`id`');
+    }
+
+    public function __toString(): string
+    {
+        return $this->getSelectSql();
+    }
+
     // ---------------------------------------------------
     //  Configuration
     // ---------------------------------------------------
@@ -100,7 +115,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * Set finder  .
      *
-     * @param  string                $pattern
+     * @param  string|array          $pattern
      * @param  mixed                 ...$arguments
      * @return FinderInterface|$this
      */
@@ -124,7 +139,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * Return where part of the query.
      */
-    public function getWhere(): string
+    private function getWhere(): string
     {
         switch (count($this->where)) {
             case 0:
@@ -315,16 +330,6 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->load_by_type_field;
     }
 
-    private function getSelectSql(): string
-    {
-        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
-    }
-
-    private function getSelectIdsSql(): string
-    {
-        return $this->getSelectFieldsSql($this->getEscapedTableName() . '.`id`');
-    }
-
     private function getSelectFieldsSql(string $escaped_field_names): string
     {
         $result = "SELECT $escaped_field_names FROM " . $this->getEscapedTableName();
@@ -357,29 +362,5 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
 
         return $this->escaped_table_name;
-    }
-
-    // ---------------------------------------------------
-    //  Access to dependencies
-    // ---------------------------------------------------
-
-    protected function getConnection(): ConnectionInterface
-    {
-        return $this->connection;
-    }
-
-    protected function getPool(): PoolInterface
-    {
-        return $this->pool;
-    }
-
-    protected function getLog(): ?LoggerInterface
-    {
-        return $this->log;
-    }
-
-    public function __toString(): string
-    {
-        return $this->getSelectIdsSql();
     }
 }

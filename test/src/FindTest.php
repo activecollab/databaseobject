@@ -141,15 +141,19 @@ class FindTest extends WritersTypeTestCase
     public function testFindByMultipleConditions()
     {
         $finder_1 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01');
-        $this->assertEquals("`birthday` > '1800-01-01'", $finder_1->getWhere());
+        $this->assertContains("WHERE `birthday` > '1800-01-01'", (string) $finder_1);
 
         /* @var Writer[] $should_be_fyodor */
         $should_be_fyodor_and_leo = $finder_1->all();
 
         $this->assertCount(2, $should_be_fyodor_and_leo);
 
-        $finder_2 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01')->where('`birthday` < ?', '1825-01-01');
-        $this->assertEquals("(`birthday` > '1800-01-01') AND (`birthday` < '1825-01-01')", $finder_2->getWhere());
+        $finder_2 = $this->pool
+            ->find(Writer::class)
+            ->where('`birthday` > ?', '1800-01-01')
+            ->where('`birthday` < ?', '1825-01-01');
+
+        $this->assertContains("WHERE (`birthday` > '1800-01-01') AND (`birthday` < '1825-01-01')", (string) $finder_2);
 
         /** @var Writer[] $should_be_fyodor */
         $should_be_fyodor = $finder_2->all();

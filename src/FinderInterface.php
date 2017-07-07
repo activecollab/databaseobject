@@ -16,10 +16,10 @@ use ActiveCollab\DatabaseObject\Entity\EntityInterface;
  */
 interface FinderInterface
 {
-    /**
-     * @return string
-     */
     public function getType(): string;
+    public function getSelectSql(): string;
+    public function getSelectIdsSql(): string;
+    public function __toString(): string;
 
     // ---------------------------------------------------
     //  Configuration
@@ -99,6 +99,4 @@ interface FinderInterface
      * @return mixed
      */
     public function execute();
-
-    public function __toString(): string;
 }
