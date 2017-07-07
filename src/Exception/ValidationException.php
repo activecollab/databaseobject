@@ -32,17 +32,8 @@ class ValidationException extends Exception
      */
     private $errors = [];
 
-    /**
-     * @param string         $message
-     * @param int            $code
-     * @param Exception|null $previous
-     */
-    public function __construct($message = '', $code = 0, Exception $previous = null)
+    public function __construct($message = 'Validation failed', int $code = 0, Exception $previous = null)
     {
-        if (empty($message)) {
-            $message = 'Validation failed';
-        }
-
         parent::__construct($message, $code, $previous);
     }
 
@@ -66,11 +57,16 @@ class ValidationException extends Exception
 
     /**
      * Return array or property => value pairs that describes this object.
+     *
      * @return array
      */
     public function jsonSerialize()
     {
-        $result = ['message' => $this->getMessage(), 'type' => get_class($this), 'field_errors' => []];
+        $result = [
+            'message' => $this->getMessage(),
+            'type' => get_class($this),
+            'field_errors' => []
+        ];
 
         foreach ($this->getErrors() as $field => $messages) {
             foreach ($messages as $message) {
@@ -147,7 +143,7 @@ class ValidationException extends Exception
      */
     public function hasError($field)
     {
-        return isset($this->errors[$field]) && count($this->errors[$field]);
+        return !empty($this->errors[$field]);
     }
 
     /**
@@ -157,7 +153,7 @@ class ValidationException extends Exception
      * @param  string $field
      * @return $this
      */
-    public function &addError($error, $field = self::ANY_FIELD)
+    public function &addError(string $error, string $field = self::ANY_FIELD)
     {
         if (empty($field)) {
             $field = self::ANY_FIELD;
