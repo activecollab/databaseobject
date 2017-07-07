@@ -33,8 +33,8 @@ class GeneratedFieldsTest extends TestCase
             `day` DATE DEFAULT NULL,
             `is_used_on_day` TINYINT(1) UNSIGNED NOT NULL DEFAULT '0',
             `stats` JSON DEFAULT NULL,
-            `plan_name` VARCHAR(191) AS (`stats`->>'$.plan_name'),
-            `number_of_users` INT AS (`stats`->>'$.users'),
+            `plan_name` VARCHAR(191) AS (JSON_UNQUOTE(JSON_EXTRACT(`stats`, '$.plan_name'))),
+            `number_of_users` INT AS (JSON_UNQUOTE(JSON_EXTRACT(`stats`, '$.users'))),
             PRIMARY KEY (`id`),
             INDEX `account_id` (`account_id`)
         ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;");
