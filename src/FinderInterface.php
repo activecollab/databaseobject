@@ -19,7 +19,7 @@ interface FinderInterface
     /**
      * @return string
      */
-    public function getType();
+    public function getType(): string;
 
     // ---------------------------------------------------
     //  Configuration
@@ -28,38 +28,38 @@ interface FinderInterface
     /**
      * Set finder conditions.
      *
-     * @param  string $pattern
-     * @param  mixed  ...$arguments
-     * @return $this
+     * @param  string          $pattern
+     * @param  mixed           ...$arguments
+     * @return FinderInterface
      */
-    public function &where($pattern, ...$arguments);
+    public function &where($pattern, ...$arguments): FinderInterface;
 
     /**
-     * @param  string $order_by
-     * @return $this
+     * @param  string          $order_by
+     * @return FinderInterface
      */
-    public function &orderBy($order_by);
+    public function &orderBy($order_by): FinderInterface;
 
     /**
-     * @param  int   $offset
-     * @param  int   $limit
-     * @return $this
+     * @param  int             $offset
+     * @param  int             $limit
+     * @return FinderInterface
      */
-    public function &limit($offset, $limit);
+    public function &limit($offset, $limit): FinderInterface;
 
     /**
-     * @param  string $type
-     * @param  string $field_name
-     * @return $this
+     * @param  string          $type
+     * @param  string          $field_name
+     * @return FinderInterface
      */
-    public function &join($type, $field_name = null);
+    public function &join($type, $field_name = null): FinderInterface;
 
     /**
-     * @param  string $table_name
-     * @param  string $field_name
-     * @return $this
+     * @param  string          $table_name
+     * @param  string          $field_name
+     * @return FinderInterface
      */
-    public function &joinTable($table_name, $field_name = null);
+    public function &joinTable($table_name, $field_name = null): FinderInterface;
 
     // ---------------------------------------------------
     //  Execution
@@ -99,4 +99,6 @@ interface FinderInterface
      * @return mixed
      */
     public function execute();
+
+    public function __toString(): string;
 }
