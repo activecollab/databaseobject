@@ -37,11 +37,11 @@ abstract class Collection implements CollectionInterface
     protected $log;
 
     /**
-     * @param ConnectionInterface  $connection
-     * @param PoolInterface        $pool
-     * @param LoggerInterface|null $log
+     * @param ConnectionInterface $connection
+     * @param PoolInterface       $pool
+     * @param LoggerInterface     $log
      */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface &$log = null)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $log)
     {
         $this->connection = $connection;
         $this->pool = $pool;

@@ -338,7 +338,7 @@ abstract class Type extends Collection
     /**
      * Collection conditions.
      *
-     * @var string
+     * @var array
      */
     private $conditions = [];
 
@@ -379,8 +379,8 @@ abstract class Type extends Collection
     /**
      * Set collection conditions.
      *
-     * @param  string $pattern
-     * @param  array  $arguments
+     * @param  string|array $pattern
+     * @param  array        $arguments
      * @return $this
      */
     public function &where($pattern, ...$arguments)
