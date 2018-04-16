@@ -8,7 +8,7 @@ addons:
     sources:
       - mysql-5.7-trusty
     packages:
-- mysql-server
+      - mysql-server
 before_install:
   - composer self-update
 install: composer install --dev
