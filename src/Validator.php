@@ -274,7 +274,7 @@ class Validator implements ValidatorInterface
         $conditions = implode(' AND ', $conditions);
 
         if (empty($this->object_id)) {
-            $sql = sprintf("SELECT COUNT(`id`) AS 'row_count' FROM $table_name WHERE $conditions");
+            $sql = "SELECT COUNT(`id`) AS 'row_count' FROM {$table_name} WHERE {$conditions}";
         } else {
             $sql = $this->connection->prepare("SELECT COUNT(`id`) AS 'row_count' FROM $table_name WHERE ($conditions) AND (`id` != ?)", ($this->old_object_id ? $this->old_object_id : $this->object_id));
         }
