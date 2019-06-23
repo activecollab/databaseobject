@@ -13,5 +13,5 @@ before_install:
   - composer self-update
 install: composer install --dev
 before_script:
-  - mysql -u root -e 'create database activecollab_database_object_test'
+  - mysql -e 'create database activecollab_database_object_test'
 script: vendor/bin/phpunit
