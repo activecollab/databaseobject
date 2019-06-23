@@ -22,7 +22,7 @@ class TypePreconfiguredCollectionTest extends WritersTypeTestCase
      */
     public function testCollectionIsPreconfigured()
     {
-        $collection = new PreconfiguredCollection($this->connection, $this->pool);
+        $collection = new PreconfiguredCollection($this->connection, $this->pool, $this->logger);
 
         $this->assertEquals("`name` LIKE 'A%'", $collection->getConditions());
         $this->assertEquals('`name`', $collection->getOrderBy());
@@ -33,7 +33,7 @@ class TypePreconfiguredCollectionTest extends WritersTypeTestCase
      */
     public function testExecutePreconfiguredCollection()
     {
-        $writers = (new PreconfiguredCollection($this->connection, $this->pool))->execute();
+        $writers = (new PreconfiguredCollection($this->connection, $this->pool, $this->logger))->execute();
 
         $this->assertInstanceOf(ResultInterface::class, $writers);
         $this->assertCount(1, $writers);

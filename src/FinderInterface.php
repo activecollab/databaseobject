@@ -8,6 +8,7 @@
 
 namespace ActiveCollab\DatabaseObject;
 
+use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 /**
@@ -15,10 +16,10 @@ use ActiveCollab\DatabaseObject\Entity\EntityInterface;
  */
 interface FinderInterface
 {
-    /**
-     * @return string
-     */
-    public function getType();
+    public function getType(): string;
+    public function getSelectSql(): string;
+    public function getSelectIdsSql(): string;
+    public function __toString(): string;
 
     // ---------------------------------------------------
     //  Configuration
@@ -27,38 +28,38 @@ interface FinderInterface
     /**
      * Set finder conditions.
      *
-     * @param string $pattern
-     * @param  mixed  ...$arguments
-     * @return $this
+     * @param  string          $pattern
+     * @param  mixed           ...$arguments
+     * @return FinderInterface
      */
-    public function &where($pattern, ...$arguments);
+    public function &where($pattern, ...$arguments): FinderInterface;
 
     /**
-     * @param  string $order_by
-     * @return $this
+     * @param  string          $order_by
+     * @return FinderInterface
      */
-    public function &orderBy($order_by);
+    public function &orderBy($order_by): FinderInterface;
 
     /**
-     * @param  int   $offset
-     * @param  int   $limit
-     * @return $this
+     * @param  int             $offset
+     * @param  int             $limit
+     * @return FinderInterface
      */
-    public function &limit($offset, $limit);
+    public function &limit($offset, $limit): FinderInterface;
 
     /**
-     * @param  string $type
-     * @param  string $field_name
-     * @return $this
+     * @param  string          $type
+     * @param  string          $field_name
+     * @return FinderInterface
      */
-    public function &join($type, $field_name = null);
+    public function &join($type, $field_name = null): FinderInterface;
 
     /**
-     * @param  string $table_name
-     * @param  string $field_name
-     * @return $this
+     * @param  string          $table_name
+     * @param  string          $field_name
+     * @return FinderInterface
      */
-    public function &joinTable($table_name, $field_name = null);
+    public function &joinTable($table_name, $field_name = null): FinderInterface;
 
     // ---------------------------------------------------
     //  Execution
@@ -69,28 +70,28 @@ interface FinderInterface
      *
      * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Return all records that match the given criteria.
      *
-     * @return \ActiveCollab\DatabaseConnection\Result\Result|EntityInterface[]|null
+     * @return ResultInterface|EntityInterface[]|iterable|null
      */
-    public function all();
+    public function all(): ?iterable;
 
     /**
      * Return first record that matches the given criteria.
      *
      * @return EntityInterface|null
      */
-    public function first();
+    public function first(): ?EntityInterface;
 
     /**
      * Return array of ID-s that match the given criteria.
      *
-     * @return int[]
+     * @return int[]|iterable|null
      */
-    public function ids();
+    public function ids(): ?iterable;
 
     /**
      * Prepare SQL and load one or more records.

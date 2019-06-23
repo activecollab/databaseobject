@@ -37,7 +37,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testTypeCollectionReadsSettingsFromType()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $this->assertEquals($collection->getTableName(), 'writers');
         $this->assertEquals($collection->getTimestampField(), 'updated_at');
@@ -49,7 +49,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetConditionsFromString()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where('type = "File"');
         $this->assertEquals($collection->getConditions(), 'type = "File"');
@@ -60,7 +60,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetConditionsFromArray()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where(['type = ?', 'File']);
         $this->assertEquals($collection->getConditions(), "type = 'File'");
@@ -72,7 +72,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetConditionsFromArrayAcceptsOnlyPatternArgument()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where(['type = ?', 'File'], 1, 2, 3);
     }
@@ -82,7 +82,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetConditionsFromArrayOfArguments()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where('type = ?', 'File');
         $this->assertEquals($collection->getConditions(), "type = 'File'");
@@ -94,7 +94,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testEmptyPatternStringThrowsAnException()
     {
-        (new WritersCollection($this->connection, $this->pool))->where('');
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->where('');
     }
 
     /**
@@ -103,7 +103,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testEmptyPatternArrayThrowsAnException()
     {
-        (new WritersCollection($this->connection, $this->pool))->where([]);
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->where([]);
     }
 
     /**
@@ -112,12 +112,12 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testInvalidConditionsTypeThrowsAnException()
     {
-        (new WritersCollection($this->connection, $this->pool))->where(123);
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->where(123);
     }
 
     public function testSetMultipleConditions()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where('type = ?', 'File');
         $collection->where('type = ?', 'YouTubeVideo');
@@ -131,7 +131,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetOrderBy()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
         $collection->orderBy('`writers`.`created_at` DESC');
 
         $this->assertEquals($collection->getOrderBy(), '`writers`.`created_at` DESC');
@@ -142,7 +142,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testCoundShouldNotWorkWhenCollectionIsNotReady()
     {
-        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->executeIds();
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->executeIds();
     }
 
     /**
@@ -150,7 +150,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecuteShouldNotWorkWhenCollectionIsNotReady()
     {
-        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->execute();
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->execute();
     }
 
     /**
@@ -158,7 +158,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecuteIdsShouldNotWorkWhenCollectionIsNotReady()
     {
-        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->executeIds();
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->executeIds();
     }
 
     /**
@@ -166,7 +166,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testGetTagShouldNotWorkWhenCollectionIsNotReady()
     {
-        (new WritersCollection($this->connection, $this->pool))->setAsNotReady()->getEtag('ilija.studen@activecollab.com');
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->getEtag('ilija.studen@activecollab.com');
     }
 
     /**
@@ -174,7 +174,14 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecuteIds()
     {
-        $this->assertEquals([3, 2, 1], (new WritersCollection($this->connection, $this->pool))->executeIds());
+        $this->assertEquals(
+            [
+                3,
+                2,
+                1
+            ],
+            (new WritersCollection($this->connection, $this->pool, $this->logger))->executeIds()
+        );
     }
 
     /**
@@ -182,7 +189,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecute()
     {
-        $writers = (new WritersCollection($this->connection, $this->pool))->execute();
+        $writers = (new WritersCollection($this->connection, $this->pool, $this->logger))->execute();
 
         $this->assertInstanceOf(ResultInterface::class, $writers);
         $this->assertCount(3, $writers);
@@ -197,7 +204,9 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecuteWithConditions()
     {
-        $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->execute();
+        $writers = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')
+            ->execute();
 
         $this->assertInstanceOf(ResultInterface::class, $writers);
         $this->assertCount(2, $writers);
@@ -211,7 +220,10 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testExecuteWithConditionsAndOrder()
     {
-        $writers = (new WritersCollection($this->connection, $this->pool))->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')->orderBy('`name`')->execute();
+        $writers = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->where('`name` LIKE ? OR `name` LIKE ?', 'Fyodor%', 'Alexander%')
+            ->orderBy('`name`')
+            ->execute();
 
         $this->assertInstanceOf(ResultInterface::class, $writers);
         $this->assertCount(2, $writers);
@@ -225,10 +237,11 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testIsPaginated()
     {
-        $not_paginated = new WritersCollection($this->connection, $this->pool);
+        $not_paginated = new WritersCollection($this->connection, $this->pool, $this->logger);
         $this->assertFalse($not_paginated->isPaginated());
 
-        $paginated = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+        $paginated = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->pagination(1, 2);
         $this->assertTrue($paginated->isPaginated());
     }
 
@@ -237,7 +250,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetCurrentPageForNonPaginatedCollectionThrowsAnError()
     {
-        (new WritersCollection($this->connection, $this->pool))->currentPage(1);
+        (new WritersCollection($this->connection, $this->pool, $this->logger))->currentPage(1);
     }
 
     /**
@@ -245,7 +258,8 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSetCurrentPageForPaginatedCollection()
     {
-        $paginated = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+        $paginated = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->pagination(1, 2);
         $this->assertEquals(1, $paginated->getCurrentPage());
 
         $paginated->currentPage(18);
@@ -258,7 +272,8 @@ class TypeCollectionTest extends WritersTypeTestCase
     public function testExecutePaginated()
     {
         //  Page 1
-        $collection = (new WritersCollection($this->connection, $this->pool))->pagination(1, 2);
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->pagination(1, 2);
 
         $this->assertEquals(1, $collection->getCurrentPage());
         $this->assertEquals(2, $collection->getItemsPerPage());
@@ -273,7 +288,8 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('Alexander Pushkin', $writers[1]->getName());
 
         //  Page 2
-        $collection = (new WritersCollection($this->connection, $this->pool))->pagination(2, 2);
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->pagination(2, 2);
 
         $this->assertEquals(2, $collection->getCurrentPage());
         $this->assertEquals(2, $collection->getItemsPerPage());
@@ -292,7 +308,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testJoinIsTurnedOffByDefault()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $this->assertNull($collection->getJoinTable());
         $this->assertNull($collection->getTargetJoinField());
@@ -303,7 +319,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testTargetJoinFieldBasedOnTableName()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->setJoinTable('writes_books');
 
@@ -317,7 +333,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testTargetJoinFieldSpecified()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->setJoinTable('writes_books', 'awesome_writer_id');
 
@@ -331,7 +347,7 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testSourceAndTargetJoinFieldsSpecified()
     {
-        $collection = new WritersCollection($this->connection, $this->pool);
+        $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->setJoinTable('writes_books', ['source_id', 'target_id']);
 
@@ -345,7 +361,8 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testInvalidSourceAndTargetJoinFieldException()
     {
-        (new WritersCollection($this->connection, $this->pool))->setJoinTable('writes_books', ['invalid', 'number', 'of', 'arguments']);
+        (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setJoinTable('writes_books', ['invalid', 'number', 'of', 'arguments']);
     }
 
     /**
@@ -369,7 +386,10 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals(3, $this->connection->count('favorite_writers', null, '*'));
 
         // Peter's favorite writers
-        $collection = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 1)->orderBy('`name`');
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setJoinTable('favorite_writers')
+            ->where('`favorite_writers`.`user_id` = ?', 1)
+            ->orderBy('`name`');
 
         $this->assertEquals('favorite_writers', $collection->getJoinTable());
         $this->assertEquals('writer_id', $collection->getTargetJoinField());
@@ -383,7 +403,11 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('Leo Tolstoy', $writers[1]->getName());
 
         // John's favorite writers
-        $writers = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 2)->orderBy('`name`')->execute();
+        $writers = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setJoinTable('favorite_writers')
+            ->where('`favorite_writers`.`user_id` = ?', 2)
+            ->orderBy('`name`')
+            ->execute();
 
         $this->assertInstanceOf(ResultInterface::class, $writers);
         $this->assertCount(1, $writers);
@@ -391,7 +415,11 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('Alexander Pushkin', $writers[0]->getName());
 
         // Oliver's favorite writes
-        $writers = (new WritersCollection($this->connection, $this->pool))->setJoinTable('favorite_writers')->where('`favorite_writers`.`user_id` = ?', 3)->orderBy('`name`')->execute();
+        $writers = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setJoinTable('favorite_writers')
+            ->where('`favorite_writers`.`user_id` = ?', 3)
+            ->orderBy('`name`')
+            ->execute();
 
         $this->assertNull($writers);
     }
@@ -401,10 +429,19 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testTimestampHash()
     {
-        $this->connection->execute('UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?', date('Y-m-d H:i:s', time() + 1), 2);
-        $this->connection->execute('UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?', date('Y-m-d H:i:s', time() + 2), 3);
+        $this->connection->execute(
+            'UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?',
+            date('Y-m-d H:i:s', time() + 1),
+            2
+        );
+        $this->connection->execute(
+            'UPDATE `writers` SET `updated_at` = ? WHERE `id` = ?',
+            date('Y-m-d H:i:s', time() + 2),
+            3
+        );
 
-        $collection = (new WritersCollection($this->connection, $this->pool))->orderBy('`writers`.`id`');
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->orderBy('`writers`.`id`');
 
         $updated_on_timestamps = [];
 
@@ -416,7 +453,10 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertCount(3, $updated_on_timestamps);
         $this->assertCount(3, array_unique($updated_on_timestamps));
 
-        $this->assertEquals($collection->getTimestampHash('updated_at'), sha1(implode(',', $updated_on_timestamps)));
+        $this->assertEquals(
+            $collection->getTimestampHash('updated_at'),
+            sha1(implode(',', $updated_on_timestamps))
+        );
     }
 
     /**
@@ -424,7 +464,8 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testEtagShouldNotBeQuoted()
     {
-        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0');
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setApplicationIdentifier('MyApp v1.0');
 
         $etag = $collection->getEtag('ilija.studen@activecollab.com');
 
@@ -439,7 +480,8 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testEtagFormat()
     {
-        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0');
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setApplicationIdentifier('MyApp v1.0');
 
         $etag = $collection->getEtag('ilija.studen@activecollab.com');
 
@@ -462,7 +504,9 @@ class TypeCollectionTest extends WritersTypeTestCase
      */
     public function testEtagCanIncludeAdditionalIdenfitier()
     {
-        $collection = (new WritersCollection($this->connection, $this->pool))->setApplicationIdentifier('MyApp v1.0')->setAdditionalIdenfitifier('addidf');
+        $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
+            ->setApplicationIdentifier('MyApp v1.0')
+            ->setAdditionalIdenfitifier('addidf');
 
         $etag = $collection->getEtag('ilija.studen@activecollab.com');
 

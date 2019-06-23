@@ -11,7 +11,7 @@ namespace ActiveCollab\DatabaseObject;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
-use ActiveCollab\DatabaseConnection\Result\Result;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
@@ -74,7 +74,12 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param LoggerInterface|null $log
      * @param string               $type
      */
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface &$log = null, $type)
+    public function __construct(
+        ConnectionInterface $connection,
+        PoolInterface $pool,
+        LoggerInterface &$log = null,
+        string $type
+    )
     {
         $this->connection = $connection;
         $this->pool = $pool;
@@ -83,12 +88,24 @@ class Finder implements FinderInterface, ContainerAccessInterface
         $this->order_by = $this->pool->getEscapedTypeOrderBy($type);
     }
 
-    /**
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
+    }
+
+    public function getSelectSql(): string
+    {
+        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
+    }
+
+    public function getSelectIdsSql(): string
+    {
+        return $this->getSelectFieldsSql($this->getEscapedTableName() . '.`id`');
+    }
+
+    public function __toString(): string
+    {
+        return $this->getSelectSql();
     }
 
     // ---------------------------------------------------
@@ -98,11 +115,11 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * Set finder  .
      *
-     * @param string $pattern
-     * @param  mixed  ...$arguments
-     * @return $this
+     * @param  string|array          $pattern
+     * @param  mixed                 ...$arguments
+     * @return FinderInterface|$this
      */
-    public function &where($pattern, ...$arguments)
+    public function &where($pattern, ...$arguments): FinderInterface
     {
         if (!is_string($pattern)) {
             throw new InvalidArgumentException('Conditions pattern needs to be string');
@@ -122,7 +139,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * Return where part of the query.
      */
-    public function getWhere()
+    private function getWhere(): string
     {
         switch (count($this->where)) {
             case 0:
@@ -137,10 +154,10 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  string $order_by
-     * @return $this
+     * @param  string                $order_by
+     * @return FinderInterface|$this
      */
-    public function &orderBy($order_by)
+    public function &orderBy($order_by): FinderInterface
     {
         $this->order_by = $order_by;
 
@@ -148,11 +165,11 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  int   $offset
-     * @param  int   $limit
-     * @return $this
+     * @param  int                   $offset
+     * @param  int                   $limit
+     * @return FinderInterface|$this
      */
-    public function &limit($offset, $limit)
+    public function &limit($offset, $limit): FinderInterface
     {
         $this->offset = $offset;
         $this->limit = $limit;
@@ -161,21 +178,21 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * @param  string $type
-     * @param  string $field_name
-     * @return $this
+     * @param  string                $type
+     * @param  string                $field_name
+     * @return FinderInterface|$this
      */
-    public function &join($type, $field_name = null)
+    public function &join($type, $field_name = null): FinderInterface
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
 
     /**
-     * @param  string $table_name
-     * @param  string $field_name
-     * @return $this
+     * @param  string                $table_name
+     * @param  string                $field_name
+     * @return FinderInterface|$this
      */
-    public function &joinTable($table_name, $field_name = null)
+    public function &joinTable($table_name, $field_name = null): FinderInterface
     {
         $join_table = $this->connection->escapeTableName($table_name);
         $join_field = $this->connection->escapeFieldName($field_name ? $field_name : $this->getJoinFieldNameFromType());
@@ -185,10 +202,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this;
     }
 
-    /**
-     * @return string
-     */
-    private function getJoinFieldNameFromType()
+    private function getJoinFieldNameFromType(): string
     {
         if (($pos = strrpos($this->getType(), '\\')) === false) {
             $type = $this->getType();
@@ -203,12 +217,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     //  Execution
     // ---------------------------------------------------
 
-    /**
-     * Return number of records that match the given criteria.
-     *
-     * @return int
-     */
-    public function count()
+    public function count(): int
     {
         $table_name = $this->getEscapedTableName();
 
@@ -226,21 +235,17 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return all records that match the given criteria.
-     *
-     * @return Result|object[]|null
+     * {@inheritdoc}
      */
-    public function all()
+    public function all(): ?iterable
     {
         return $this->execute();
     }
 
     /**
-     * Return first record that matches the given criteria.
-     *
-     * @return object|null
+     * {@inheritdoc}
      */
-    public function first()
+    public function first(): ?EntityInterface
     {
         if ($this->offset === null) {
             $this->offset = 0;
@@ -256,11 +261,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Return array of ID-s that match the given criteria.
-     *
-     * @return int[]
+     * {@inheritdoc}
      */
-    public function ids()
+    public function ids(): ?iterable
     {
         $ids = $this->connection->executeFirstColumn($this->getSelectIdsSql());
 
@@ -268,9 +271,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     }
 
     /**
-     * Prepare SQL and load one or more records.
-     *
-     * @return mixed
+     * {@inheritdoc}
      */
     public function execute()
     {
@@ -285,9 +286,32 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
 
         if ($this->hasContainer()) {
-            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log], $this->getContainer());
+            return $this->connection->advancedExecute(
+                $select_sql,
+                null,
+                ConnectionInterface::LOAD_ALL_ROWS,
+                $return_by,
+                $return_by_value,
+                [
+                    &$this->connection,
+                    &$this->pool,
+                    &$this->log,
+                ],
+                $this->getContainer()
+            );
         } else {
-            return $this->connection->advancedExecute($select_sql, null, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this->pool, &$this->log]);
+            return $this->connection->advancedExecute(
+                $select_sql,
+                null,
+                ConnectionInterface::LOAD_ALL_ROWS,
+                $return_by,
+                $return_by_value,
+                [
+                    &$this->connection,
+                    &$this->pool,
+                    &$this->log,
+                ]
+            );
         }
     }
 
@@ -295,17 +319,9 @@ class Finder implements FinderInterface, ContainerAccessInterface
     //  Utilities
     // ---------------------------------------------------
 
-    /**
-     * @var bool
-     */
     private $load_by_type_field;
 
-    /**
-     * Check if we should load by type field or by type class.
-     *
-     * @return bool
-     */
-    private function loadByTypeField()
+    private function loadByTypeField(): string
     {
         if ($this->load_by_type_field === null) {
             $this->load_by_type_field = in_array('type', $this->pool->getTypeFields($this->type));
@@ -314,33 +330,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->load_by_type_field;
     }
 
-    /**
-     * Prepare select one or more rows query.
-     *
-     * @return string
-     */
-    private function getSelectSql()
-    {
-        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
-    }
-
-    /**
-     * Return select ID-s SQL.
-     *
-     * @return string
-     */
-    private function getSelectIdsSql()
-    {
-        return $this->getSelectFieldsSql($this->getEscapedTableName() . '.`id`');
-    }
-
-    /**
-     * Construct SELECT query for the given fields based on set criteria.
-     *
-     * @param  string $escaped_field_names
-     * @return string
-     */
-    private function getSelectFieldsSql($escaped_field_names)
+    private function getSelectFieldsSql(string $escaped_field_names): string
     {
         $result = "SELECT $escaped_field_names FROM " . $this->getEscapedTableName();
 
@@ -363,48 +353,14 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $result;
     }
 
-    /**
-     * @var string
-     */
     private $escaped_table_name;
 
-    /**
-     * @return string
-     */
-    private function getEscapedTableName()
+    private function getEscapedTableName(): string
     {
         if (empty($this->escaped_table_name)) {
             $this->escaped_table_name = $this->pool->getTypeTable($this->type, true);
         }
 
         return $this->escaped_table_name;
-    }
-
-    // ---------------------------------------------------
-    //  Access to dependencies
-    // ---------------------------------------------------
-
-    /**
-     * @return ConnectionInterface
-     */
-    protected function getConnection()
-    {
-        return $this->connection;
-    }
-
-    /**
-     * @return PoolInterface
-     */
-    protected function getPool()
-    {
-        return $this->pool;
-    }
-
-    /**
-     * @return LoggerInterface|null
-     */
-    protected function getLog()
-    {
-        return $this->log;
     }
 }

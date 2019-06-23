@@ -9,8 +9,12 @@
 namespace ActiveCollab\DatabaseObject\Test\Base;
 
 use ActiveCollab\DatabaseConnection\Connection;
+use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
 use ActiveCollab\DatabaseObject\Pool;
+use Monolog\Handler\TestHandler;
+use Monolog\Logger;
 use mysqli;
+use Psr\Log\LoggerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Base
@@ -33,8 +37,10 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     protected $pool;
 
     /**
-     * Set up test environment.
+     * @var LoggerInterface
      */
+    protected $logger;
+
     public function setUp()
     {
         parent::setUp();
@@ -45,8 +51,11 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             throw new \RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
         }
 
-        $this->connection = new Connection($this->link);
+        $this->connection = new MysqliConnection($this->link);
         $this->pool = new Pool($this->connection);
+
+        $this->logger = new Logger('DatabaseObject test');
+        $this->logger->pushHandler(new TestHandler());
     }
 
     /**

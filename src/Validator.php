@@ -85,6 +85,8 @@ class Validator implements ValidatorInterface
                 } else {
                     return $this->failPresenceValidation($field_name);
                 }
+            } elseif (is_bool($this->field_values[$field_name])) {
+                return true;
             } else {
                 if (empty($this->field_values[$field_name])) {
                     return $this->failPresenceValidation($field_name);
@@ -272,7 +274,7 @@ class Validator implements ValidatorInterface
         $conditions = implode(' AND ', $conditions);
 
         if (empty($this->object_id)) {
-            $sql = sprintf("SELECT COUNT(`id`) AS 'row_count' FROM $table_name WHERE $conditions");
+            $sql = "SELECT COUNT(`id`) AS 'row_count' FROM {$table_name} WHERE {$conditions}";
         } else {
             $sql = $this->connection->prepare("SELECT COUNT(`id`) AS 'row_count' FROM $table_name WHERE ($conditions) AND (`id` != ?)", ($this->old_object_id ? $this->old_object_id : $this->object_id));
         }

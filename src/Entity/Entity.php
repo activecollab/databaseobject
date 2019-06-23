@@ -171,6 +171,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     private $modified_fields = [];
 
     /**
+     * @var array
+     */
+    private $modified_attributes = [];
+
+    /**
      * Primary key is updated.
      *
      * @var bool
@@ -202,7 +207,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
                 return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
             } else {
                 foreach ($this->getFields() as $field_name) {
-                    if (!$object->fieldExists($field_name) || !$this->areFieldValuesSame($this->getFieldValue($field_name), $object->getFieldValue($field_name))) {
+                    if (!$object->fieldExists($field_name) ||
+                        !$this->areFieldValuesSame(
+                            $this->getFieldValue($field_name),
+                            $object->getFieldValue($field_name)
+                        )) {
                         return false;
                     }
                 }
@@ -223,7 +232,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     private function areFieldValuesSame($value_1, $value_2)
     {
-        if (($value_1 instanceof DateValueInterface && $value_2 instanceof DateValueInterface) || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)) {
+        if (($value_1 instanceof DateValueInterface && $value_2 instanceof DateValueInterface)
+            || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)) {
             return $value_1->getTimestamp() == $value_2->getTimestamp();
         } else {
             return $value_1 === $value_2;
@@ -336,7 +346,13 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             }
         }
 
-        $validator = new Validator($this->connection, $this->table_name, $this->getId(), $this->getOldFieldValue('id'), $values_to_validate);
+        $validator = new Validator(
+            $this->connection,
+            $this->table_name,
+            $this->getId(),
+            $this->getOldFieldValue('id'),
+            $values_to_validate
+        );
 
         $this->validate($validator);
 
@@ -503,6 +519,16 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
+     * Check if this object has modified columns.
+     *
+     * @return bool
+     */
+    public function isModified()
+    {
+        return !empty($this->modified_fields) || !empty($this->modified_attributes);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getModifiedFields()
@@ -532,16 +558,6 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Check if this object has modified columns.
-     *
-     * @return bool
-     */
-    public function isModified()
-    {
-        return (bool) count($this->modified_fields);
-    }
-
-    /**
      * Returns true if specific field is modified.
      *
      * @param  string $field
@@ -560,6 +576,32 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     public function isPrimaryKeyModified()
     {
         return $this->primary_key_modified;
+    }
+
+    /**
+     * @return array
+     */
+    public function getModifiedAttributes()
+    {
+        return $this->modified_attributes;
+    }
+
+    /**
+     * Return true if $attribute is modified.
+     *
+     * @param  string $attribute
+     * @return bool
+     */
+    public function isModifiedAttribute($attribute)
+    {
+        return in_array($attribute, $this->modified_attributes);
+    }
+
+    protected function recordModifiedAttribute($attribute)
+    {
+        if (!in_array($attribute, $this->modified_attributes)) {
+            $this->modified_attributes[] = $attribute;
+        }
     }
 
     /**
@@ -661,7 +703,10 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     public function getFieldValue($field, $default = null)
     {
         if (empty($this->values[$field]) && !array_key_exists($field, $this->values)) {
-            return empty($this->default_field_values[$field]) && !array_key_exists($field, $this->default_field_values) ? $default : $this->default_field_values[$field];
+            return empty($this->default_field_values[$field])
+                && !array_key_exists($field, $this->default_field_values) ?
+                    $default :
+                    $this->default_field_values[$field];
         } else {
             return $this->values[$field];
         }
@@ -886,7 +931,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         $result = [];
 
         if (!empty($this->generated_fields)) {
-            $result = $this->connection->selectFirstRow($this->getTableName(), $this->generated_fields, $this->getWherePartById($id));
+            $result = $this->connection->selectFirstRow(
+                $this->getTableName(),
+                $this->generated_fields,
+                $this->getWherePartById($id)
+            );
 
             if (empty($result)) {
                 $result = [];
@@ -926,7 +975,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     private function resetModifiedFlags()
     {
-        $this->modified_fields = $this->old_values = [];
+        $this->modified_fields = [];
+        $this->modified_attributes = [];
+        $this->old_values = [];
         $this->primary_key_modified = false;
     }
 

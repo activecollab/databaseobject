@@ -13,6 +13,8 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as Cont
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolver;
+use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolverInterface;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -126,10 +128,67 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
+    private $default_producer_class = Producer::class;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDefaultProducerClass()
+    {
+        return $this->default_producer_class;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setDefaultProducerClass($default_producer_class)
+    {
+        if (!class_exists($default_producer_class, true)) {
+            throw new InvalidArgumentException('Producer class not found.');
+        }
+
+        if (!(new ReflectionClass($default_producer_class))->implementsInterface(ProducerInterface::class)) {
+            throw new InvalidArgumentException('Producer class does not implement producer interface.');
+        }
+
+        $this->default_producer_class = $default_producer_class;
+        $this->default_producer = null;
+
+        return $this;
+    }
+
     /**
      * @var ProducerInterface
      */
     private $default_producer;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &getDefaultProducer(): ProducerInterface
+    {
+        if (empty($this->default_producer)) {
+            $default_producer_class = $this->getDefaultProducerClass();
+
+            $this->default_producer = new $default_producer_class($this->connection, $this);
+
+            if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
+                $this->default_producer->setContainer($this->getContainer());
+            }
+        }
+
+        return $this->default_producer;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setDefaultProducer(ProducerInterface $producer)
+    {
+        $this->default_producer = $producer;
+
+        return $this;
+    }
 
     /**
      * @var ProducerInterface[]
@@ -145,28 +204,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     protected function &getProducerForRegisteredType($registered_type)
     {
         if (empty($this->producers[$registered_type])) {
-            if (empty($this->default_producer)) {
-                $default_producer_class = $this->getDefaultProducerClass();
-
-                $this->default_producer = new $default_producer_class($this->connection, $this);
-
-                if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
-                    $this->default_producer->setContainer($this->getContainer());
-                }
-            }
-
-            return $this->default_producer;
+            return $this->getDefaultProducer();
         } else {
             return $this->producers[$registered_type];
         }
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultProducerClass()
-    {
-        return Producer::class;
     }
 
     /**
@@ -657,6 +698,34 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
+     * @var string|null
+     */
+    private $polymorph_type_interface;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPolymorphTypeInterface()
+    {
+        return $this->polymorph_type_interface;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function &setPolymorphTypeInterface($value)
+    {
+        $this->polymorph_type_interface = $value;
+
+        return $this;
+    }
+
+    /**
+     * @var array
+     */
+    private $polymorph_types = [];
+
+    /**
      * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
      *
      * @param  string $type
@@ -664,7 +733,22 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function isTypePolymorph($type)
     {
-        return in_array('type', $this->getTypeFields($type));
+        $registered_type = $this->getRegisteredType($type);
+
+        if (!array_key_exists($registered_type, $this->polymorph_types)) {
+
+            // Use polymorph interface to detect type.
+            if ($this->getPolymorphTypeInterface()) {
+                $this->polymorph_types[$registered_type] = (new ReflectionClass($registered_type))
+                    ->implementsInterface($this->polymorph_type_interface);
+
+            // Check for type field (legacy).
+            } else {
+                $this->polymorph_types[$registered_type] = in_array('type', $this->getTypeFields($type));
+            }
+        }
+
+        return $this->polymorph_types[$registered_type];
     }
 
     /**
@@ -701,6 +785,23 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     }
 
     /**
+     * @var TraitsResolverInterface
+     */
+    private $traits_resolver;
+
+    /**
+     * @return TraitsResolverInterface
+     */
+    private function &getTraitsResolver()
+    {
+        if (empty($this->traits_resolver)) {
+            $this->traits_resolver = new TraitsResolver();
+        }
+
+        return $this->traits_resolver;
+    }
+
+    /**
      * Return trait names by object.
      *
      * Note: $type does not need to be directly registered, because we need to support subclasses, which call can have
@@ -711,27 +812,6 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     public function getTraitNamesByType($type)
     {
-        if (empty($this->types[$type]['traits'])) {
-            $this->types[$type]['traits'] = [];
-
-            $this->recursiveGetTraitNames(new ReflectionClass($type), $this->types[ $type ]['traits']);
-        }
-
-        return $this->types[$type]['traits'];
-    }
-
-    /**
-     * Recursively get trait names for the given class.
-     *
-     * @param ReflectionClass $class
-     * @param array           $trait_names
-     */
-    private function recursiveGetTraitNames(ReflectionClass $class, array &$trait_names)
-    {
-        $trait_names = array_merge($trait_names, $class->getTraitNames());
-
-        if ($class->getParentClass()) {
-            $this->recursiveGetTraitNames($class->getParentClass(), $trait_names);
-        }
+        return $this->getTraitsResolver()->getClassTraits($type);
     }
 }
