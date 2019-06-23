@@ -3,8 +3,6 @@
     "type": "library",
     "description": "Library that enables easy persistance of objects to the MySQL 5.7+ database",
     "license": "MIT",
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "keywords": [
         "persistence",
         "mysql",
@@ -19,7 +17,7 @@
     ],
     "require": {
         "php": ">=7.1",
-        "activecollab/databaseconnection": "v3.0.x-dev",
+        "activecollab/databaseconnection": "^3.0",
         "activecollab/etag": "^1.0",
         "activecollab/object": "^1.0",
         "doctrine/inflector": "^1.0",
