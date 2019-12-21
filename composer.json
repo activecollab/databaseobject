@@ -16,8 +16,8 @@
         }
     ],
     "require": {
-        "php": ">=7.1",
-        "activecollab/databaseconnection": "^3.0",
+        "php": ">=7.3",
+        "activecollab/databaseconnection": "^3.0||^4.0",
         "activecollab/etag": "^1.0",
         "activecollab/object": "^1.0",
         "doctrine/inflector": "^1.0",
