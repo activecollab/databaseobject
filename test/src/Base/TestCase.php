@@ -46,7 +46,12 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
 
-        $this->link = new \MySQLi('localhost', 'root', '', 'activecollab_database_object_test');
+        $this->link = new \MySQLi(
+            'localhost',
+            'root',
+            $this->getValidMySqlPassword(),
+            'activecollab_database_object_test'
+        );
 
         if ($this->link->connect_error) {
             throw new \RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
@@ -69,5 +74,10 @@ abstract class TestCase extends BaseTestCase
         $this->link->close();
 
         parent::tearDown();
+    }
+
+    protected function getValidMySqlPassword(): string
+    {
+        return (string) getenv('DATABASE_CONNECTION_TEST_PASSWORD');
     }
 }
