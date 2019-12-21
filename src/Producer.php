@@ -53,7 +53,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
      */
     public function &produce($type, array $attributes = null, $save = true)
     {
-        /** @var object|EntityInterface $object */
+        /** @var EntityInterface $object */
         $object = new $type($this->connection, $this->pool, $this->log);
 
         if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
