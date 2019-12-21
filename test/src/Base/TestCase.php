@@ -15,11 +15,12 @@ use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use mysqli;
 use Psr\Log\LoggerInterface;
+use PHPUnit\Framework\TestCase as BaseTestCase;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Base
  */
-abstract class TestCase extends \PHPUnit_Framework_TestCase
+abstract class TestCase extends BaseTestCase
 {
     /**
      * @var mysqli
