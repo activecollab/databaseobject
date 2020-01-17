@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
@@ -14,38 +16,19 @@ use ActiveCollab\Etag\EtagInterface\Implementation as EtagInterfaceImplementatio
 use LogicException;
 use Psr\Log\LoggerInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 abstract class Collection implements CollectionInterface
 {
     use EtagInterfaceImplementation;
 
-    /**
-     * @var ConnectionInterface
-     */
     protected $connection;
-
-    /**
-     * @var PoolInterface
-     */
     protected $pool;
+    protected $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
-
-    /**
-     * @param ConnectionInterface $connection
-     * @param PoolInterface       $pool
-     * @param LoggerInterface     $log
-     */
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $log)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->pool = $pool;
-        $this->log = $log;
+        $this->logger = $logger;
 
         $this->configure();
     }
@@ -107,15 +90,20 @@ abstract class Collection implements CollectionInterface
      */
     protected function prepareTagFromBits($additional_identifier, $visitor_identifier, $hash)
     {
-        return implode(',', [$this->getApplicationIdentifier(), 'collection', get_class($this), $additional_identifier, $visitor_identifier, $hash]);
+        return implode(
+            ',',
+            [
+                $this->getApplicationIdentifier(),
+                'collection',
+                get_class($this),
+                $additional_identifier,
+                $visitor_identifier,
+                $hash,
+            ]
+        );
     }
 
-    /**
-     * Return true if this object can be tagged and cached on client side.
-     *
-     * @return bool|null
-     */
-    public function canBeTagged()
+    public function canBeTagged(): bool
     {
         return true;
     }

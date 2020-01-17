@@ -6,17 +6,11 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Entity;
 
-/**
- * @package ActiveCollab\DatabaseObject\Entity
- */
 interface ManagerInterface
 {
-    /**
-     * Return type that this manager works with.
-     *
-     * @return string
-     */
-    public function getType();
+    public function getType(): string;
 }

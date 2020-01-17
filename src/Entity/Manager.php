@@ -6,41 +6,24 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Entity;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject\Entity
- */
 abstract class Manager implements ManagerInterface
 {
-    /**
-     * @var ConnectionInterface
-     */
     protected $connection;
-
-    /**
-     * @var PoolInterface
-     */
     protected $pool;
+    protected $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
-
-    /**
-     * @param PoolInterface        $pool
-     * @param ConnectionInterface  $connection
-     * @param LoggerInterface|null $log
-     */
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface &$log = null)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->pool = $pool;
-        $this->log = $log;
+        $this->logger = $logger;
     }
 }

@@ -33,6 +33,8 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
      */
     public function &setApplicationIdentifier($value);
 
+    public function canBeTagged(): bool;
+
     /**
      * Run the query and return DB result.
      *
