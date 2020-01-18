@@ -14,6 +14,7 @@ use ActiveCollab\DatabaseObject\Pool;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use mysqli;
+use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 
@@ -57,8 +58,11 @@ abstract class TestCase extends BaseTestCase
             throw new \RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
         }
 
+        /** @var LoggerInterface|MockObject $logger */
+        $logger = $this->createMock(LoggerInterface::class);
+
         $this->connection = new MysqliConnection($this->link);
-        $this->pool = new Pool($this->connection);
+        $this->pool = new Pool($this->connection, $logger);
 
         $this->logger = new Logger('DatabaseObject test');
         $this->logger->pushHandler(new TestHandler());

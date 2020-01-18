@@ -28,29 +28,18 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    /**
-     * @var ConnectionInterface
-     */
     protected $connection;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
+    protected $logger;
 
     /**
      * @var EntityInterface[]
      */
     private $objects_pool = [];
 
-    /**
-     * @param ConnectionInterface  $connection
-     * @param LoggerInterface|null $log
-     */
-    public function __construct(ConnectionInterface $connection, LoggerInterface &$log = null)
+    public function __construct(ConnectionInterface $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
-        $this->log = $log;
+        $this->logger = $logger;
     }
 
     /**
@@ -278,7 +267,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
 
                 /** @var object|EntityInterface $object */
-                $object = new $object_class($this->connection, $this, $this->log);
+                $object = new $object_class($this->connection, $this, $this->logger);
 
                 if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
                     $object->setContainer($this->getContainer());
@@ -446,7 +435,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         $default_finder_class = $this->getDefaultFinderClass();
 
         /** @var Finder $finder */
-        $finder = new $default_finder_class($this->connection, $this, $this->log, $registered_type);
+        $finder = new $default_finder_class($this->connection, $this, $this->logger, $registered_type);
 
         if ($finder instanceof ContainerAccessInterface && $this->hasContainer()) {
             $finder->setContainer($this->getContainer());
@@ -487,9 +476,9 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
 
         if ($this->hasContainer()) {
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log], $this->getContainer());
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->logger], $this->getContainer());
         } else {
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->log]);
+            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->logger]);
         }
     }
 
