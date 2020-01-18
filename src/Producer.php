@@ -14,38 +14,19 @@ use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Psr\Log\LoggerInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 class Producer implements ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    /**
-     * @var ConnectionInterface
-     */
     protected $connection;
-
-    /**
-     * @var PoolInterface
-     */
     protected $pool;
+    protected $logger;
 
-    /**
-     * @var LoggerInterface
-     */
-    protected $log;
-
-    /**
-     * @param ConnectionInterface  $connection
-     * @param PoolInterface        $pool
-     * @param LoggerInterface|null $log
-     */
-    public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface &$log = null)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->pool = $pool;
-        $this->log = $log;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,7 +35,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     public function &produce($type, array $attributes = null, $save = true)
     {
         /** @var EntityInterface $object */
-        $object = new $type($this->connection, $this->pool, $this->log);
+        $object = new $type($this->connection, $this->pool, $this->logger);
 
         if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
             $object->setContainer($this->getContainer());

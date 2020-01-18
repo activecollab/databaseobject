@@ -27,7 +27,7 @@ class DefaultProducerTest extends TestCase
     public function testDefaultProducerCanBeSet()
     {
         $this->assertInstanceOf(Producer::class, $this->pool->getDefaultProducer());
-        $this->pool->setDefaultProducer(new CustomProducer($this->connection, $this->pool));
+        $this->pool->setDefaultProducer(new CustomProducer($this->connection, $this->pool, $this->logger));
         $this->assertInstanceOf(CustomProducer::class, $this->pool->getDefaultProducer());
     }
 

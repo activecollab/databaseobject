@@ -40,7 +40,7 @@ class ProducerTest extends WritersTypeTestCase
      */
     public function testCustomProducerCanBeSetForType()
     {
-        $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool));
+        $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool, $this->logger));
 
         /** @var Writer $object */
         $object = $this->pool->produce(Writer::class, [
@@ -58,7 +58,7 @@ class ProducerTest extends WritersTypeTestCase
      */
     public function testCustomProducerCanBeSetForSubtype()
     {
-        $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool));
+        $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool, $this->logger));
 
         /** @var Writer $object */
         $object = $this->pool->produce(AwesomeWriter::class, [
@@ -95,7 +95,7 @@ class ProducerTest extends WritersTypeTestCase
     public function testCustomProducerCantBeSetForUnregisteredType()
     {
         $this->assertFalse($this->pool->isTypeRegistered(User::class));
-        $this->pool->registerProducer(User::class, new CustomProducer($this->connection, $this->pool));
+        $this->pool->registerProducer(User::class, new CustomProducer($this->connection, $this->pool, $this->logger));
     }
 
     /**
@@ -103,8 +103,8 @@ class ProducerTest extends WritersTypeTestCase
      */
     public function testCustomProducerCantBeSetTwice()
     {
-        $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool));
-        $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool));
+        $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool, $this->logger));
+        $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool, $this->logger));
     }
 
     /**

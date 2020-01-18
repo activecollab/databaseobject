@@ -23,7 +23,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testNewInstancesGetDefaultFieldValues()
     {
-        $unknown_writer = new Writer($this->connection, $this->pool);
+        $unknown_writer = new Writer($this->connection, $this->pool, $this->logger);
         $this->assertEquals('Unknown Writer', $unknown_writer->getName());
     }
 
@@ -32,7 +32,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testFieldsWithDefaultValueCantBeNull()
     {
-        $unknown_writer = new Writer($this->connection, $this->pool);
+        $unknown_writer = new Writer($this->connection, $this->pool, $this->logger);
         $unknown_writer->setName(null);
     }
 
@@ -42,7 +42,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testCantLoadFromEmptyRow()
     {
-        $writer = new Writer($this->connection, $this->pool);
+        $writer = new Writer($this->connection, $this->pool, $this->logger);
         $writer->loadFromRow([]);
     }
 
@@ -51,7 +51,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testIdIsPrimaryKey()
     {
-        $unknown_writer = new Writer($this->connection, $this->pool);
+        $unknown_writer = new Writer($this->connection, $this->pool, $this->logger);
 
         $this->assertSame('id', $unknown_writer->getPrimaryKey());
         $this->assertTrue($unknown_writer->isPrimaryKey('id'));
@@ -130,7 +130,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testCreate()
     {
-        $chekhov = new Writer($this->connection, $this->pool);
+        $chekhov = new Writer($this->connection, $this->pool, $this->logger);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -149,7 +149,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testExceptionOnInvalidCreate()
     {
-        (new Writer($this->connection, $this->pool))
+        (new Writer($this->connection, $this->pool, $this->logger))
             ->setName('Anton Chekhov')
             ->save();
     }
@@ -209,7 +209,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testChangeIdToNewRecord()
     {
-        $chekhov = new Writer($this->connection, $this->pool);
+        $chekhov = new Writer($this->connection, $this->pool, $this->logger);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -238,7 +238,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testChangeIdToExistingRecord()
     {
-        $chekhov = new Writer($this->connection, $this->pool);
+        $chekhov = new Writer($this->connection, $this->pool, $this->logger);
 
         $chekhov->setName('Anton Chekhov');
         $chekhov->setBirthday(new DateValue('1860-01-29'));
@@ -277,7 +277,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testSetAttributeWithEventHandler()
     {
-        $writer = new Writer($this->connection, $this->pool);
+        $writer = new Writer($this->connection, $this->pool, $this->logger);
         $this->assertNull($writer->custom_attribute_value);
         $writer->setAttribute('custom_attribute', 13.5);
         $this->assertSame(13.5, $writer->custom_attribute_value);
@@ -288,7 +288,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testSetAttributeWithSetter()
     {
-        $writer = new Writer($this->connection, $this->pool);
+        $writer = new Writer($this->connection, $this->pool, $this->logger);
         $this->assertNull($writer->getCustomFieldValue());
         $writer->setAttribute('custom_field_value', 12);
         $this->assertSame(12, $writer->getCustomFieldValue());
@@ -299,7 +299,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testSetAttributeIgnoresUnknownAttributes()
     {
-        $writer = new Writer($this->connection, $this->pool);
+        $writer = new Writer($this->connection, $this->pool, $this->logger);
         $this->assertEquals('protected', $writer->getProtectedCustomFieldValue());
         $writer->setAttribute('protected_custom_field_value', 12);
         $this->assertEquals('protected', $writer->getProtectedCustomFieldValue());
@@ -310,7 +310,7 @@ class CrudTest extends WritersTypeTestCase
      */
     public function testUnknownAttributeDoesNotProduceAnError()
     {
-        $writer = new Writer($this->connection, $this->pool);
+        $writer = new Writer($this->connection, $this->pool, $this->logger);
         $writer->setAttribute('unknown_attribute', 12);
     }
 }

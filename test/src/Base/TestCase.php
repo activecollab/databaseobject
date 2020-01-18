@@ -17,6 +17,7 @@ use mysqli;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase as BaseTestCase;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test\Base
@@ -55,7 +56,7 @@ abstract class TestCase extends BaseTestCase
         );
 
         if ($this->link->connect_error) {
-            throw new \RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
+            throw new RuntimeException('Failed to connect to database. MySQL said: ' . $this->link->connect_error);
         }
 
         /** @var LoggerInterface|MockObject $logger */

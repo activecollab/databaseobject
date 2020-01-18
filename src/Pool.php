@@ -159,7 +159,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         if (empty($this->default_producer)) {
             $default_producer_class = $this->getDefaultProducerClass();
 
-            $this->default_producer = new $default_producer_class($this->connection, $this);
+            $this->default_producer = new $default_producer_class($this->connection, $this, $this->logger);
 
             if ($this->default_producer instanceof ContainerAccessInterface && $this->hasContainer()) {
                 $this->default_producer->setContainer($this->getContainer());
@@ -226,13 +226,14 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param string $type
      * @param string $producer_class
      */
+
     public function registerProducerByClass($type, $producer_class)
     {
         if (class_exists($producer_class)) {
             $producer_class_reflection = new ReflectionClass($producer_class);
 
             if ($producer_class_reflection->implementsInterface(ProducerInterface::class)) {
-                $this->registerProducer($type, new $producer_class($this->connection, $this));
+                $this->registerProducer($type, new $producer_class($this->connection, $this, $this->logger));
             } else {
                 throw new InvalidArgumentException("Class '$producer_class' does not implement '" . ProducerInterface::class . "' interface");
             }

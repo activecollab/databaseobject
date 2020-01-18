@@ -47,7 +47,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * @var LoggerInterface
      */
-    protected $log;
+    protected $logger;
 
     /**
      * Name of the table.
@@ -96,16 +96,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     protected $default_field_values = [];
 
-    /**
-     * @param ConnectionInterface  $connection
-     * @param PoolInterface        $pool
-     * @param LoggerInterface|null $log
-     */
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface &$log = null)
+    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->pool = $pool;
-        $this->log = $log;
+        $this->logger = $logger;
 
         if ($traits = $pool->getTraitNamesByType(get_class($this))) {
             foreach ($traits as $trait) {
@@ -410,7 +405,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         $object_class = get_class($this);
 
         /** @var EntityInterface $copy */
-        $copy = new $object_class($this->connection, $this->pool, $this->log);
+        $copy = new $object_class($this->connection, $this->pool, $this->logger);
 
         foreach ($this->getFields() as $field) {
             if ($this->isPrimaryKey($field)) {

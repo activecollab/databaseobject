@@ -36,7 +36,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     /**
      * @var LoggerInterface
      */
-    private $log;
+    private $logger;
 
     /**
      * @var string
@@ -68,22 +68,16 @@ class Finder implements FinderInterface, ContainerAccessInterface
      */
     private $join;
 
-    /**
-     * @param PoolInterface        $pool
-     * @param ConnectionInterface  $connection
-     * @param LoggerInterface|null $log
-     * @param string               $type
-     */
     public function __construct(
         ConnectionInterface $connection,
         PoolInterface $pool,
-        LoggerInterface &$log = null,
+        LoggerInterface $logger,
         string $type
     )
     {
         $this->connection = $connection;
         $this->pool = $pool;
-        $this->log = $log;
+        $this->logger = $logger;
         $this->type = $type;
         $this->order_by = $this->pool->getEscapedTypeOrderBy($type);
     }
@@ -295,7 +289,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
                 [
                     &$this->connection,
                     &$this->pool,
-                    &$this->log,
+                    &$this->logger,
                 ],
                 $this->getContainer()
             );
@@ -309,7 +303,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
                 [
                     &$this->connection,
                     &$this->pool,
-                    &$this->log,
+                    &$this->logger,
                 ]
             );
         }

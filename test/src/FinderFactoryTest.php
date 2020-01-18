@@ -21,7 +21,8 @@ final class FinderFactoryTest extends WritersTypeTestCase
     {
         $finder = (new FinderFactory(
             $this->connection,
-            $this->pool
+            $this->pool,
+            $this->logger
         ))->produceFinder(Writer::class);
 
         $this->assertInstanceOf(FinderInterface::class, $finder);
@@ -32,7 +33,8 @@ final class FinderFactoryTest extends WritersTypeTestCase
     {
         $finder = (new FinderFactory(
             $this->connection,
-            $this->pool
+            $this->pool,
+            $this->logger
         ))->produceFinder(Writer::class, '`name` = ?', 'Leo Tolstoy');
 
         $this->assertInstanceOf(FinderInterface::class, $finder);

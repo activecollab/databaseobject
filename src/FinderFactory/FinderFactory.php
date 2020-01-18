@@ -25,7 +25,7 @@ class FinderFactory implements FinderFactoryInterface
     public function __construct(
         ConnectionInterface $connection,
         PoolInterface $pool,
-        LoggerInterface $logger = null
+        LoggerInterface $logger
     )
     {
         $this->connection = $connection;
