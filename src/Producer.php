@@ -29,10 +29,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         $this->logger = $logger;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &produce($type, array $attributes = null, $save = true)
+    public function produce($type, array $attributes = null, $save = true): EntityInterface
     {
         /** @var EntityInterface $object */
         $object = new $type($this->connection, $this->pool, $this->logger);
@@ -58,10 +55,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         return $object;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
+    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
     {
         if ($attributes) {
             foreach ($attributes as $k => $v) {
@@ -80,10 +74,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &scrap(EntityInterface &$instance, $force_delete = false)
+    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
     {
         if (!$force_delete && $instance instanceof ScrapInterface) {
             return $instance->scrap();

@@ -30,7 +30,7 @@ class Collection extends Type
     /**
      * {@inheritdoc}
      */
-    protected function isReady()
+    protected function isReady(): bool
     {
         return $this->is_ready;
     }

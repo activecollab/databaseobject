@@ -6,18 +6,13 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
+
 interface ScrapInterface
 {
-    /**
-     * Scrap the object, instead of permanently deleting it.
-     *
-     * @param  bool|false $bulk
-     * @return $this
-     */
-    public function &scrap($bulk = false);
+    public function scrap($bulk = false): EntityInterface;
 }

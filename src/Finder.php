@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -16,31 +18,13 @@ use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 class Finder implements FinderInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    /**
-     * @var ConnectionInterface
-     */
     private $connection;
-
-    /**
-     * @var PoolInterface
-     */
     private $pool;
-
-    /**
-     * @var LoggerInterface
-     */
     private $logger;
-
-    /**
-     * @var string
-     */
     private $type;
 
     /**
@@ -315,7 +299,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
 
     private $load_by_type_field;
 
-    private function loadByTypeField(): string
+    private function loadByTypeField(): bool
     {
         if ($this->load_by_type_field === null) {
             $this->load_by_type_field = in_array('type', $this->pool->getTypeFields($this->type));

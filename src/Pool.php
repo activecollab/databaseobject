@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -21,9 +23,6 @@ use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
@@ -42,15 +41,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         $this->logger = $logger;
     }
 
-    /**
-     * Produce new instance of $type.
-     *
-     * @param  string          $type
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
-     */
-    public function &produce($type, array $attributes = null, $save = true)
+    public function produce($type, array $attributes = null, $save = true): EntityInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -67,15 +58,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * Update an instance.
-     *
-     * @param  EntityInterface $instance
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
-     */
-    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
+    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
@@ -92,14 +75,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
-    /**
-     * Scrap an instance (move it to trash, if object supports, or delete it).
-     *
-     * @param  EntityInterface $instance
-     * @param  bool            $force_delete
-     * @return EntityInterface
-     */
-    public function &scrap(EntityInterface &$instance, $force_delete = false)
+    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
@@ -216,7 +192,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
             $this->producers[$registered_type] = $producer;
         } else {
-            throw new LogicException("Producer for '$type' is already registered");
+            throw new LogicException(sprintf("Producer for '%s' is already registered", $type));
         }
     }
 
@@ -226,7 +202,6 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param string $type
      * @param string $producer_class
      */
-
     public function registerProducerByClass($type, $producer_class)
     {
         if (class_exists($producer_class)) {
@@ -235,7 +210,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             if ($producer_class_reflection->implementsInterface(ProducerInterface::class)) {
                 $this->registerProducer($type, new $producer_class($this->connection, $this, $this->logger));
             } else {
-                throw new InvalidArgumentException("Class '$producer_class' does not implement '" . ProducerInterface::class . "' interface");
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Class '%s' does not implement '%s' interface",
+                        $producer_class,
+                        ProducerInterface::class
+                    )
+                );
             }
         }
     }

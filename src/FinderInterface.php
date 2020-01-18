@@ -6,14 +6,13 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 interface FinderInterface
 {
     public function getType(): string;

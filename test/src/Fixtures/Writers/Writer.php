@@ -9,6 +9,7 @@
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
+use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\ScrapInterface;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\ClassicWriter;
@@ -136,13 +137,7 @@ class Writer extends BaseWriter implements ScrapInterface
         parent::validate($validator);
     }
 
-    /**
-     * Scrap the object, instead of permanently deleting it.
-     *
-     * @param  bool|false $bulk
-     * @return $this
-     */
-    public function &scrap($bulk = false)
+    public function scrap($bulk = false): EntityInterface
     {
         $this->is_scrapped = true;
 

@@ -33,9 +33,6 @@ abstract class Collection implements CollectionInterface
         $this->configure();
     }
 
-    /**
-     * Pre-configure the collection when it is created.
-     */
     protected function configure()
     {
     }
@@ -47,7 +44,7 @@ abstract class Collection implements CollectionInterface
      *
      * @return bool
      */
-    protected function isReady()
+    protected function isReady(): bool
     {
         return true;
     }

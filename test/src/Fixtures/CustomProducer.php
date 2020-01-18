@@ -6,26 +6,17 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures;
 
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Producer;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Users
- */
 class CustomProducer extends Producer
 {
-    /**
-     * Produce new instance of $type.
-     *
-     * @param  string          $type
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
-     */
-    public function &produce($type, array $attributes = null, $save = true)
+    public function produce($type, array $attributes = null, $save = true): EntityInterface
     {
         $object = parent::produce($type, $attributes, $save);
 
@@ -36,15 +27,7 @@ class CustomProducer extends Producer
         return $object;
     }
 
-    /**
-     * Update an instance.
-     *
-     * @param  EntityInterface $instance
-     * @param  array|null      $attributes
-     * @param  bool            $save
-     * @return EntityInterface
-     */
-    public function &modify(EntityInterface &$instance, array $attributes = null, $save = true)
+    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
     {
         $instance = parent::modify($instance, $attributes, $save);
 
@@ -55,14 +38,7 @@ class CustomProducer extends Producer
         return $instance;
     }
 
-    /**
-     * Scrap an instance (move it to trash, if object can be trashed, or delete it).
-     *
-     * @param  EntityInterface $instance
-     * @param  bool            $force_delete
-     * @return EntityInterface
-     */
-    public function &scrap(EntityInterface &$instance, $force_delete = false)
+    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
     {
         $instance = parent::scrap($instance, $force_delete);
 
