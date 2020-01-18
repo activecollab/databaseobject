@@ -29,29 +29,8 @@ interface PoolInterface
     public function getById(string $type, int $id, bool $use_cache = true): ?EntityInterface;
     public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface;
     public function reload(string $type, int $id): ?EntityInterface;
-
-    /**
-     * Check if object #ID of $type is in the pool.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @return bool
-     */
-    public function isInPool($type, $id);
-
-    /**
-     * Add object to the pool.
-     *
-     * @param EntityInterface $object
-     */
+    public function isInPool(string $type, int $id): bool;
     public function remember(EntityInterface $object): void;
-
-    /**
-     * Forget object if it is loaded in memory.
-     *
-     * @param string    $type
-     * @param array|int $id
-     */
     public function forget(string $type, int $id): void;
 
     /**
@@ -88,16 +67,9 @@ interface PoolInterface
      * @param  mixed                                  $arguments
      * @return ResultInterface|EntityInterface[]|null
      */
-    public function findBySql($type, $sql, ...$arguments);
+    public function findBySql(string $type, string $sql, ...$arguments);
 
-    /**
-     * Return table name by type.
-     *
-     * @param  string $type
-     * @param  bool   $escaped
-     * @return string
-     */
-    public function getTypeTable($type, $escaped = false);
+    public function getTypeTable(string $type, bool $escaped = false): string;
 
     /**
      * Return a list of fields that are managed by the type.
@@ -105,15 +77,8 @@ interface PoolInterface
      * @param  string $type
      * @return array
      */
-    public function getTypeFields($type);
-
-    /**
-     * Return a list of generated type fields that $type is aware of.
-     *
-     * @param  string $type
-     * @return array
-     */
-    public function getGeneratedTypeFields($type);
+    public function getTypeFields(string $type): array;
+    public function getGeneratedTypeFields(string $type): array;
 
     /**
      * Get a particular type property, and make it (using $callback) if it is not set already.
@@ -123,67 +88,21 @@ interface PoolInterface
      * @param  callable $callback
      * @return mixed
      */
-    public function getTypeProperty($type, $property, callable $callback);
-
-    /**
-     * Return a list of escaped field names for the given type.
-     *
-     * @param  string $type
-     * @return string
-     */
-    public function getEscapedTypeFields($type);
-
-    /**
-     * Return default order by for the given type.
-     *
-     * @param  string   $type
-     * @return string[]
-     */
-    public function getTypeOrderBy($type);
-
-    /**
-     * Return escaped list of fields that we can order by.
-     *
-     * @param  string $type
-     * @return string
-     */
-    public function getEscapedTypeOrderBy($type);
-
-    /**
-     * @return array
-     */
-    public function getRegisteredTypes();
-
-    /**
-     * Return registered type for the given $type. This function is subclassing aware.
-     *
-     * @param  string      $type
-     * @return string|null
-     */
-    public function getRegisteredType($type);
-
-    /**
-     * Get registered type's class, or throw an execption if type is not regiestered.
-     *
-     * @param  string $type
-     * @return string
-     */
-    public function requireRegisteredType($type);
-
-    /**
-     * Return true if $type is registered.
-     *
-     * @param  string $type
-     * @return bool
-     */
-    public function isTypeRegistered($type);
+    public function getTypeProperty(string $type, string $property, callable $callback);
+    public function getEscapedTypeFields(string $type): string;
+    public function getTypeOrderBy(string $type): array;
+    public function getEscapedTypeOrderBy(string $type): string;
+    public function getRegisteredTypes(): array;
+    public function getRegisteredType(string $type): ?string;
+    public function requireRegisteredType(string $type): string;
+    public function isTypeRegistered(string $type): bool;
 
     /**
      * Return interface that is used to detect if type is polymorph.
      *
      * @return string|null
      */
-    public function getPolymorphTypeInterface();
+    public function getPolymorphTypeInterface(): ?string;
 
     /**
      * Set interface that is used to detect if type is polymorph.
@@ -191,7 +110,7 @@ interface PoolInterface
      * @param  string|null $value
      * @return $this
      */
-    public function &setPolymorphTypeInterface($value);
+    public function &setPolymorphTypeInterface(?string $value): PoolInterface;
 
     /**
      * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
@@ -199,23 +118,9 @@ interface PoolInterface
      * @param  string $type
      * @return bool
      */
-    public function isTypePolymorph($type);
+    public function isTypePolymorph(string $type): bool;
+    public function registerType(string ...$types): PoolInterface;
 
-    /**
-     * @param string[] $types
-     */
-    public function registerType(...$types);
-
-    /**
-     * Return trait names by object.
-     *
-     * @param  string $type
-     * @return array
-     */
-    public function getTraitNamesByType($type);
-
-    /**
-     * @return string
-     */
-    public function getDefaultFinderClass();
+    public function getTraitNamesByType(string $type): array;
+    public function getDefaultFinderClass(): string;
 }

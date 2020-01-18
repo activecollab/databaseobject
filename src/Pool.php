@@ -247,14 +247,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->getById($type, $id, false);
     }
 
-    /**
-     * Check if object #ID of $type is in the pool.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @return bool
-     */
-    public function isInPool($type, $id)
+    public function isInPool(string $type, int $id): bool
     {
         $this->requireRegisteredType($type);
 
@@ -365,10 +358,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $finder;
     }
 
-    /**
-     * @return string
-     */
-    public function getDefaultFinderClass()
+    public function getDefaultFinderClass(): string
     {
         return Finder::class;
     }
@@ -376,7 +366,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * {@inheritdoc}
      */
-    public function findBySql($type, $sql, ...$arguments)
+    public function findBySql(string $type, string $sql, ...$arguments)
     {
         if (empty($type)) {
             throw new InvalidArgumentException('Type is required');
@@ -406,7 +396,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * {@inheritdoc}
      */
-    public function getTypeTable($type, $escaped = false)
+    public function getTypeTable(string $type, bool $escaped = false): string
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -421,18 +411,12 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getTypeFields($type)
+    public function getTypeFields(string $type): array
     {
         return $this->types[$this->requireRegisteredType($type)]['fields'];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGeneratedTypeFields($type)
+    public function getGeneratedTypeFields(string $type): array
     {
         return $this->types[$this->requireRegisteredType($type)]['generated_fields'];
     }
@@ -445,7 +429,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  callable $callback
      * @return mixed
      */
-    public function getTypeProperty($type, $property, callable $callback)
+    public function getTypeProperty(string $type, string $property, callable $callback)
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -471,13 +455,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->types[$type]['sql_select_by_ids'];
     }
 
-    /**
-     * Return a list of escaped field names for the given type.
-     *
-     * @param  string $type
-     * @return string
-     */
-    public function getEscapedTypeFields($type)
+    public function getEscapedTypeFields(string $type): string
     {
         return $this->getTypeProperty($type, 'escaped_fields', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
@@ -496,24 +474,12 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         });
     }
 
-    /**
-     * Return default order by for the given type.
-     *
-     * @param  string   $type
-     * @return string[]
-     */
-    public function getTypeOrderBy($type)
+    public function getTypeOrderBy(string $type): array
     {
         return $this->types[$this->requireRegisteredType($type)]['order_by'];
     }
 
-    /**
-     * Return escaped list of fields that we can order by.
-     *
-     * @param  string $type
-     * @return string
-     */
-    public function getEscapedTypeOrderBy($type)
+    public function getEscapedTypeOrderBy(string $type): string
     {
         return $this->getTypeProperty($type, 'escaped_order_by', function () use ($type) {
             $table_name = $this->getTypeTable($type, true);
@@ -533,10 +499,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     private $types = [];
 
-    /**
-     * @return array
-     */
-    public function getRegisteredTypes()
+    public function getRegisteredTypes(): array
     {
         return array_keys($this->types);
     }
@@ -554,7 +517,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string      $type
      * @return string|null
      */
-    public function getRegisteredType($type)
+    public function getRegisteredType(string $type): ?string
     {
         $type = ltrim($type, '\\');
 
@@ -584,10 +547,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->known_types[$type];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function requireRegisteredType($type)
+    public function requireRegisteredType(string $type): string
     {
         if ($registered_type = $this->getRegisteredType($type)) {
             return $registered_type;
@@ -596,13 +556,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * Return true if $type is registered.
-     *
-     * @param  string $type
-     * @return bool
-     */
-    public function isTypeRegistered($type)
+    public function isTypeRegistered(string $type): bool
     {
         return (bool) $this->getRegisteredType($type);
     }
@@ -612,10 +566,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     private $polymorph_type_interface;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPolymorphTypeInterface()
+    public function getPolymorphTypeInterface(): ?string
     {
         return $this->polymorph_type_interface;
     }
@@ -623,7 +574,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * {@inheritdoc}
      */
-    public function &setPolymorphTypeInterface($value)
+    public function &setPolymorphTypeInterface(?string $value): PoolInterface
     {
         $this->polymorph_type_interface = $value;
 
@@ -641,7 +592,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string $type
      * @return bool
      */
-    public function isTypePolymorph($type)
+    public function isTypePolymorph(string $type): bool
     {
         $registered_type = $this->getRegisteredType($type);
 
@@ -661,10 +612,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->polymorph_types[$registered_type];
     }
 
-    /**
-     * @param string[] $types
-     */
-    public function registerType(...$types)
+    public function registerType(string ...$types): PoolInterface
     {
         foreach ($types as $type) {
             $type = ltrim($type, '\\');
@@ -692,6 +640,8 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 throw new InvalidArgumentException("Type '$type' is not defined");
             }
         }
+
+        return $this;
     }
 
     /**
@@ -720,7 +670,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string $type
      * @return array
      */
-    public function getTraitNamesByType($type)
+    public function getTraitNamesByType(string $type): array
     {
         return $this->getTraitsResolver()->getClassTraits($type);
     }
