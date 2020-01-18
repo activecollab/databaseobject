@@ -63,10 +63,13 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
     public function testInstantinationUsingProducer()
     {
         /** @var Writer $special_writer */
-        $special_writer = $this->pool->produce(Writer::class, [
-            'name' => 'Special Writer',
-            'birthday' => '2013-10-02',
-        ]);
+        $special_writer = $this->pool->produce(
+            Writer::class,
+            [
+                'name' => 'Special Writer',
+                'birthday' => '2013-10-02',
+            ]
+        );
 
         $this->assertInstanceOf(Writer::class, $special_writer);
         $this->assertTrue($special_writer->is_special);

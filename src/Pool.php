@@ -95,18 +95,12 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     private $default_producer_class = Producer::class;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getDefaultProducerClass()
+    public function getDefaultProducerClass(): string
     {
         return $this->default_producer_class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &setDefaultProducerClass($default_producer_class)
+    public function setDefaultProducerClass(string $default_producer_class): PoolInterface
     {
         if (!class_exists($default_producer_class, true)) {
             throw new InvalidArgumentException('Producer class not found.');
@@ -127,10 +121,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     private $default_producer;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &getDefaultProducer(): ProducerInterface
+    public function getDefaultProducer(): ProducerInterface
     {
         if (empty($this->default_producer)) {
             $default_producer_class = $this->getDefaultProducerClass();
@@ -145,10 +136,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->default_producer;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function &setDefaultProducer(ProducerInterface $producer)
+    public function setDefaultProducer(ProducerInterface $producer): PoolInterface
     {
         $this->default_producer = $producer;
 
@@ -160,13 +148,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      */
     private $producers = [];
 
-    /**
-     * Return producer for registered type.
-     *
-     * @param  string            $registered_type
-     * @return ProducerInterface
-     */
-    protected function &getProducerForRegisteredType($registered_type)
+    protected function getProducerForRegisteredType(string $registered_type): ProducerInterface
     {
         if (empty($this->producers[$registered_type])) {
             return $this->getDefaultProducer();
@@ -175,13 +157,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * Register producer instance for the given type.
-     *
-     * @param string            $type
-     * @param ProducerInterface $producer
-     */
-    public function registerProducer($type, ProducerInterface $producer)
+    public function registerProducer(string $type, ProducerInterface $producer): PoolInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -194,15 +170,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         } else {
             throw new LogicException(sprintf("Producer for '%s' is already registered", $type));
         }
+
+        return $this;
     }
 
-    /**
-     * Register producerby providing a producer class name.
-     *
-     * @param string $type
-     * @param string $producer_class
-     */
-    public function registerProducerByClass($type, $producer_class)
+    public function registerProducerByClass(string $type, string $producer_class): PoolInterface
     {
         if (class_exists($producer_class)) {
             $producer_class_reflection = new ReflectionClass($producer_class);
@@ -219,18 +191,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 );
             }
         }
+
+        return $this;
     }
 
-    /**
-     * Return object from object pool by the given type and ID; if object is not found, return NULL.
-     *
-     * @param  string                   $type
-     * @param  int                      $id
-     * @param  bool                     $use_cache
-     * @return object
-     * @throws InvalidArgumentException
-     */
-    public function &getById($type, $id, $use_cache = true)
+    public function getById(string $type, int $id, bool $use_cache = true): ?EntityInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -266,17 +231,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * Return object from object pool by the given type and ID; if object is not found, raise an exception.
-     *
-     * @param  string                   $type
-     * @param  int                      $id
-     * @param  bool                     $use_cache
-     * @return object
-     * @throws ObjectNotFoundException
-     * @throws InvalidArgumentException
-     */
-    public function &mustGetById($type, $id, $use_cache = true)
+    public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface
     {
         $result = $this->getById($type, $id, $use_cache);
 
@@ -287,14 +242,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $result;
     }
 
-    /**
-     * Reload an object of the give type with the given ID.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @return object
-     */
-    public function &reload($type, $id)
+    public function reload(string $type, int $id): ?EntityInterface
     {
         return $this->getById($type, $id, false);
     }
@@ -338,12 +286,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->objects_pool[$registered_type][$id];
     }
 
-    /**
-     * Add object to the pool.
-     *
-     * @param EntityInterface $object
-     */
-    public function remember(EntityInterface &$object)
+    public function remember(EntityInterface $object): void
     {
         if ($object->isLoaded()) {
             $this->addToObjectPool($this->requireRegisteredType(get_class($object)), $object->getId(), $object);
@@ -351,11 +294,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             throw new InvalidArgumentException('Object needs to be saved in the database to be remembered');
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function forget($type, $id)
+    public function forget(string $type, int $id): void
     {
         $this->requireRegisteredType($type);
 
@@ -381,7 +320,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  array|string|null $conditions
      * @return int
      */
-    public function count($type, $conditions = null)
+    public function count(string $type, $conditions = null): int
     {
         $this->requireRegisteredType($type);
 
@@ -399,7 +338,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  int    $id
      * @return bool
      */
-    public function exists($type, $id)
+    public function exists(string $type, int $id): bool
     {
         return (bool) $this->count($type, ['`id` = ?', $id]);
     }
@@ -410,7 +349,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * @param  string $type
      * @return Finder
      */
-    public function find($type)
+    public function find(string $type): FinderInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 

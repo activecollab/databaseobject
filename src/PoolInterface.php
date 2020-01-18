@@ -19,74 +19,16 @@ interface PoolInterface
     public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface;
     public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface;
 
-    /**
-     * @return string
-     */
-    public function getDefaultProducerClass();
+    public function getDefaultProducerClass(): string;
+    public function getDefaultProducer(): ProducerInterface;
+    public function setDefaultProducer(ProducerInterface $producer): PoolInterface;
+    public function setDefaultProducerClass(string $default_producer_class): PoolInterface;
+    public function registerProducer(string $type, ProducerInterface $producer): PoolInterface;
+    public function registerProducerByClass(string $type, string $producer_class): PoolInterface;
 
-    /**
-     * @return ProducerInterface
-     */
-    public function &getDefaultProducer(): ProducerInterface;
-
-    /**
-     * @param  ProducerInterface $producer
-     * @return $this
-     */
-    public function &setDefaultProducer(ProducerInterface $producer);
-
-    /**
-     * Set default producer class.
-     *
-     * @param  string $default_producer_class
-     * @return $this
-     */
-    public function setDefaultProducerClass($default_producer_class);
-
-    /**
-     * Register producer instance for the given type.
-     *
-     * @param string            $type
-     * @param ProducerInterface $producer
-     */
-    public function registerProducer($type, ProducerInterface $producer);
-
-    /**
-     * Register producerby providing a producer class name.
-     *
-     * @param string $type
-     * @param string $producer_class
-     */
-    public function registerProducerByClass($type, $producer_class);
-
-    /**
-     * Return object from object pool by the given type and ID; if object is not found, return NULL.
-     *
-     * @param  string      $type
-     * @param  int         $id
-     * @param  bool        $use_cache
-     * @return object|null
-     */
-    public function &getById($type, $id, $use_cache = true);
-
-    /**
-     * Return object from object pool by the given type and ID; if object is not found, raise an exception.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @param  bool   $use_cache
-     * @return object
-     */
-    public function &mustGetById($type, $id, $use_cache = true);
-
-    /**
-     * Reload an object of the give type with the given ID.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @return object
-     */
-    public function &reload($type, $id);
+    public function getById(string $type, int $id, bool $use_cache = true): ?EntityInterface;
+    public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface;
+    public function reload(string $type, int $id): ?EntityInterface;
 
     /**
      * Check if object #ID of $type is in the pool.
@@ -102,7 +44,7 @@ interface PoolInterface
      *
      * @param EntityInterface $object
      */
-    public function remember(EntityInterface &$object);
+    public function remember(EntityInterface $object): void;
 
     /**
      * Forget object if it is loaded in memory.
@@ -110,7 +52,7 @@ interface PoolInterface
      * @param string    $type
      * @param array|int $id
      */
-    public function forget($type, $id);
+    public function forget(string $type, int $id): void;
 
     /**
      * Return number of records of the given type that match the given conditions.
@@ -119,7 +61,7 @@ interface PoolInterface
      * @param  array|string|null $conditions
      * @return int
      */
-    public function count($type, $conditions = null);
+    public function count(string $type, $conditions = null): int;
 
     /**
      * Return true if object of the given type with the given ID exists.
@@ -128,7 +70,7 @@ interface PoolInterface
      * @param  int    $id
      * @return bool
      */
-    public function exists($type, $id);
+    public function exists(string $type, int $id): bool;
 
     /**
      * Find records by type.
@@ -136,7 +78,7 @@ interface PoolInterface
      * @param  string $type
      * @return Finder
      */
-    public function find($type);
+    public function find(string $type): FinderInterface;
 
     /**
      * Return result by a prepared SQL statement.
