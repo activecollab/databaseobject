@@ -212,6 +212,16 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->connection->executeFirstCell($sql);
     }
 
+    public function exists(): bool
+    {
+        return $this->count() > 0;
+    }
+
+    public function existsOne(): bool
+    {
+        return $this->count() === 1;
+    }
+
     /**
      * {@inheritdoc}
      */

@@ -14,25 +14,22 @@ use ActiveCollab\DatabaseObject\Finder;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
 class FindTest extends WritersTypeTestCase
 {
-    /**
-     * Test count all.
-     */
     public function testCount()
     {
         $this->assertEquals(3, $this->pool->count(Writer::class));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCountThrowsAnExceptionOnUnregisteredType()
     {
+        $this->expectException(InvalidArgumentException::class);
+
         $this->pool->count(DateValue::class);
     }
 
@@ -41,7 +38,10 @@ class FindTest extends WritersTypeTestCase
      */
     public function testCountWithConditions()
     {
-        $this->assertEquals(2, $this->pool->count(Writer::class, ['birthday > ?', new DateValue('1800-01-01')]));
+        $this->assertEquals(
+            2,
+            $this->pool->count(Writer::class, ['birthday > ?', new DateValue('1800-01-01')])
+        );
     }
 
     /**
@@ -122,6 +122,28 @@ class FindTest extends WritersTypeTestCase
         $this->assertEquals(3, $this->pool->find(Writer::class)->count());
     }
 
+    public function testExistsUsingFinder()
+    {
+        $this->assertEquals(3, $this->pool->find(Writer::class)->count());
+
+        $this->assertTrue($this->pool->find(Writer::class)->exists());
+        $this->assertFalse($this->pool->find(Writer::class)->existsOne());
+
+        $this->connection->execute('DELETE FROM `writers` WHERE `name` != ?', 'Leo Tolstoy');
+
+        $this->assertEquals(1, $this->pool->find(Writer::class)->count());
+
+        $this->assertTrue($this->pool->find(Writer::class)->exists());
+        $this->assertTrue($this->pool->find(Writer::class)->existsOne());
+
+        $this->connection->execute('DELETE FROM `writers`');
+
+        $this->assertEquals(0, $this->pool->find(Writer::class)->count());
+
+        $this->assertFalse($this->pool->find(Writer::class)->exists());
+        $this->assertFalse($this->pool->find(Writer::class)->existsOne());
+    }
+
     /**
      * Test find by conditions.
      */
@@ -166,7 +188,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testConditionsPatternNeedsToBeString()
     {
@@ -235,7 +257,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testFindBySqlRequiresType()
     {
@@ -243,7 +265,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testFindBySqlRequiresRegisteredType()
     {
@@ -251,7 +273,7 @@ class FindTest extends WritersTypeTestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException InvalidArgumentException
      */
     public function testFindBySqlRequiresSqlStatement()
     {

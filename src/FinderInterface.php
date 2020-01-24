@@ -71,6 +71,9 @@ interface FinderInterface
      */
     public function count(): int;
 
+    public function exists(): bool;
+    public function existsOne(): bool;
+
     /**
      * Return all records that match the given criteria.
      *
