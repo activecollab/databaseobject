@@ -97,12 +97,8 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  mixed                 ...$arguments
      * @return FinderInterface|$this
      */
-    public function where($pattern, ...$arguments): FinderInterface
+    public function where(string $pattern, ...$arguments): FinderInterface
     {
-        if (!is_string($pattern)) {
-            throw new InvalidArgumentException('Conditions pattern needs to be string');
-        }
-
         $conditions_to_prepare = [$pattern];
 
         if (!empty($arguments)) {
@@ -131,23 +127,14 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * @param  string                $order_by
-     * @return FinderInterface|$this
-     */
-    public function orderBy($order_by): FinderInterface
+    public function orderBy(string $order_by): FinderInterface
     {
         $this->order_by = $order_by;
 
         return $this;
     }
 
-    /**
-     * @param  int                   $offset
-     * @param  int                   $limit
-     * @return FinderInterface|$this
-     */
-    public function limit($offset, $limit): FinderInterface
+    public function limit(int $offset, int $limit): FinderInterface
     {
         $this->offset = $offset;
         $this->limit = $limit;
@@ -155,25 +142,17 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this;
     }
 
-    /**
-     * @param  string                $type
-     * @param  string                $field_name
-     * @return FinderInterface|$this
-     */
-    public function join($type, $field_name = null): FinderInterface
+    public function join(string $type, string $field_name = null): FinderInterface
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
 
-    /**
-     * @param  string                $table_name
-     * @param  string                $field_name
-     * @return FinderInterface|$this
-     */
-    public function joinTable($table_name, $field_name = null): FinderInterface
+    public function joinTable(string $table_name, string $field_name = null): FinderInterface
     {
         $join_table = $this->connection->escapeTableName($table_name);
-        $join_field = $this->connection->escapeFieldName($field_name ? $field_name : $this->getJoinFieldNameFromType());
+        $join_field = $this->connection->escapeFieldName(
+            $field_name ? $field_name : $this->getJoinFieldNameFromType()
+        );
 
         $this->join = "LEFT JOIN $join_table ON {$this->getEscapedTableName()}.`id` = $join_table.$join_field";
 

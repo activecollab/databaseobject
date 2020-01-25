@@ -15,6 +15,7 @@ use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
 use InvalidArgumentException;
+use TypeError;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -187,11 +188,10 @@ class FindTest extends WritersTypeTestCase
         $this->assertEquals('Fyodor Dostoyevsky', $should_be_fyodor[0]->getName());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testConditionsPatternNeedsToBeString()
     {
+        $this->expectException(TypeError::class);
+
         $this->pool->find(Writer::class)->where(['`name` LIKE ?', '%Leo%']);
     }
 
