@@ -31,34 +31,34 @@ interface FinderInterface
      * @param  mixed           ...$arguments
      * @return FinderInterface
      */
-    public function &where($pattern, ...$arguments): FinderInterface;
+    public function where($pattern, ...$arguments): FinderInterface;
 
     /**
      * @param  string          $order_by
      * @return FinderInterface
      */
-    public function &orderBy($order_by): FinderInterface;
+    public function orderBy($order_by): FinderInterface;
 
     /**
      * @param  int             $offset
      * @param  int             $limit
      * @return FinderInterface
      */
-    public function &limit($offset, $limit): FinderInterface;
+    public function limit($offset, $limit): FinderInterface;
 
     /**
      * @param  string          $type
      * @param  string          $field_name
      * @return FinderInterface
      */
-    public function &join($type, $field_name = null): FinderInterface;
+    public function join($type, $field_name = null): FinderInterface;
 
     /**
      * @param  string          $table_name
      * @param  string          $field_name
      * @return FinderInterface
      */
-    public function &joinTable($table_name, $field_name = null): FinderInterface;
+    public function joinTable($table_name, $field_name = null): FinderInterface;
 
     // ---------------------------------------------------
     //  Execution

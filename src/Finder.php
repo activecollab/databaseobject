@@ -97,7 +97,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  mixed                 ...$arguments
      * @return FinderInterface|$this
      */
-    public function &where($pattern, ...$arguments): FinderInterface
+    public function where($pattern, ...$arguments): FinderInterface
     {
         if (!is_string($pattern)) {
             throw new InvalidArgumentException('Conditions pattern needs to be string');
@@ -135,7 +135,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  string                $order_by
      * @return FinderInterface|$this
      */
-    public function &orderBy($order_by): FinderInterface
+    public function orderBy($order_by): FinderInterface
     {
         $this->order_by = $order_by;
 
@@ -147,7 +147,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  int                   $limit
      * @return FinderInterface|$this
      */
-    public function &limit($offset, $limit): FinderInterface
+    public function limit($offset, $limit): FinderInterface
     {
         $this->offset = $offset;
         $this->limit = $limit;
@@ -160,7 +160,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  string                $field_name
      * @return FinderInterface|$this
      */
-    public function &join($type, $field_name = null): FinderInterface
+    public function join($type, $field_name = null): FinderInterface
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
@@ -170,7 +170,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
      * @param  string                $field_name
      * @return FinderInterface|$this
      */
-    public function &joinTable($table_name, $field_name = null): FinderInterface
+    public function joinTable($table_name, $field_name = null): FinderInterface
     {
         $join_table = $this->connection->escapeTableName($table_name);
         $join_field = $this->connection->escapeFieldName($field_name ? $field_name : $this->getJoinFieldNameFromType());
