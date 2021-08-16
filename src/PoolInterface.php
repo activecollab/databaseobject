@@ -31,7 +31,7 @@ interface PoolInterface
     public function reload(string $type, int $id): ?EntityInterface;
     public function isInPool(string $type, int $id): bool;
     public function remember(EntityInterface $object): void;
-    public function forget(string $type, int $id): void;
+    public function forget(string $type, int ...$ids_to_forget): void;
 
     /**
      * Return number of records of the given type that match the given conditions.

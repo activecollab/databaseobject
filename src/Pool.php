@@ -287,15 +287,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             throw new InvalidArgumentException('Object needs to be saved in the database to be remembered');
         }
     }
-    public function forget(string $type, int $id): void
+    public function forget(string $type, int ...$ids_to_forget): void
     {
         $this->requireRegisteredType($type);
 
-        $ids_to_forget = (array) $id;
-
         foreach ($ids_to_forget as $id_to_forget) {
-            $id_to_forget = (int) $id_to_forget;
-
             if ($id_to_forget < 1) {
                 throw new InvalidArgumentException('ID is expected to be a number larger than 0');
             }
