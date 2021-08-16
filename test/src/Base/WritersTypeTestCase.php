@@ -19,7 +19,7 @@ abstract class WritersTypeTestCase extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -56,7 +56,7 @@ abstract class WritersTypeTestCase extends TestCase
     /**
      * Tear down test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('writers')) {
             $this->connection->dropTable('writers');

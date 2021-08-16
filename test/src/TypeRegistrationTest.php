@@ -17,6 +17,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DateValue\DateValue;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -40,11 +41,9 @@ class TypeRegistrationTest extends TestCase
         $this->assertSame([], $this->pool->getRegisteredTypes());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionWhenRegisteringInvalidClass()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->registerType(DateValue::class);
     }
 
@@ -100,7 +99,7 @@ class TypeRegistrationTest extends TestCase
 
         $fileds = $this->pool->getTypeFields(Writer::class);
 
-        $this->assertInternalType('array', $fileds);
+        $this->assertIsArray($fileds);
 
         $this->assertContains('id', $fileds);
         $this->assertContains('name', $fileds);
@@ -116,7 +115,7 @@ class TypeRegistrationTest extends TestCase
 
         $fileds = $this->pool->getTypeFields(AwesomeWriter::class);
 
-        $this->assertInternalType('array', $fileds);
+        $this->assertIsArray($fileds);
 
         $this->assertContains('id', $fileds);
         $this->assertContains('name', $fileds);
@@ -195,7 +194,7 @@ class TypeRegistrationTest extends TestCase
     {
         $trait_names = $this->pool->getTraitNamesByType(Writer::class);
 
-        $this->assertInternalType('array', $trait_names);
+        $this->assertIsArray($trait_names);
         $this->assertCount(3, $trait_names);
 
         $this->assertContains(Implementation::class, $trait_names);

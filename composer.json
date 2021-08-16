@@ -27,7 +27,7 @@
         "ext-mysqli": "*",
         "friendsofphp/php-cs-fixer": "^2.0",
         "monolog/monolog": "^1.0",
-        "phpunit/phpunit": "~7.0",
+        "phpunit/phpunit": "~9.0",
         "pimple/pimple": "~3.0.0"
     },
     "autoload": {

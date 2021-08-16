@@ -20,7 +20,7 @@ class EmailValidatorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class EmailValidatorTest extends TestCase
 
         $email_errors = $validator->getFieldErrors('email');
 
-        $this->assertInternalType('array', $email_errors);
+        $this->assertIsArray($email_errors);
         $this->assertCount(0, $email_errors);
     }
 
@@ -60,7 +60,7 @@ class EmailValidatorTest extends TestCase
 
         $email_errors = $validator->getFieldErrors('email');
 
-        $this->assertInternalType('array', $email_errors);
+        $this->assertIsArray($email_errors);
         $this->assertCount(1, $email_errors);
     }
 
@@ -78,7 +78,7 @@ class EmailValidatorTest extends TestCase
 
         $email_errors = $validator->getFieldErrors('email');
 
-        $this->assertInternalType('array', $email_errors);
+        $this->assertIsArray($email_errors);
         $this->assertCount(0, $email_errors);
     }
 
@@ -96,7 +96,7 @@ class EmailValidatorTest extends TestCase
 
         $email_errors = $validator->getFieldErrors('email');
 
-        $this->assertInternalType('array', $email_errors);
+        $this->assertIsArray($email_errors);
         $this->assertCount(1, $email_errors);
     }
 }

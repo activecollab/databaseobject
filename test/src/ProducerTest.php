@@ -14,6 +14,9 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base\User;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
+use InvalidArgumentException;
+use LogicException;
+use RuntimeException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -89,38 +92,30 @@ class ProducerTest extends WritersTypeTestCase
         $this->assertSame(1234, $object->custom_attribute_value);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testCustomProducerCantBeSetForUnregisteredType()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->assertFalse($this->pool->isTypeRegistered(User::class));
         $this->pool->registerProducer(User::class, new CustomProducer($this->connection, $this->pool, $this->logger));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCustomProducerCantBeSetTwice()
     {
+        $this->expectException(LogicException::class);
         $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool, $this->logger));
         $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool, $this->logger));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Class 'stdClass' does not implement 'ActiveCollab\DatabaseObject\ProducerInterface' interface
-     */
     public function testCustomProducerRequiresProducerInterface()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Class 'stdClass' does not implement 'ActiveCollab\DatabaseObject\ProducerInterface' interface");
         $this->pool->registerProducerByClass(Writer::class, \stdClass::class);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUnsavedObjectsCantBeModified()
     {
+        $this->expectException(RuntimeException::class);
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
             'birthday' => new DateValue('1860-01-20'),
@@ -184,11 +179,9 @@ class ProducerTest extends WritersTypeTestCase
         $this->assertTrue($object->modified_using_custom_producer);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testUnsavedObjectsCantBeScrapped()
     {
+        $this->expectException(RuntimeException::class);
         $object = $this->pool->produce(Writer::class, [
             'name' => 'Anton Chekhov',
             'birthday' => new DateValue('1860-01-20'),

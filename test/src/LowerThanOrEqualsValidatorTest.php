@@ -11,6 +11,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Validator;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -25,7 +26,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -33,12 +34,10 @@ class LowerThanOrEqualsValidatorTest extends TestCase
         $this->assertTrue($this->pool->isTypeRegistered(User::class));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value '' is not a valid field name
-     */
     public function testFieldNameIsRequired()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Value '' is not a valid field name");
         $validator = new Validator($this->connection, 'users', null, null, []);
         $validator->lowerThanOrEquals('', 123);
     }
@@ -57,7 +56,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
 
         $age_errors = $validator->getFieldErrors('age');
 
-        $this->assertInternalType('array', $age_errors);
+        $this->assertIsArray($age_errors);
         $this->assertCount(0, $age_errors);
     }
 
@@ -75,7 +74,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
 
         $age_errors = $validator->getFieldErrors('age');
 
-        $this->assertInternalType('array', $age_errors);
+        $this->assertIsArray($age_errors);
         $this->assertCount(0, $age_errors);
     }
 
@@ -93,7 +92,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
 
         $age_errors = $validator->getFieldErrors('age');
 
-        $this->assertInternalType('array', $age_errors);
+        $this->assertIsArray($age_errors);
         $this->assertCount(1, $age_errors);
     }
 
@@ -111,7 +110,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
 
         $age_errors = $validator->getFieldErrors('age');
 
-        $this->assertInternalType('array', $age_errors);
+        $this->assertIsArray($age_errors);
         $this->assertCount(0, $age_errors);
     }
 
@@ -129,7 +128,7 @@ class LowerThanOrEqualsValidatorTest extends TestCase
 
         $age_errors = $validator->getFieldErrors('age');
 
-        $this->assertInternalType('array', $age_errors);
+        $this->assertIsArray($age_errors);
         $this->assertCount(1, $age_errors);
     }
 }

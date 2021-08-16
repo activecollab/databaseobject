@@ -13,6 +13,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DateValue\DateValue;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -146,19 +147,15 @@ class PoolProduceTest extends WritersTypeTestCase
         $this->assertEquals('Anton Pavlovich Chekhov', $object_from_pool_second_take->getName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnUnknonwClass()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->produce('Definitely not a Class');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testExceptionOnNonObjectClass()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->produce(Validator::class);
     }
 }

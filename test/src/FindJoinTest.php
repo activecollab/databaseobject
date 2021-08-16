@@ -20,7 +20,7 @@ class FindJoinTest extends WritersTypeTestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -45,7 +45,7 @@ class FindJoinTest extends WritersTypeTestCase
     /**
      * Tear down test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('writer_groups')) {
             $this->connection->dropTable('writer_groups');
@@ -122,19 +122,19 @@ class FindJoinTest extends WritersTypeTestCase
     {
         $ids = $this->pool->find(Writer::class)->orderBy('`id`')->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(3, $ids);
         $this->assertEquals([1, 2, 3], $ids);
 
         $ids = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 1)->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(2, $ids);
         $this->assertEquals([1, 2], $ids);
 
         $ids = $this->pool->find(Writer::class)->orderBy('`id`')->joinTable('writer_groups')->where('`writer_groups`.`group_id` = ?', 2)->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(1, $ids);
         $this->assertEquals([3], $ids);
     }

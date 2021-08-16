@@ -20,7 +20,7 @@ class UrlValidatorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class UrlValidatorTest extends TestCase
 
         $url_errors = $validator->getFieldErrors('homepage_url');
 
-        $this->assertInternalType('array', $url_errors);
+        $this->assertIsArray($url_errors);
         $this->assertCount(0, $url_errors);
     }
 
@@ -57,7 +57,7 @@ class UrlValidatorTest extends TestCase
 
         $url_errors = $validator->getFieldErrors('homepage_url');
 
-        $this->assertInternalType('array', $url_errors);
+        $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
         $this->assertContains("Value of 'homepage_url' is required", $url_errors);
     }
@@ -76,7 +76,7 @@ class UrlValidatorTest extends TestCase
 
         $url_errors = $validator->getFieldErrors('homepage_url');
 
-        $this->assertInternalType('array', $url_errors);
+        $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
         $this->assertContains("Value of 'homepage_url' is not a valid URL", $url_errors);
     }
@@ -95,7 +95,7 @@ class UrlValidatorTest extends TestCase
 
         $url_errors = $validator->getFieldErrors('homepage_url');
 
-        $this->assertInternalType('array', $url_errors);
+        $this->assertIsArray($url_errors);
         $this->assertCount(0, $url_errors);
     }
 
@@ -113,7 +113,7 @@ class UrlValidatorTest extends TestCase
 
         $url_errors = $validator->getFieldErrors('homepage_url');
 
-        $this->assertInternalType('array', $url_errors);
+        $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
         $this->assertContains("Value of 'homepage_url' is required", $url_errors);
     }

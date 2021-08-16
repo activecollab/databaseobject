@@ -21,7 +21,7 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

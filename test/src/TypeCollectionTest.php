@@ -12,6 +12,8 @@ use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Collection as WritersCollection;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * Test data object collection.
@@ -23,7 +25,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     /**
      * Tear down test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         if ($this->connection->tableExists('favorite_writers')) {
             $this->connection->dropTable('favorite_writers');
@@ -66,12 +68,10 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals($collection->getConditions(), "type = 'File'");
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage When pattern is an array, no extra arguments are allowed
-     */
     public function testSetConditionsFromArrayAcceptsOnlyPatternArgument()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("When pattern is an array, no extra arguments are allowed");
         $collection = new WritersCollection($this->connection, $this->pool, $this->logger);
 
         $collection->where(['type = ?', 'File'], 1, 2, 3);
@@ -88,30 +88,24 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals($collection->getConditions(), "type = 'File'");
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Pattern argument is required
-     */
     public function testEmptyPatternStringThrowsAnException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Pattern argument is required");
         (new WritersCollection($this->connection, $this->pool, $this->logger))->where('');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Pattern argument is required
-     */
     public function testEmptyPatternArrayThrowsAnException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Pattern argument is required");
         (new WritersCollection($this->connection, $this->pool, $this->logger))->where([]);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Pattern can be string or an array
-     */
     public function testInvalidConditionsTypeThrowsAnException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Pattern can be string or an array");
         (new WritersCollection($this->connection, $this->pool, $this->logger))->where(123);
     }
 
@@ -137,35 +131,27 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals($collection->getOrderBy(), '`writers`.`created_at` DESC');
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testCoundShouldNotWorkWhenCollectionIsNotReady()
     {
+        $this->expectException(LogicException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->executeIds();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testExecuteShouldNotWorkWhenCollectionIsNotReady()
     {
+        $this->expectException(LogicException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->execute();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testExecuteIdsShouldNotWorkWhenCollectionIsNotReady()
     {
+        $this->expectException(LogicException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->executeIds();
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testGetTagShouldNotWorkWhenCollectionIsNotReady()
     {
+        $this->expectException(LogicException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))->setAsNotReady()->getEtag('ilija.studen@activecollab.com');
     }
 
@@ -245,11 +231,9 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertTrue($paginated->isPaginated());
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testSetCurrentPageForNonPaginatedCollectionThrowsAnError()
     {
+        $this->expectException(LogicException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))->currentPage(1);
     }
 
@@ -356,11 +340,9 @@ class TypeCollectionTest extends WritersTypeTestCase
         $this->assertEquals('target_id', $collection->getTargetJoinField());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidSourceAndTargetJoinFieldException()
     {
+        $this->expectException(InvalidArgumentException::class);
         (new WritersCollection($this->connection, $this->pool, $this->logger))
             ->setJoinTable('writes_books', ['invalid', 'number', 'of', 'arguments']);
     }

@@ -26,7 +26,7 @@ class SerializeTest extends WritersTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -42,7 +42,7 @@ class SerializeTest extends WritersTypeTestCase
     public function testSerialization()
     {
         $data = json_decode(json_encode($this->writer), true);
-        $this->assertInternalType('array', $data);
+        $this->assertIsArray($data);
 
         $this->assertArrayHasKey('id', $data);
         $this->assertSame($this->writer->getId(), $data['id']);
@@ -59,7 +59,7 @@ class SerializeTest extends WritersTypeTestCase
 
     public function testExtendedSerializationIsEmptyByDefault()
     {
-        $this->assertInternalType('array', $this->writer->jsonSerializeDetails());
+        $this->assertIsArray($this->writer->jsonSerializeDetails());
         $this->assertEmpty($this->writer->jsonSerializeDetails());
     }
 }

@@ -23,7 +23,7 @@ class TraitTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -35,7 +35,7 @@ class TraitTest extends TestCase
     {
         $trait_names = (new TraitsResolver())->getClassTraits(Writer::class);
 
-        $this->assertInternalType('array', $trait_names);
+        $this->assertIsArray($trait_names);
         $this->assertCount(3, $trait_names);
 
         $this->assertContains(Implementation::class, $trait_names);

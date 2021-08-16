@@ -40,6 +40,6 @@ final class FinderFactoryTest extends WritersTypeTestCase
         $this->assertInstanceOf(FinderInterface::class, $finder);
         $this->assertSame(Writer::class, $finder->getType());
 
-        $this->assertContains("`name` = 'Leo Tolstoy'", (string) $finder);
+        $this->assertStringContainsString("`name` = 'Leo Tolstoy'", (string) $finder);
     }
 }

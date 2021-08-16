@@ -8,10 +8,14 @@
 
 namespace ActiveCollab\DatabaseObject\Test;
 
+use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
+use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\AwesomeWriter;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
+use InvalidArgumentException;
+use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -27,21 +31,17 @@ class CrudTest extends WritersTypeTestCase
         $this->assertEquals('Unknown Writer', $unknown_writer->getName());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testFieldsWithDefaultValueCantBeNull()
     {
+        $this->expectException(InvalidArgumentException::class);
         $unknown_writer = new Writer($this->connection, $this->pool, $this->logger);
         $unknown_writer->setName(null);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Database row expected
-     */
     public function testCantLoadFromEmptyRow()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Database row expected");
         $writer = new Writer($this->connection, $this->pool, $this->logger);
         $writer->loadFromRow([]);
     }
@@ -73,12 +73,10 @@ class CrudTest extends WritersTypeTestCase
         $this->assertSame('1828-09-09', $tolstoy->getBirthday()->format('Y-m-d'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage ID is expected to be a number larger than 0
-     */
     public function testGetByIdOnInvalidIdException()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("ID is expected to be a number larger than 0");
         $this->pool->getById(Writer::class, 0);
     }
 
@@ -93,11 +91,10 @@ class CrudTest extends WritersTypeTestCase
 
     /**
      * Test if Pool::mustGetById() throws an exception when record was not found.
-     *
-     * @expectedException \ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException
      */
     public function testMustGetByIdThrowsAnException()
     {
+        $this->expectException(ObjectNotFoundException::class);
         $this->assertFalse($this->pool->exists(Writer::class, 890));
         $this->assertNull($this->pool->mustGetById(Writer::class, 890));
     }
@@ -117,11 +114,9 @@ class CrudTest extends WritersTypeTestCase
         $this->assertSame('1828-09-09', $tolstoy->getBirthday()->format('Y-m-d'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testGetByIdThrowsAnExceptionOnUnregisteredType()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->getById(DateValue::class, 1);
     }
 
@@ -143,12 +138,10 @@ class CrudTest extends WritersTypeTestCase
         $this->assertEquals('1860-01-29', $chekhov->getBirthday()->format('Y-m-d'));
     }
 
-    /**
-     * @expectedException \ActiveCollab\DatabaseObject\Exception\ValidationException
-     * @expectedExceptionMessage Value of 'birthday' is required
-     */
     public function testExceptionOnInvalidCreate()
     {
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage("Value of 'birthday' is required");
         (new Writer($this->connection, $this->pool, $this->logger))
             ->setName('Anton Chekhov')
             ->save();
@@ -184,12 +177,12 @@ class CrudTest extends WritersTypeTestCase
         /** @var Writer $tolstoy */
         $tolstoy = $this->pool->getById(Writer::class, 1);
 
-        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertIsArray($tolstoy->getModifications());
         $this->assertEmpty($tolstoy->getModifications());
 
         $tolstoy->setName('Lev Nikolayevich Tolstoy')->setBirthday(new DateValue('1828-09-10'));
 
-        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertIsArray($tolstoy->getModifications());
         $this->assertCount(2, $tolstoy->getModifications());
 
         $this->assertEquals('Leo Tolstoy', $tolstoy->getModifications()['name'][0]);
@@ -200,7 +193,7 @@ class CrudTest extends WritersTypeTestCase
 
         $tolstoy->save();
 
-        $this->assertInternalType('array', $tolstoy->getModifications());
+        $this->assertIsArray($tolstoy->getModifications());
         $this->assertEmpty($tolstoy->getModifications());
     }
 
@@ -233,11 +226,9 @@ class CrudTest extends WritersTypeTestCase
         $this->assertEquals(1, $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM `writers` WHERE `id` = ?', 18));
     }
 
-    /**
-     * @expectedException \LogicException
-     */
     public function testChangeIdToExistingRecord()
     {
+        $this->expectException(LogicException::class);
         $chekhov = new Writer($this->connection, $this->pool, $this->logger);
 
         $chekhov->setName('Anton Chekhov');

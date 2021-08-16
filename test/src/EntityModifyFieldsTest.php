@@ -11,6 +11,7 @@ namespace ActiveCollab\DatabaseObject\Test;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -25,7 +26,7 @@ class EntityModifyFieldsTest extends WritersTypeTestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -33,12 +34,10 @@ class EntityModifyFieldsTest extends WritersTypeTestCase
         $this->assertInstanceOf(Writer::class, $this->writer);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage 'not a field' is not a known field
-     */
     public function testMissingFieldCantBeSet()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("'not a field' is not a known field");
         $this->writer->setFieldValue('not a field', 'yes, a value');
     }
 

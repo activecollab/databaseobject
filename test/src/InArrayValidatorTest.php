@@ -25,7 +25,7 @@ class InArrayValidatorTest extends TestCase
     /**
      * Set up test environment.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -47,7 +47,7 @@ class InArrayValidatorTest extends TestCase
 
         $continent_errors = $validator->getFieldErrors('continent');
 
-        $this->assertInternalType('array', $continent_errors);
+        $this->assertIsArray($continent_errors);
         $this->assertCount(0, $continent_errors);
     }
 
@@ -65,7 +65,7 @@ class InArrayValidatorTest extends TestCase
 
         $continent_errors = $validator->getFieldErrors('continent');
 
-        $this->assertInternalType('array', $continent_errors);
+        $this->assertIsArray($continent_errors);
         $this->assertCount(1, $continent_errors);
     }
 
@@ -83,7 +83,7 @@ class InArrayValidatorTest extends TestCase
 
         $continent_errors = $validator->getFieldErrors('continent');
 
-        $this->assertInternalType('array', $continent_errors);
+        $this->assertIsArray($continent_errors);
         $this->assertCount(0, $continent_errors);
     }
 
@@ -101,7 +101,7 @@ class InArrayValidatorTest extends TestCase
 
         $continent_errors = $validator->getFieldErrors('continent');
 
-        $this->assertInternalType('array', $continent_errors);
+        $this->assertIsArray($continent_errors);
         $this->assertCount(1, $continent_errors);
     }
 }

@@ -14,6 +14,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\StatsSnapshot;
 use ActiveCollab\DateValue\DateTimeValue;
 use ActiveCollab\DateValue\DateValue;
 use ActiveCollab\DateValue\DateValueInterface;
+use LogicException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -23,7 +24,7 @@ class GeneratedFieldsTest extends TestCase
     /**
      * {@inheritdoc}
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -46,7 +47,7 @@ class GeneratedFieldsTest extends TestCase
         $this->pool->registerType(StatsSnapshot::class);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection->dropTable('stats_snapshots');
         $this->connection->execute('DROP TRIGGER IF EXISTS `insert_stats_snapshots`');
@@ -80,12 +81,10 @@ class GeneratedFieldsTest extends TestCase
         $this->assertContains('is_used_on_day', $this->pool->getGeneratedTypeFields(StatsSnapshot::class));
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Generated field is_used_on_day cannot be set by directly assigning a value
-     */
     public function testGeneratedFieldCantBeSetDuringProduction()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("Generated field is_used_on_day cannot be set by directly assigning a value");
         $this->pool->produce(StatsSnapshot::class, [
             'account_id' => 1,
             'day' => new DateValue(),
@@ -96,12 +95,10 @@ class GeneratedFieldsTest extends TestCase
         ]);
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Generated field is_used_on_day cannot be set by directly assigning a value
-     */
     public function testGeneratedFieldCantBeSetUsingSetField()
     {
+        $this->expectException(LogicException::class);
+        $this->expectExceptionMessage("Generated field is_used_on_day cannot be set by directly assigning a value");
         $this->produceSnapshot()->setFieldValue('is_used_on_day', true);
     }
 
@@ -114,12 +111,12 @@ class GeneratedFieldsTest extends TestCase
     public function testPoolIncludesGeneratedFieldsInTypeFieldsList()
     {
         $generated_type_fields = $this->pool->getGeneratedTypeFields(StatsSnapshot::class);
-        $this->assertInternalType('array', $generated_type_fields);
+        $this->assertIsArray($generated_type_fields);
         $this->assertContains('is_used_on_day', $generated_type_fields);
 
         $escaped_type_fields = $this->pool->getEscapedTypeFields(StatsSnapshot::class);
-        $this->assertInternalType('string', $escaped_type_fields);
-        $this->assertContains('is_used_on_day', $escaped_type_fields);
+        $this->assertIsString($escaped_type_fields);
+        $this->assertStringContainsString('is_used_on_day', $escaped_type_fields);
     }
 
     public function testGeneratedFieldsAreHydrated()
@@ -134,7 +131,7 @@ class GeneratedFieldsTest extends TestCase
         $this->assertSame(1, $insert_id);
 
         $row = $this->connection->executeFirstRow('SELECT * FROM stats_snapshots WHERE id = ?', $insert_id);
-        $this->assertInternalType('array', $row);
+        $this->assertIsArray($row);
         $this->assertArrayHasKey('is_used_on_day', $row);
         $this->assertTrue($row['is_used_on_day']);
 

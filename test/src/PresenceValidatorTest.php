@@ -10,18 +10,17 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Validator;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
 class PresenceValidatorTest extends WritersTypeTestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Value '' is not a valid field name
-     */
     public function testFieldNameIsRequired()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Value '' is not a valid field name");
         $validator = new Validator($this->connection, 'writers', null, null, []);
         $validator->present('');
     }
@@ -40,7 +39,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -58,7 +57,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 
@@ -91,7 +90,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
 
         $is_alive_errors = $validator->getFieldErrors('is_alive');
 
-        $this->assertInternalType('array', $is_alive_errors);
+        $this->assertIsArray($is_alive_errors);
         $this->assertCount(1, $is_alive_errors);
     }
 
@@ -109,7 +108,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 
@@ -127,7 +126,7 @@ class PresenceValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 }

@@ -99,7 +99,7 @@ class FindTest extends WritersTypeTestCase
     {
         $ids = $this->pool->find(Writer::class)->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(3, $ids);
     }
 
@@ -110,7 +110,7 @@ class FindTest extends WritersTypeTestCase
     {
         $ids = $this->pool->find(Writer::class)->where('id = ?', -1)->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(0, $ids);
     }
 
@@ -163,7 +163,7 @@ class FindTest extends WritersTypeTestCase
     public function testFindByMultipleConditions()
     {
         $finder_1 = $this->pool->find(Writer::class)->where('`birthday` > ?', '1800-01-01');
-        $this->assertContains("WHERE `birthday` > '1800-01-01'", (string) $finder_1);
+        $this->assertStringContainsString("WHERE `birthday` > '1800-01-01'", (string) $finder_1);
 
         /* @var Writer[] $should_be_fyodor */
         $should_be_fyodor_and_leo = $finder_1->all();
@@ -175,7 +175,7 @@ class FindTest extends WritersTypeTestCase
             ->where('`birthday` > ?', '1800-01-01')
             ->where('`birthday` < ?', '1825-01-01');
 
-        $this->assertContains("WHERE (`birthday` > '1800-01-01') AND (`birthday` < '1825-01-01')", (string) $finder_2);
+        $this->assertStringContainsString("WHERE (`birthday` > '1800-01-01') AND (`birthday` < '1825-01-01')", (string) $finder_2);
 
         /** @var Writer[] $should_be_fyodor */
         $should_be_fyodor = $finder_2->all();
@@ -209,7 +209,7 @@ class FindTest extends WritersTypeTestCase
     {
         $ids = $this->pool->find(Writer::class)->where('`name` LIKE ?', '%Leo%')->ids();
 
-        $this->assertInternalType('array', $ids);
+        $this->assertIsArray($ids);
         $this->assertCount(1, $ids);
         $this->assertSame(1, $ids[0]);
     }
@@ -255,27 +255,21 @@ class FindTest extends WritersTypeTestCase
         $this->assertEquals('Lev Nikolayevich Tolstoy', $should_be_leo->getName());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFindBySqlRequiresType()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->findBySql('', 'SELECT * FROM `writers` ORDER BY `name`');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFindBySqlRequiresRegisteredType()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->findBySql(DateValue::class, 'SELECT * FROM `writers` ORDER BY `name`');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testFindBySqlRequiresSqlStatement()
     {
+        $this->expectException(InvalidArgumentException::class);
         $this->pool->findBySql(Writer::class, '');
     }
 

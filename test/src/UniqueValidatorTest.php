@@ -35,7 +35,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -53,7 +53,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -71,7 +71,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 
@@ -89,7 +89,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -107,7 +107,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 
@@ -125,7 +125,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -143,7 +143,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 
@@ -161,7 +161,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(0, $name_errors);
     }
 
@@ -179,7 +179,7 @@ class UniqueValidatorTest extends WritersTypeTestCase
 
         $name_errors = $validator->getFieldErrors('name');
 
-        $this->assertInternalType('array', $name_errors);
+        $this->assertIsArray($name_errors);
         $this->assertCount(1, $name_errors);
     }
 }

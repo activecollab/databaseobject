@@ -44,7 +44,7 @@ abstract class TestCase extends BaseTestCase
      */
     protected $logger;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -72,7 +72,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Tear down test environment.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->connection = null;
         $this->pool = null;

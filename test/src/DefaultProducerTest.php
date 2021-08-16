@@ -13,6 +13,7 @@ use ActiveCollab\DatabaseObject\ProducerInterface;
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\CustomProducer;
 use ActiveCollab\DatabaseObject\Validator;
+use InvalidArgumentException;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
@@ -38,21 +39,17 @@ class DefaultProducerTest extends TestCase
         $this->assertInstanceOf(CustomProducer::class, $this->pool->getDefaultProducer());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Producer class not found.
-     */
     public function testUnknownClassCantBeSetAsDefaultProducer()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Producer class not found.");
         $this->pool->setDefaultProducerClass('Unknown class');
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Producer class does not implement producer interface.
-     */
     public function testDefaultProducerClassNeedsToImlementProducerInterface()
     {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage("Producer class does not implement producer interface.");
         $this->pool->setDefaultProducerClass(Validator::class);
     }
 }
