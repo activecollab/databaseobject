@@ -28,14 +28,14 @@ abstract class User extends Entity
      *
      * @var array
      */
-    protected $fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
+    protected $entity_fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_field_values = [
+    protected $default_entity_field_values = [
         'type' => 'ActiveCollab\DatabaseObject\Test\Fixtures\Users\User',
         'first_name' => '',
         'last_name' => '',

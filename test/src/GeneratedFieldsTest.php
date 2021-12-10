@@ -65,8 +65,8 @@ class GeneratedFieldsTest extends TestCase
     {
         $snapshot = $this->produceSnapshot();
 
-        $this->assertTrue($snapshot->fieldExists('account_id'));
-        $this->assertTrue($snapshot->fieldExists('is_used_on_day'));
+        $this->assertTrue($snapshot->entityFieldExists('account_id'));
+        $this->assertTrue($snapshot->entityFieldExists('is_used_on_day'));
 
         $this->assertFalse($snapshot->generatedFieldExists('account_id'));
         $this->assertTrue($snapshot->generatedFieldExists('is_used_on_day'));

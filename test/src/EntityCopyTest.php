@@ -43,7 +43,7 @@ class EntityCopyTest extends WritersTypeTestCase
         $this->assertTrue($writer_copy->isLoaded());
         $this->assertNotEquals($this->writer->getId(), $writer_copy->getId());
 
-        foreach ($writer_copy->getFields() as $field) {
+        foreach ($writer_copy->getEntityFields() as $field) {
             if ($writer_copy->isPrimaryKey($field)) {
                 continue;
             }
@@ -67,7 +67,7 @@ class EntityCopyTest extends WritersTypeTestCase
         $this->assertFalse($writer_copy->isLoaded());
         $this->assertEmpty($writer_copy->getId());
 
-        foreach ($writer_copy->getFields() as $field) {
+        foreach ($writer_copy->getEntityFields() as $field) {
             if ($writer_copy->isPrimaryKey($field)) {
                 continue;
             }

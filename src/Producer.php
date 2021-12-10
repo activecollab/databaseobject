@@ -40,7 +40,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
 
         if ($attributes) {
             foreach ($attributes as $k => $v) {
-                if ($object->fieldExists($k)) {
+                if ($object->entityFieldExists($k)) {
                     $object->setFieldValue($k, $v);
                 } else {
                     $object->setAttribute($k, $v);
@@ -59,7 +59,7 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     {
         if ($attributes) {
             foreach ($attributes as $k => $v) {
-                if ($instance->fieldExists($k)) {
+                if ($instance->entityFieldExists($k)) {
                     $instance->setFieldValue($k, $v);
                 } else {
                     $instance->setAttribute($k, $v);

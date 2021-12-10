@@ -30,14 +30,14 @@ abstract class BaseWriter extends Entity implements EntityInterface
      *
      * @var array
      */
-    protected $fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
+    protected $entity_fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_field_values = ['name' => 'Unknown Writer'];
+    protected $default_entity_field_values = ['name' => 'Unknown Writer'];
 
     /**
      * Name of AI field (if any).

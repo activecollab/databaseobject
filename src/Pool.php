@@ -625,8 +625,8 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
                     $this->types[$type] = [
                         'table_name' => $default_properties['table_name'],
-                        'fields' => $default_properties['fields'],
-                        'generated_fields' => $default_properties['generated_fields'],
+                        'fields' => $default_properties['entity_fields'],
+                        'generated_fields' => $default_properties['generated_entity_fields'],
                         'order_by' => $default_properties['order_by'],
                     ];
                 } else {

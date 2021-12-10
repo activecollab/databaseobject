@@ -42,7 +42,7 @@ class EntityIsTest extends WritersTypeTestCase
     {
         $field_values = [];
 
-        foreach ($this->writer->getFields() as $field_name) {
+        foreach ($this->writer->getEntityFields() as $field_name) {
             $field_values[$field_name] = $this->writer->getFieldValue($field_name);
         }
 
@@ -57,7 +57,7 @@ class EntityIsTest extends WritersTypeTestCase
     {
         $writer_field_values = [];
 
-        foreach ($this->writer->getFields() as $field_name) {
+        foreach ($this->writer->getEntityFields() as $field_name) {
             $writer_field_values[$field_name] = $this->writer->getFieldValue($field_name);
         }
 
@@ -65,7 +65,7 @@ class EntityIsTest extends WritersTypeTestCase
 
         $new_writer_field_values = [];
 
-        foreach ($new_writer->getFields() as $field_name) {
+        foreach ($new_writer->getEntityFields() as $field_name) {
             $new_writer_field_values[$field_name] = $new_writer->getFieldValue($field_name);
         }
 

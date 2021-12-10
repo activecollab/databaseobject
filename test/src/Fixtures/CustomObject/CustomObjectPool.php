@@ -6,13 +6,12 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\CustomObject;
 
 use ActiveCollab\DatabaseObject\Pool;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\CustomObject
- */
 class CustomObjectPool extends Pool
 {
 }

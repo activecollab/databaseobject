@@ -155,19 +155,24 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function isModifiedAttribute($attribute);
 
     /**
-     * Return a list of fields that are managed by this entity.
-     *
-     * @return array
+     * @deprecated Use getEntityFields() instead.
      */
     public function getFields();
 
     /**
-     * Return true if $field exists (both generated and non-generated fields are checked).
-     *
-     * @param  string $field Field name
-     * @return bool
+     * Return a list of fields that are managed by this entity.
+     */
+    public function getEntityFields(): array;
+
+    /**
+     * @deprecated Use entityFieldExists() instead.
      */
     public function fieldExists($field);
+
+    /**
+     * Return true if $field exists (both generated and non-generated fields are checked).
+     */
+    public function entityFieldExists(string $entity_field): bool;
 
     /**
      * Return a list of fields that this entity is aware of, but does not manage.

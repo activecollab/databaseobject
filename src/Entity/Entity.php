@@ -77,24 +77,22 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Table fields that are managed by this entity.
-     *
-     * @var array
      */
-    protected $fields = [];
+    protected $entity_fields = [];
 
     /**
      * Generated fields that are loaded, but not managed by the entity.
      *
      * @var array
      */
-    protected $generated_fields = [];
+    protected $generated_entity_fields = [];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_field_values = [];
+    protected $default_entity_field_values = [];
 
     public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
     {
@@ -201,8 +199,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             if ($this->isLoaded()) {
                 return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
             } else {
-                foreach ($this->getFields() as $field_name) {
-                    if (!$object->fieldExists($field_name) ||
+                foreach ($this->getEntityFields() as $field_name) {
+                    if (!$object->entityFieldExists($field_name) ||
                         !$this->areFieldValuesSame(
                             $this->getFieldValue($field_name),
                             $object->getFieldValue($field_name)
@@ -276,7 +274,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         foreach ($row as $k => $v) {
             if ($this->isGeneratedField($k)) {
                 $found_generated_fields[] = $k;
-            } elseif ($this->fieldExists($k)) {
+            } elseif ($this->entityFieldExists($k)) {
                 $this->setFieldValue($k, $v);
             }
         }
@@ -313,7 +311,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         // ---------------------------------------------------
 
         if ($this->isNew()) {
-            foreach ($this->default_field_values as $field_name => $field_value) {
+            foreach ($this->default_entity_field_values as $field_name => $field_value) {
                 if (empty($this->values[$field_name]) && !array_key_exists($field_name, $this->values)) {
                     $this->setFieldValue($field_name, $field_value);
                 }
@@ -335,7 +333,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
         $values_to_validate = $this->values;
 
-        foreach ($this->fields as $field_name) {
+        foreach ($this->entity_fields as $field_name) {
             if (empty($values_to_validate[$field_name]) && !array_key_exists($field_name, $values_to_validate)) {
                 $values_to_validate[$field_name] = null;
             }
@@ -407,7 +405,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         /** @var EntityInterface $copy */
         $copy = new $object_class($this->connection, $this->pool, $this->logger);
 
-        foreach ($this->getFields() as $field) {
+        foreach ($this->getEntityFields() as $field) {
             if ($this->isPrimaryKey($field)) {
                 continue;
             }
@@ -627,19 +625,29 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated Use getEntityFields() instead.
      */
     public function getFields()
     {
-        return $this->fields;
+        return $this->getEntityFields();
+    }
+
+    public function getEntityFields(): array
+    {
+        return $this->entity_fields;
     }
 
     /**
-     * {@inheritdoc}
+     * @deprecated Use entityFieldExists() instead.
      */
     public function fieldExists($field)
     {
-        return in_array($field, $this->fields) || in_array($field, $this->generated_fields);
+        return $this->entityFieldExists($field);
+    }
+
+    public function entityFieldExists(string $entity_field): bool
+    {
+        return in_array($entity_field, $this->entity_fields) || in_array($entity_field, $this->generated_entity_fields);
     }
 
     /**
@@ -647,7 +655,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function getGeneratedFields()
     {
-        return $this->generated_fields;
+        return $this->generated_entity_fields;
     }
 
     /**
@@ -655,7 +663,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function generatedFieldExists($field)
     {
-        return in_array($field, $this->generated_fields);
+        return in_array($field, $this->generated_entity_fields);
     }
 
     /**
@@ -698,10 +706,10 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     public function getFieldValue($field, $default = null)
     {
         if (empty($this->values[$field]) && !array_key_exists($field, $this->values)) {
-            return empty($this->default_field_values[$field])
-                && !array_key_exists($field, $this->default_field_values) ?
+            return empty($this->default_entity_field_values[$field])
+                && !array_key_exists($field, $this->default_entity_field_values) ?
                     $default :
-                    $this->default_field_values[$field];
+                    $this->default_entity_field_values[$field];
         } else {
             return $this->values[$field];
         }
@@ -742,12 +750,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     public function &setFieldValue($field, $value)
     {
-        if ($this->fieldExists($field)) {
+        if ($this->entityFieldExists($field)) {
             if ($field === 'id') {
                 $value = $value === null ? null : (int) $value;
             }
 
-            if ($value === null && array_key_exists($field, $this->default_field_values)) {
+            if ($value === null && array_key_exists($field, $this->default_entity_field_values)) {
                 throw new InvalidArgumentException("Value of '$field' can't be null");
             }
 
@@ -925,10 +933,10 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     {
         $result = [];
 
-        if (!empty($this->generated_fields)) {
+        if (!empty($this->generated_entity_fields)) {
             $result = $this->connection->selectFirstRow(
                 $this->getTableName(),
-                $this->generated_fields,
+                $this->generated_entity_fields,
                 $this->getWherePartById($id)
             );
 

@@ -30,21 +30,21 @@ abstract class StatsSnapshot extends Entity
      *
      * @var array
      */
-    protected $fields = ['id', 'account_id', 'day', 'stats'];
+    protected $entity_fields = ['id', 'account_id', 'day', 'stats'];
 
     /**
      * Generated fields that are loaded, but not managed by the entity.
      *
      * @var array
      */
-    protected $generated_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
+    protected $generated_entity_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_field_values = [];
+    protected $default_entity_field_values = [];
 
     /**
      * {@inheritdoc}
