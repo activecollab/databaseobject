@@ -6,64 +6,55 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 interface ValidatorInterface
 {
     /**
      * Check if value of $field_name is present.
-     *
-     * @param  string $field_name
-     * @return bool
      */
-    public function present($field_name);
+    public function present(string $field_name): bool;
 
-    /**
-     * @param  string     $field_name
-     * @param  int        $reference_value
-     * @param  bool|false $allow_null
-     * @return bool
-     */
-    public function lowerThan($field_name, $reference_value, $allow_null = false);
+    public function lowerThan(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool;
 
-    /**
-     * @param  string     $field_name
-     * @param  int        $reference_value
-     * @param  bool|false $allow_null
-     * @return bool
-     */
-    public function lowerThanOrEquals($field_name, $reference_value, $allow_null = false);
+    public function lowerThanOrEquals(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool;
 
-    /**
-     * @param  string     $field_name
-     * @param  int        $reference_value
-     * @param  bool|false $allow_null
-     * @return bool
-     */
-    public function greaterThan($field_name, $reference_value, $allow_null = false);
+    public function greaterThan(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool;
 
-    /**
-     * @param  string     $field_name
-     * @param  int        $reference_value
-     * @param  bool|false $allow_null
-     * @return bool
-     */
-    public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false);
+    public function greaterThanOrEquals(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool;
 
     public function inArray(
         string $field_name,
         array $array_of_values, bool $allow_null = false
     ): bool;
 
+    /**
+     * Check if value that we are trying to save is unique in the given context.
+     */
     public function unique(string $field_name, string ...$context): bool;
 
     /**
-     * Check if value that we are trying to save is unique in the given context.
+     * Check if value that we are trying to save is unique in the given context, with extra filtering.
      */
     public function uniqueWhere(
         string $field_name,
@@ -95,13 +86,42 @@ interface ValidatorInterface
     ): bool;
 
     /**
-     * Validate email address value.
+     * Make sure that that only one record with the given value in the given context exists.
      *
-     * @param  string     $field_name
-     * @param  bool|false $allow_null
-     * @return bool
+     * Note: Difference with unique() validation is that there can other non-unique values, as long as there's not more
+     * than one record with the given value.
      */
-    public function email($field_name, $allow_null = false);
+    public function onlyOne(
+        string $field_name,
+        mixed $field_value,
+        string ...$context
+    ): bool;
+
+    /**
+     * Make sure that that only one record with the given value in the given context exists, with extra filtering.
+     */
+    public function onlyOneWhere(
+        string $field_name,
+        mixed $field_value,
+        mixed $where,
+        string ...$context
+    ): bool;
+
+    /**
+     * Validate email address value.
+     */
+    public function email(
+        string $field_name,
+        bool $allow_null = false
+    ): bool;
+
+    /**
+     * Validate URL value.
+     */
+    public function url(
+        string $field_name,
+        bool $allow_null = false
+    ): bool;
 
     /**
      * Return array of validation messages, indexed by field name.

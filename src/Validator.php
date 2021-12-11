@@ -6,15 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 class Validator implements ValidatorInterface
 {
     private array $errors = [];
@@ -44,11 +43,8 @@ class Validator implements ValidatorInterface
      *
      * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are consdiered
      * to be present (because we check strlen(trim($value)).
-     *
-     * @param  string $field_name
-     * @return bool
      */
-    public function present($field_name)
+    public function present(string $field_name): bool
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
@@ -83,33 +79,49 @@ class Validator implements ValidatorInterface
      */
     private function failPresenceValidation($field_name)
     {
-        $this->addFieldError($field_name, "Value of '$field_name' is required");
+        $this->addFieldError($field_name, "Value of '$field_name' is required.");
 
         return false;
     }
 
-    public function lowerThan($field_name, $reference_value, $allow_null = false)
+    public function lowerThan(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
             return $a < $b;
         }, "Value of '$field_name' is not lower than $reference_value");
     }
 
-    public function lowerThanOrEquals($field_name, $reference_value, $allow_null = false)
+    public function lowerThanOrEquals(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
             return $a <= $b;
         }, "Value of '$field_name' is not lower than or equal to $reference_value");
     }
 
-    public function greaterThan($field_name, $reference_value, $allow_null = false)
+    public function greaterThan(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
             return $a > $b;
         }, "Value of '$field_name' is not greater than $reference_value");
     }
 
-    public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false)
+    public function greaterThanOrEquals(
+        string $field_name,
+        int $reference_value,
+        bool $allow_null = false
+    ): bool
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
             return $a >= $b;
@@ -173,7 +185,7 @@ class Validator implements ValidatorInterface
             if (in_array($this->field_values[$field_name], $array_of_values)) {
                 return true;
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' is not present in the list of supported values");
+                $this->addFieldError($field_name, "Value of '$field_name' is not present in the list of supported values.");
 
                 return false;
             }
@@ -222,42 +234,6 @@ class Validator implements ValidatorInterface
         );
 
         return false;
-    }
-
-    private function prepareUniquenessValidatorSql(array $field_names, mixed $where): string
-    {
-        $conditions = [];
-
-        if ($where) {
-            $conditions[] = $this->connection->prepareConditions($where);
-        }
-
-        foreach ($field_names as $v) {
-            $escaped_field_name = $this->connection->escapeFieldName($v);
-
-            if ($this->field_values[$v] === null) {
-                $conditions[] = "$escaped_field_name IS NULL";
-            } else {
-                $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
-            }
-        }
-
-        if (empty($this->object_id)) {
-            return sprintf(
-                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE %s",
-                $this->connection->escapeTableName($this->table_name),
-                implode(' AND ', $conditions)
-            );
-        }
-
-        return $this->connection->prepare(
-            sprintf(
-                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
-                $this->connection->escapeTableName($this->table_name),
-                implode(' AND ', $conditions)
-            ),
-            $this->old_object_id ?? $this->object_id
-        );
     }
 
     public function presentAndUnique(string $field_name, string ...$context): bool
@@ -370,7 +346,46 @@ class Validator implements ValidatorInterface
         );
     }
 
-    public function email($field_name, $allow_null = false)
+    private function prepareUniquenessValidatorSql(array $field_names, mixed $where): string
+    {
+        $conditions = [];
+
+        if ($where) {
+            $conditions[] = $this->connection->prepareConditions($where);
+        }
+
+        foreach ($field_names as $v) {
+            $escaped_field_name = $this->connection->escapeFieldName($v);
+
+            if ($this->field_values[$v] === null) {
+                $conditions[] = "$escaped_field_name IS NULL";
+            } else {
+                $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
+            }
+        }
+
+        if (empty($this->object_id)) {
+            return sprintf(
+                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE %s",
+                $this->connection->escapeTableName($this->table_name),
+                implode(' AND ', $conditions)
+            );
+        }
+
+        return $this->connection->prepare(
+            sprintf(
+                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
+                $this->connection->escapeTableName($this->table_name),
+                implode(' AND ', $conditions)
+            ),
+            $this->old_object_id ?? $this->object_id
+        );
+    }
+
+    public function email(
+        string $field_name,
+        bool $allow_null = false
+    ): bool
     {
         if (array_key_exists($field_name, $this->field_values)) {
             if ($this->field_values[$field_name] === null) {
@@ -384,7 +399,7 @@ class Validator implements ValidatorInterface
             if (filter_var($this->field_values[$field_name], FILTER_VALIDATE_EMAIL)) {
                 return true;
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' is not a valid email address");
+                $this->addFieldError($field_name, "Value of '$field_name' is not a valid email address.");
 
                 return false;
             }
@@ -393,7 +408,10 @@ class Validator implements ValidatorInterface
         }
     }
 
-    public function url($field_name, $allow_null = false)
+    public function url(
+        string $field_name,
+        bool $allow_null = false
+    ): bool
     {
         if (array_key_exists($field_name, $this->field_values)) {
             if ($this->field_values[$field_name] === null) {
@@ -407,7 +425,7 @@ class Validator implements ValidatorInterface
             if (filter_var($this->field_values[$field_name], FILTER_VALIDATE_URL)) {
                 return true;
             } else {
-                $this->addFieldError($field_name, "Value of '$field_name' is not a valid URL");
+                $this->addFieldError($field_name, "Value of '$field_name' is not a valid URL.");
 
                 return false;
             }

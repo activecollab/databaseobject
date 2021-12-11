@@ -56,7 +56,7 @@ class UrlValidatorTest extends TestCase
 
         $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
-        $this->assertContains("Value of 'homepage_url' is required", $url_errors);
+        $this->assertContains("Value of 'homepage_url' is required.", $url_errors);
     }
 
     /**
@@ -75,7 +75,7 @@ class UrlValidatorTest extends TestCase
 
         $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
-        $this->assertContains("Value of 'homepage_url' is not a valid URL", $url_errors);
+        $this->assertContains("Value of 'homepage_url' is not a valid URL.", $url_errors);
     }
 
     /**
@@ -112,6 +112,6 @@ class UrlValidatorTest extends TestCase
 
         $this->assertIsArray($url_errors);
         $this->assertCount(1, $url_errors);
-        $this->assertContains("Value of 'homepage_url' is required", $url_errors);
+        $this->assertContains("Value of 'homepage_url' is required.", $url_errors);
     }
 }

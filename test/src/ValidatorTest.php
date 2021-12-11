@@ -63,6 +63,6 @@ class ValidatorTest extends WritersTypeTestCase
         $this->assertArrayHasKey('birthday', $errors);
         $this->assertIsArray($errors['birthday']);
         $this->assertCount(1, $errors['birthday']);
-        $this->assertEquals("Value of 'birthday' is required", $errors['birthday'][0]);
+        $this->assertEquals("Value of 'birthday' is required.", $errors['birthday'][0]);
     }
 }
