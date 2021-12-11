@@ -15,7 +15,25 @@ use ActiveCollab\DatabaseObject\Validator;
 
 class OnlyOneValidatorTest extends WritersTypeTestCase
 {
-    public function testNewRecordDoesNotReportAnErrorWhenTheresNoDuplicateValue()
+    public function testRecordWithDifferentFieldValueIsValidated(): void
+    {
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Alexander Pushkin',
+            ]
+        );
+
+        $is_only_one = $validator->onlyOne('name', 'Not Alexander Pushkin');
+
+        $this->assertTrue($is_only_one);
+        $this->assertEmpty($validator->getFieldErrors('name'));
+    }
+
+    public function testWillValidateMatchingValueThatDoesNotExist(): void
     {
         $validator = new Validator(
             $this->connection,
@@ -27,14 +45,79 @@ class OnlyOneValidatorTest extends WritersTypeTestCase
             ]
         );
 
-        $is_only_one = $validator->onlyOneWhere('name', 'Anton Chekhov', '');
+        $is_only_one = $validator->onlyOne('name', 'Alexander Pushkin');
 
         $this->assertTrue($is_only_one);
-        $this->assertFalse($validator->hasErrors());
+        $this->assertEmpty($validator->getFieldErrors('name'));
+    }
+
+    public function testWillInvalidateMatchingValueThatAlreadyExists(): void
+    {
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Alexander Pushkin',
+            ]
+        );
+
+        $is_only_one = $validator->onlyOne('name', 'Alexander Pushkin');
+
+        $this->assertFalse($is_only_one);
 
         $name_errors = $validator->getFieldErrors('name');
+        $this->assertNotEmpty($name_errors);
+        $this->assertSame(
+            "Only one record with field 'name' set to 'Alexander Pushkin' is allowed.",
+            $name_errors[0]
+        );
+    }
 
-        $this->assertIsArray($name_errors);
-        $this->assertCount(0, $name_errors);
+    public function testWillValidateMatchingValueWhenContextIsNotTheSame(): void
+    {
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Alexander Pushkin',
+
+                // Same writer, different birthday (Pushkin's birthday is '1799-06-06').
+                'birthday' => '1821-11-11',
+            ]
+        );
+
+        $is_only_one = $validator->onlyOne('name', 'Alexander Pushkin', 'birthday');
+
+        $this->assertTrue($is_only_one);
+        $this->assertEmpty($validator->getFieldErrors('name'));
+    }
+
+    public function testWillInvalidateMatchingValueThatAlreadyExistsInGivenContext(): void
+    {
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Alexander Pushkin',
+                'birthday' => '1799-06-06',
+            ]
+        );
+
+        $is_only_one = $validator->onlyOne('name', 'Alexander Pushkin', 'birthday');
+
+        $this->assertFalse($is_only_one);
+
+        $name_errors = $validator->getFieldErrors('name');
+        $this->assertNotEmpty($name_errors);
+        $this->assertSame(
+            "Only one record with field 'name' set to 'Alexander Pushkin' is allowed in context of 'birthday'.",
+            $name_errors[0]
+        );
     }
 }

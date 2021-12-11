@@ -70,7 +70,15 @@ class UniqueValidatorTest extends WritersTypeTestCase
      */
     public function testNewRecordReportsAnErrorOnDuplicateValue()
     {
-        $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Leo Tolstoy']);
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Leo Tolstoy',
+            ]
+        );
 
         $is_unique = $validator->unique('name');
 
@@ -88,7 +96,15 @@ class UniqueValidatorTest extends WritersTypeTestCase
      */
     public function testExistingRecordDoesNotReportAnErrorWhenTheresNoDuplicateValue()
     {
-        $validator = new Validator($this->connection, 'writers', 1, null, ['name' => 'Leo Tolstoy']);
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            1,
+            null,
+            [
+                'name' => 'Leo Tolstoy',
+            ]
+        );
 
         $is_unique = $validator->unique('name');
 
@@ -106,7 +122,15 @@ class UniqueValidatorTest extends WritersTypeTestCase
      */
     public function testExistingRecordReportsAnErrorOnDuplicateValue()
     {
-        $validator = new Validator($this->connection, 'writers', 1, null, ['name' => 'Alexander Pushkin']);
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            1,
+            null,
+            [
+                'name' => 'Alexander Pushkin',
+            ]
+        );
 
         $is_unique = $validator->unique('name');
 

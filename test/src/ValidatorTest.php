@@ -58,7 +58,7 @@ class ValidatorTest extends WritersTypeTestCase
         $this->assertArrayHasKey('name', $errors);
         $this->assertIsArray($errors['name']);
         $this->assertCount(1, $errors['name']);
-        $this->assertEquals("Value of 'name' needs to be unique", $errors['name'][0]);
+        $this->assertEquals("Value of 'name' needs to be unique.", $errors['name'][0]);
 
         $this->assertArrayHasKey('birthday', $errors);
         $this->assertIsArray($errors['birthday']);

@@ -206,7 +206,7 @@ class Validator implements ValidatorInterface
         if (empty($context)) {
             $this->addFieldError(
                 $field_name,
-                sprintf("Value of '%s' needs to be unique", $field_name)
+                sprintf("Value of '%s' needs to be unique.", $field_name)
             );
 
             return false;
@@ -215,17 +215,9 @@ class Validator implements ValidatorInterface
         $this->addFieldError(
             $field_name,
             sprintf(
-                "Value of '%s' needs to be unique in context of %s",
+                "Value of '%s' needs to be unique in context of %s.",
                 $field_name,
-                implode(
-                    ', ',
-                    array_map(
-                        function ($field_name) {
-                            return "'$field_name'";
-                        },
-                        $context
-                    )
-                )
+                $this->implodeFieldNames($context)
             )
         );
 
@@ -290,6 +282,15 @@ class Validator implements ValidatorInterface
         return false;
     }
 
+    public function onlyOne(
+        string $field_name,
+        mixed $field_value,
+        string ...$context
+    ): bool
+    {
+        return $this->onlyOneWhere($field_name, $field_value, '', ...$context);
+    }
+
     public function onlyOneWhere(
         string $field_name,
         mixed $field_value,
@@ -304,6 +305,34 @@ class Validator implements ValidatorInterface
         }
 
         $field_names = $this->mustGetFieldNames($field_name, $context);
+
+        // No need to check value if it's not the one that we're looking for.
+        if ($this->field_values[$field_name] !== $field_value) {
+            return true;
+        }
+
+        if ($this->connection->executeFirstCell($this->prepareUniquenessValidatorSql($field_names, $where)) === 0) {
+            return true;
+        }
+
+        if (empty($context)) {
+            $this->addFieldError(
+                $field_name,
+                sprintf("Only one record with field '%s' set to '%s' is allowed.", $field_name, $field_value)
+            );
+
+            return false;
+        }
+
+        $this->addFieldError(
+            $field_name,
+            sprintf(
+                "Only one record with field '%s' set to '%s' is allowed in context of %s.",
+                $field_name,
+                $field_value,
+                $this->implodeFieldNames($context)
+            )
+        );
 
         return false;
     }
@@ -326,6 +355,19 @@ class Validator implements ValidatorInterface
         }
 
         return $result;
+    }
+
+    private function implodeFieldNames(array $field_names): string
+    {
+        return implode(
+            ', ',
+            array_map(
+                function ($field_name) {
+                    return "'$field_name'";
+                },
+                $field_names
+            )
+        );
     }
 
     public function email($field_name, $allow_null = false)
