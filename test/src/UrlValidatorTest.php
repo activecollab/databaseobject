@@ -17,9 +17,6 @@ use ActiveCollab\DatabaseObject\Validator;
  */
 class UrlValidatorTest extends TestCase
 {
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();

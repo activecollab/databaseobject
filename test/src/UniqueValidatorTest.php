@@ -18,7 +18,7 @@ use ActiveCollab\DateValue\DateValue;
 class UniqueValidatorTest extends WritersTypeTestCase
 {
     /**
-     * Test if theres no error thrown for NULL even though there are NULL records in the table.
+     * Test if there's no error thrown for NULL even though there are NULL records in the table.
      */
     public function testNoErrorOnNull()
     {
@@ -44,7 +44,15 @@ class UniqueValidatorTest extends WritersTypeTestCase
      */
     public function testNewRecordDoesNotReportAnErrorWhenTheresNoDuplicateValue()
     {
-        $validator = new Validator($this->connection, 'writers', null, null, ['name' => 'Anton Chekhov']);
+        $validator = new Validator(
+            $this->connection,
+            'writers',
+            null,
+            null,
+            [
+                'name' => 'Anton Chekhov',
+            ]
+        );
 
         $is_unique = $validator->unique('name');
 

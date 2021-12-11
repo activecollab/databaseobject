@@ -55,29 +55,21 @@ interface ValidatorInterface
      */
     public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false);
 
-    /**
-     * @param  string     $field_name
-     * @param  array      $array_of_values
-     * @param  bool|false $allow_null
-     * @return bool
-     */
-    public function inArray($field_name, array $array_of_values, $allow_null = false);
+    public function inArray(
+        string $field_name,
+        array $array_of_values, bool $allow_null = false
+    ): bool;
 
-    /**
-     * @param  string   $field_name
-     * @param  string[] $context
-     * @return bool
-     */
-    public function unique($field_name, ...$context);
+    public function unique(string $field_name, string ...$context): bool;
 
     /**
      * Check if value that we are trying to save is unique in the given context.
-     *
-     * @param string       $field_name
-     * @param array|string $where
-     * @param string[]     $context
      */
-    public function uniqueWhere($field_name, $where, ...$context);
+    public function uniqueWhere(
+        string $field_name,
+        mixed $where,
+        string ...$context
+    ): bool;
 
     /**
      * Field value needs to be present and unique.
@@ -86,7 +78,7 @@ interface ValidatorInterface
      * @param  string[] $context
      * @return bool
      */
-    public function presentAndUnique($field_name, ...$context);
+    public function presentAndUnique(string $field_name, string ...$context): bool;
 
     /**
      * Present and unique, with the given condition.
@@ -96,7 +88,11 @@ interface ValidatorInterface
      * @param  string[]     $context
      * @return bool
      */
-    public function presentAndUniqueWhere($field_name, $where, ...$context);
+    public function presentAndUniqueWhere(
+        string $field_name,
+        mixed $where,
+        string ...$context
+    ): bool;
 
     /**
      * Validate email address value.
@@ -109,36 +105,22 @@ interface ValidatorInterface
 
     /**
      * Return array of validation messages, indexed by field name.
-     *
-     * @return array
      */
-    public function getErrors();
+    public function getErrors(): array;
 
     /**
      * Return true if there are error.
-     *
-     * @return bool
      */
-    public function hasErrors();
+    public function hasErrors(): bool;
 
     /**
      * Return field errors.
-     *
-     * @param  string $field_name
-     * @return array
      */
-    public function getFieldErrors($field_name);
+    public function getFieldErrors(string $field_name): array;
 
     /**
      * Report an error for the given field.
-     *
-     * @param string $field_name
-     * @param string $error_message
      */
-    public function addFieldError($field_name, $error_message);
-
-    /**
-     * @return ValidationException
-     */
-    public function createException();
+    public function addFieldError(string $field_name, string $error_message): void;
+    public function createException(): ValidationException;
 }

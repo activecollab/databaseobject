@@ -17,44 +17,20 @@ use InvalidArgumentException;
  */
 class Validator implements ValidatorInterface
 {
-    /**
-     * @var array
-     */
-    private $errors = [];
+    private array $errors = [];
+    private ConnectionInterface $connection;
+    private string $table_name;
+    private ?int $object_id;
+    private ?int $old_object_id;
+    private array $field_values;
 
-    /**
-     * @var ConnectionInterface
-     */
-    private $connection;
-
-    /**
-     * @var string
-     */
-    private $table_name;
-
-    /**
-     * @var int|null
-     */
-    private $object_id;
-
-    /**
-     * @var int|null
-     */
-    private $old_object_id;
-
-    /**
-     * @var array
-     */
-    private $field_values;
-
-    /**
-     * @param ConnectionInterface $connection
-     * @param string              $table_name
-     * @param int|null            $object_id
-     * @param int|null            $old_object_id
-     * @param array               $field_values
-     */
-    public function __construct(ConnectionInterface $connection, $table_name, $object_id, $old_object_id, array $field_values)
+    public function __construct(
+        ConnectionInterface $connection,
+        string $table_name,
+        ?int $object_id,
+        ?int $old_object_id,
+        array $field_values
+    )
     {
         $this->connection = $connection;
         $this->table_name = $table_name;
@@ -112,9 +88,6 @@ class Validator implements ValidatorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lowerThan($field_name, $reference_value, $allow_null = false)
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
@@ -122,9 +95,6 @@ class Validator implements ValidatorInterface
         }, "Value of '$field_name' is not lower than $reference_value");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function lowerThanOrEquals($field_name, $reference_value, $allow_null = false)
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
@@ -132,9 +102,6 @@ class Validator implements ValidatorInterface
         }, "Value of '$field_name' is not lower than or equal to $reference_value");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function greaterThan($field_name, $reference_value, $allow_null = false)
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
@@ -142,9 +109,6 @@ class Validator implements ValidatorInterface
         }, "Value of '$field_name' is not greater than $reference_value");
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function greaterThanOrEquals($field_name, $reference_value, $allow_null = false)
     {
         return $this->compareValues($field_name, $reference_value, $allow_null, function ($a, $b) {
@@ -154,15 +118,14 @@ class Validator implements ValidatorInterface
 
     /**
      * Validate field value by comparing it to a reference value using a closure.
-     *
-     * @param  string   $field_name
-     * @param  mixed    $reference_value
-     * @param  bool     $allow_null
-     * @param  callable $compare_with
-     * @param  string   $validation_failed_message
-     * @return bool
      */
-    protected function compareValues($field_name, $reference_value, $allow_null, callable $compare_with, $validation_failed_message)
+    protected function compareValues(
+        string $field_name,
+        mixed $reference_value,
+        bool $allow_null,
+        callable $compare_with,
+        string $validation_failed_message
+    ): bool
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
@@ -189,10 +152,10 @@ class Validator implements ValidatorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function inArray($field_name, array $array_of_values, $allow_null = false)
+    public function inArray(
+        string $field_name,
+        array $array_of_values, bool $allow_null = false
+    ): bool
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
@@ -219,18 +182,16 @@ class Validator implements ValidatorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function unique($field_name, ...$context)
+    public function unique(string $field_name, string ...$context): bool
     {
         return $this->uniqueWhere($field_name, '', ...$context);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function uniqueWhere($field_name, $where, ...$context)
+    public function uniqueWhere(
+        string $field_name,
+        mixed $where,
+        string ...$context
+    ): bool
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
@@ -240,13 +201,15 @@ class Validator implements ValidatorInterface
             return true; // NULL is always good for single column keys because MySQL does not check NULL for uniqueness
         }
 
-        $field_names = [$field_name];
+        $field_names = [
+            $field_name,
+        ];
 
-        if (count($context)) {
+        if (!empty($context)) {
             $field_names = array_merge($field_names, $context);
         }
 
-        // Check if we have existsing columns
+        // Check if we have existing columns.
         foreach ($field_names as $v) {
             if (!array_key_exists($v, $this->field_values)) {
                 throw new InvalidArgumentException("Field '$v' is not known");
@@ -274,30 +237,52 @@ class Validator implements ValidatorInterface
         $conditions = implode(' AND ', $conditions);
 
         if (empty($this->object_id)) {
-            $sql = "SELECT COUNT(`id`) AS 'row_count' FROM {$table_name} WHERE {$conditions}";
+            $sql = sprintf("SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE %s", $table_name, $conditions);
         } else {
-            $sql = $this->connection->prepare("SELECT COUNT(`id`) AS 'row_count' FROM $table_name WHERE ($conditions) AND (`id` != ?)", ($this->old_object_id ? $this->old_object_id : $this->object_id));
+            $sql = $this->connection->prepare(
+                sprintf(
+                    "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
+                    $table_name,
+                    $conditions
+                ),
+                $this->old_object_id ? $this->old_object_id : $this->object_id
+            );
         }
 
-        if ($this->connection->executeFirstCell($sql) > 0) {
-            if (empty($context)) {
-                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique");
-            } else {
-                $this->addFieldError($field_name, "Value of '$field_name' needs to be unique in context of " . implode(', ', array_map(function ($field_name) {
-                    return "'$field_name'";
-                }, $context)));
-            }
+        if ($this->connection->executeFirstCell($sql) === 0) {
+            return true;
+        }
+
+        if (empty($context)) {
+            $this->addFieldError(
+                $field_name,
+                sprintf("Value of '%s' needs to be unique", $field_name)
+            );
 
             return false;
         }
 
-        return true;
+        $this->addFieldError(
+            $field_name,
+            sprintf(
+                "Value of '%s' needs to be unique in context of %s",
+                $field_name,
+                implode(
+                    ', ',
+                    array_map(
+                        function ($field_name) {
+                            return "'$field_name'";
+                        },
+                        $context
+                    )
+                )
+            )
+        );
+
+        return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function presentAndUnique($field_name, ...$context)
+    public function presentAndUnique(string $field_name, string ...$context): bool
     {
         if ($this->present($field_name)) {
             return $this->unique($field_name, ...$context);
@@ -306,10 +291,11 @@ class Validator implements ValidatorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function presentAndUniqueWhere($field_name, $where, ...$context)
+    public function presentAndUniqueWhere(
+        string $field_name,
+        mixed $where,
+        string ...$context
+    ): bool
     {
         if ($this->present($field_name)) {
             return $this->uniqueWhere($field_name, $where, ...$context);
@@ -318,9 +304,22 @@ class Validator implements ValidatorInterface
         return false;
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    public function onlyOneWhere(
+        string $field_name,
+        mixed $field_value,
+        mixed $where,
+        string ...$context
+    ): bool
+    {
+        if (empty($field_name)) {
+            throw new InvalidArgumentException(
+                sprintf("Value '%s' is not a valid field name", $field_name)
+            );
+        }
+
+        return false;
+    }
+
     public function email($field_name, $allow_null = false)
     {
         if (array_key_exists($field_name, $this->field_values)) {
@@ -344,9 +343,6 @@ class Validator implements ValidatorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function url($field_name, $allow_null = false)
     {
         if (array_key_exists($field_name, $this->field_values)) {
@@ -370,34 +366,22 @@ class Validator implements ValidatorInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getErrors()
+    public function getErrors(): array
     {
         return $this->errors;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function hasErrors()
+    public function hasErrors(): bool
     {
         return count($this->errors) > 0;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldErrors($field_name)
+    public function getFieldErrors(string $field_name): array
     {
-        return isset($this->errors[$field_name]) ? $this->errors[$field_name] : [];
+        return $this->errors[$field_name] ?? [];
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function addFieldError($field_name, $error_message)
+    public function addFieldError(string $field_name, string $error_message): void
     {
         if (empty($this->errors[$field_name])) {
             $this->errors[$field_name] = [];
@@ -406,10 +390,7 @@ class Validator implements ValidatorInterface
         $this->errors[$field_name][] = $error_message;
     }
 
-    /**
-     * @return ValidationException
-     */
-    public function createException()
+    public function createException(): ValidationException
     {
         $message = 'Validation failed';
 
