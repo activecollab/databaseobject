@@ -193,63 +193,13 @@ class Validator implements ValidatorInterface
         string ...$context
     ): bool
     {
-        if (empty($field_name)) {
-            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
-        }
+        $field_names = $this->mustGetFieldNames($field_name, $context);
 
         if (empty($context) && (!array_key_exists($field_name, $this->field_values) || $this->field_values[$field_name] === null)) {
             return true; // NULL is always good for single column keys because MySQL does not check NULL for uniqueness
         }
 
-        $field_names = [
-            $field_name,
-        ];
-
-        if (!empty($context)) {
-            $field_names = array_merge($field_names, $context);
-        }
-
-        // Check if we have existing columns.
-        foreach ($field_names as $v) {
-            if (!array_key_exists($v, $this->field_values)) {
-                throw new InvalidArgumentException("Field '$v' is not known");
-            }
-        }
-
-        $table_name = $this->connection->escapeTableName($this->table_name);
-
-        $conditions = [];
-
-        if ($where) {
-            $conditions[] = $this->connection->prepareConditions($where);
-        }
-
-        foreach ($field_names as $v) {
-            $escaped_field_name = $this->connection->escapeFieldName($v);
-
-            if ($this->field_values[$v] === null) {
-                $conditions[] = "$escaped_field_name IS NULL";
-            } else {
-                $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
-            }
-        }
-
-        $conditions = implode(' AND ', $conditions);
-
-        if (empty($this->object_id)) {
-            $sql = sprintf("SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE %s", $table_name, $conditions);
-        } else {
-            $sql = $this->connection->prepare(
-                sprintf(
-                    "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
-                    $table_name,
-                    $conditions
-                ),
-                $this->old_object_id ? $this->old_object_id : $this->object_id
-            );
-        }
-
-        if ($this->connection->executeFirstCell($sql) === 0) {
+        if ($this->connection->executeFirstCell($this->prepareUniquenessValidatorSql($field_names, $where)) === 0) {
             return true;
         }
 
@@ -280,6 +230,42 @@ class Validator implements ValidatorInterface
         );
 
         return false;
+    }
+
+    private function prepareUniquenessValidatorSql(array $field_names, mixed $where): string
+    {
+        $conditions = [];
+
+        if ($where) {
+            $conditions[] = $this->connection->prepareConditions($where);
+        }
+
+        foreach ($field_names as $v) {
+            $escaped_field_name = $this->connection->escapeFieldName($v);
+
+            if ($this->field_values[$v] === null) {
+                $conditions[] = "$escaped_field_name IS NULL";
+            } else {
+                $conditions[] = $this->connection->prepare("$escaped_field_name = ?", $this->field_values[$v]);
+            }
+        }
+
+        if (empty($this->object_id)) {
+            return sprintf(
+                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE %s",
+                $this->connection->escapeTableName($this->table_name),
+                implode(' AND ', $conditions)
+            );
+        }
+
+        return $this->connection->prepare(
+            sprintf(
+                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
+                $this->connection->escapeTableName($this->table_name),
+                implode(' AND ', $conditions)
+            ),
+            $this->old_object_id ?? $this->object_id
+        );
     }
 
     public function presentAndUnique(string $field_name, string ...$context): bool
@@ -317,7 +303,29 @@ class Validator implements ValidatorInterface
             );
         }
 
+        $field_names = $this->mustGetFieldNames($field_name, $context);
+
         return false;
+    }
+
+    private function mustGetFieldNames(string $field_name, array $context): array
+    {
+        $result = [
+            $field_name,
+        ];
+
+        if (!empty($context)) {
+            $result = array_merge($result, $context);
+        }
+
+        // Check if we have existing columns.
+        foreach ($result as $v) {
+            if (!array_key_exists($v, $this->field_values)) {
+                throw new InvalidArgumentException("Field '$v' is not known");
+            }
+        }
+
+        return $result;
     }
 
     public function email($field_name, $allow_null = false)
