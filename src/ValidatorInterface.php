@@ -15,7 +15,7 @@ use ActiveCollab\DatabaseObject\Exception\ValidationException;
 interface ValidatorInterface
 {
     /**
-     * Check if value of $field_name is present.
+     * Check if value of $field_name is present (not-empty).
      */
     public function present(string $field_name): bool;
 
@@ -64,20 +64,11 @@ interface ValidatorInterface
 
     /**
      * Field value needs to be present and unique.
-     *
-     * @param  string   $field_name
-     * @param  string[] $context
-     * @return bool
      */
     public function presentAndUnique(string $field_name, string ...$context): bool;
 
     /**
      * Present and unique, with the given condition.
-     *
-     * @param  string       $field_name
-     * @param  array|string $where
-     * @param  string[]     $context
-     * @return bool
      */
     public function presentAndUniqueWhere(
         string $field_name,
