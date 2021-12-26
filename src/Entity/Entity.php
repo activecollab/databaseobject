@@ -13,7 +13,6 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as Cont
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
-use ActiveCollab\DatabaseObject\Pool;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
@@ -26,6 +25,7 @@ use Doctrine\Common\Inflector\Inflector;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
+use ReturnTypeWillChange;
 
 /**
  * @package ActiveCollab\DatabaseObject
@@ -33,21 +33,6 @@ use Psr\Log\LoggerInterface;
 abstract class Entity implements EntityInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
-
-    /**
-     * @var ConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * @var Pool
-     */
-    protected $pool;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
 
     /**
      * Name of the table.
@@ -94,12 +79,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     protected $default_entity_field_values = [];
 
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
+    public function __construct(
+        protected ConnectionInterface $connection,
+        protected PoolInterface $pool,
+        protected LoggerInterface $logger
+    )
     {
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->logger = $logger;
-
         if ($traits = $pool->getTraitNamesByType(get_class($this))) {
             foreach ($traits as $trait) {
                 $trait_constructor = str_replace('\\', '', $trait);
@@ -1033,9 +1018,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $result = [
