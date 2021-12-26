@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "9354d67e92268040ff0fdefa7b7fd695",
+    "content-hash": "d20fdf1c17334eb50830d1625cc0839f",
     "packages": [
         {
             "name": "activecollab/containeraccess",
@@ -59,31 +59,26 @@
         },
         {
             "name": "activecollab/databaseconnection",
-            "version": "4.0.0",
+            "version": "dev-master",
             "source": {
                 "type": "git",
-                "url": "https://github.com/activecollab/databaseconnection.git",
-                "reference": "7192b59cda4022a381ab0b9fe0bdd670f9b083ca"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/activecollab/databaseconnection/zipball/7192b59cda4022a381ab0b9fe0bdd670f9b083ca",
-                "reference": "7192b59cda4022a381ab0b9fe0bdd670f9b083ca",
-                "shasum": ""
+                "url": "/Users/ilijastuden/Projects/Components/databaseconnection",
+                "reference": "fa168fcfc236b0bd6672ff0faca083930322a6d9"
             },
             "require": {
                 "activecollab/containeraccess": "^2.0",
                 "activecollab/datevalue": "^2.0",
                 "ext-json": "*",
                 "ext-mysqli": "*",
-                "php": ">=7.3",
+                "php": ">=8.1",
                 "psr/log": "^1.0.0"
             },
             "require-dev": {
                 "friendsofphp/php-cs-fixer": "^2.0",
-                "phpunit/phpunit": "~5.0",
-                "pimple/pimple": "~3.0.0"
+                "phpunit/phpunit": "~9.0",
+                "pimple/pimple": "~3.5.0"
             },
+            "default-branch": true,
             "type": "library",
             "autoload": {
                 "psr-4": {
@@ -91,7 +86,6 @@
                     "ActiveCollab\\DatabaseConnection\\Test\\": "test/src"
                 }
             },
-            "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "MIT"
             ],
@@ -107,11 +101,7 @@
                 "activecollab",
                 "mysql"
             ],
-            "support": {
-                "issues": "https://github.com/activecollab/databaseconnection/issues",
-                "source": "https://github.com/activecollab/databaseconnection/tree/4.0.0"
-            },
-            "time": "2019-12-21T13:48:35+00:00"
+            "time": "2021-12-26T12:20:04+00:00"
         },
         {
             "name": "activecollab/datevalue",
@@ -1543,9 +1533,6 @@
             "require": {
                 "php": "^7.1 || ^8.0"
             },
-            "replace": {
-                "myclabs/deep-copy": "self.version"
-            },
             "require-dev": {
                 "doctrine/collections": "^1.0",
                 "doctrine/common": "^2.6",
@@ -2353,16 +2340,16 @@
         },
         {
             "name": "phpunit/phpunit",
-            "version": "9.5.10",
+            "version": "9.5.11",
             "source": {
                 "type": "git",
                 "url": "https://github.com/sebastianbergmann/phpunit.git",
-                "reference": "c814a05837f2edb0d1471d6e3f4ab3501ca3899a"
+                "reference": "2406855036db1102126125537adb1406f7242fdd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/c814a05837f2edb0d1471d6e3f4ab3501ca3899a",
-                "reference": "c814a05837f2edb0d1471d6e3f4ab3501ca3899a",
+                "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/2406855036db1102126125537adb1406f7242fdd",
+                "reference": "2406855036db1102126125537adb1406f7242fdd",
                 "shasum": ""
             },
             "require": {
@@ -2440,11 +2427,11 @@
             ],
             "support": {
                 "issues": "https://github.com/sebastianbergmann/phpunit/issues",
-                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.10"
+                "source": "https://github.com/sebastianbergmann/phpunit/tree/9.5.11"
             },
             "funding": [
                 {
-                    "url": "https://phpunit.de/donate.html",
+                    "url": "https://phpunit.de/sponsors.html",
                     "type": "custom"
                 },
                 {
@@ -2452,57 +2439,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2021-09-25T07:38:51+00:00"
-        },
-        {
-            "name": "pimple/pimple",
-            "version": "v3.0.2",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/silexphp/Pimple.git",
-                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
-                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "3.0.x-dev"
-                }
-            },
-            "autoload": {
-                "psr-0": {
-                    "Pimple": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Fabien Potencier",
-                    "email": "fabien@symfony.com"
-                }
-            ],
-            "description": "Pimple, a simple Dependency Injection Container",
-            "homepage": "http://pimple.sensiolabs.org",
-            "keywords": [
-                "container",
-                "dependency injection"
-            ],
-            "support": {
-                "issues": "https://github.com/silexphp/Pimple/issues",
-                "source": "https://github.com/silexphp/Pimple/tree/master"
-            },
-            "time": "2015-09-11T15:10:35+00:00"
+            "time": "2021-12-25T07:07:57+00:00"
         },
         {
             "name": "psr/cache",
@@ -4962,14 +4899,16 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "activecollab/databaseconnection": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
-        "php": ">=8.0"
+        "php": ">=8.1"
     },
     "platform-dev": {
         "ext-mysqli": "*"
     },
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }

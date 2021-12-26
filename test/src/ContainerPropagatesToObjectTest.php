@@ -10,30 +10,30 @@ namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
-use ActiveCollab\DatabaseObject\Test\Fixtures\Container;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
+use Psr\Container\ContainerInterface;
 
 /**
  * @package ActiveCollab\DatabaseObject\Test
  */
 class ContainerPropagatesToObjectTest extends WritersTypeTestCase
 {
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
 
-        $container = new Container(['is_special' => true]);
+        $container = $this->createMock(ContainerInterface::class);
+        $container
+            ->expects($this->once())
+            ->method('get')
+            ->with('is_special')
+            ->willReturn(true);
 
         $this->pool->setContainer($container);
-        $this->assertTrue($this->pool->hasContainer());
-        $this->assertInstanceOf(Container::class, $this->pool->getContainer());
     }
 
     /**
-     * Test instantination via getById() method.
+     * Test instantiation via getById() method.
      */
     public function testGetByIdInstantination()
     {

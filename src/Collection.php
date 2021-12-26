@@ -199,10 +199,8 @@ abstract class Collection implements CollectionInterface
 
     /**
      * Return array or property => value pairs that describes this object.
-     *
-     * @return array
      */
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         $result = $this->execute();
 
