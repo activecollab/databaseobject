@@ -15,15 +15,9 @@
             "email": "ilija.studen@activecollab.com"
         }
     ],
-    "repositories": [
-        {
-            "type": "vcs",
-            "url": "/Users/ilijastuden/Projects/Components/databaseconnection"
-        }
-    ],
     "require": {
-        "php": ">=8.1",
-        "activecollab/databaseconnection": "dev-master",
+        "php": ">=8.0",
+        "activecollab/databaseconnection": "^5.0",
         "activecollab/etag": "^1.0",
         "activecollab/object": "^1.0",
         "doctrine/inflector": "^1.0",
