@@ -21,7 +21,7 @@ use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValue;
 use ActiveCollab\DateValue\DateValueInterface;
 use DateTime;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 use InvalidArgumentException;
 use LogicException;
 use Psr\Log\LoggerInterface;
@@ -801,7 +801,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      */
     private function getAttributeSetter($attribute)
     {
-        return 'set' . Inflector::classify($attribute);
+        return sprintf('set%s', InflectorFactory::create()->build()->classify($attribute));
     }
 
     /**

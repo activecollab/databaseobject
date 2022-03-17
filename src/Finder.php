@@ -14,43 +14,22 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
-use Doctrine\Common\Inflector\Inflector;
-use InvalidArgumentException;
+use Doctrine\Inflector\InflectorFactory;
 use Psr\Log\LoggerInterface;
 
 class Finder implements FinderInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    private $connection;
-    private $pool;
-    private $logger;
-    private $type;
-
-    /**
-     * @var string[]
-     */
-    private $where = [];
-
-    /**
-     * @var string
-     */
-    private $order_by;
-
-    /**
-     * @var int|null
-     */
-    private $offset;
-
-    /**
-     * @var int|null
-     */
-    private $limit;
-
-    /**
-     * @var string
-     */
-    private $join;
+    private ConnectionInterface $connection;
+    private PoolInterface $pool;
+    private LoggerInterface $logger;
+    private string $type;
+    private array $where = [];
+    private string $order_by;
+    private ?int $offset = null;
+    private ?int $limit = null;
+    private ?string $join = null;
 
     public function __construct(
         ConnectionInterface $connection,
@@ -167,7 +146,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
             $type = substr($this->getType(), $pos + 1);
         }
 
-        return Inflector::tableize($type) . '_id';
+        return sprintf('%s_id', InflectorFactory::create()->build()->tableize($type));
     }
 
     // ---------------------------------------------------
@@ -178,7 +157,10 @@ class Finder implements FinderInterface, ContainerAccessInterface
     {
         $table_name = $this->getEscapedTableName();
 
-        $sql = "SELECT COUNT($table_name.`id`) AS 'row_count' FROM $table_name";
+        $sql = sprintf("SELECT COUNT(%s.`id`) AS 'row_count' FROM %s",
+            $table_name,
+            $table_name
+        );
 
         if ($this->join) {
             $sql .= " $this->join";
@@ -286,7 +268,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     //  Utilities
     // ---------------------------------------------------
 
-    private $load_by_type_field;
+    private ?bool $load_by_type_field = null;
 
     private function loadByTypeField(): bool
     {
@@ -320,7 +302,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $result;
     }
 
-    private $escaped_table_name;
+    private ?string $escaped_table_name = null;
 
     private function getEscapedTableName(): string
     {

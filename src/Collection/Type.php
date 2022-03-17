@@ -11,7 +11,7 @@ namespace ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Collection;
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
-use Doctrine\Common\Inflector\Inflector;
+use Doctrine\Inflector\InflectorFactory;
 use InvalidArgumentException;
 use LogicException;
 
@@ -457,10 +457,18 @@ abstract class Type extends Collection
             } else {
                 $registered_type = $this->getRegisteredType();
 
+                $inflector = InflectorFactory::create()->build();
+
                 if (($pos = strrpos($registered_type, '\\')) !== false) {
-                    $this->target_join_field = Inflector::singularize(Inflector::tableize(substr($registered_type, $pos + 1))) . '_id';
+                    $this->target_join_field = sprintf(
+                        '%s_id',
+                        $inflector->singularize($inflector->tableize(substr($registered_type, $pos + 1)))
+                    );
                 } else {
-                    $this->target_join_field = Inflector::singularize(Inflector::tableize($registered_type)) . '_id';
+                    $this->target_join_field = sprintf(
+                        '%s_id',
+                        $inflector->singularize($inflector->tableize($registered_type))
+                    );
                 }
             }
         }
