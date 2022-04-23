@@ -276,19 +276,12 @@ abstract class Type extends Collection
         }
     }
 
-    /**
-     * Return model table name.
-     *
-     * @var string
-     */
-    private $table_name;
+    private ?string $table_name = null;
 
     /**
      * Return model table name.
-     *
-     * @return mixed
      */
-    public function getTableName()
+    public function getTableName(): string
     {
         if (empty($this->table_name)) {
             $this->table_name = $this->pool->getTypeTable($this->getRegisteredType());

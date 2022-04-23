@@ -225,11 +225,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     {
         return $this->primary_key;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTableName()
+    
+    public function getTableName(): string
     {
         return $this->table_name;
     }

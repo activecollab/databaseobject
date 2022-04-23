@@ -75,10 +75,8 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Return value of table name.
-     *
-     * @return string
      */
-    public function getTableName();
+    public function getTableName(): string;
 
     // ---------------------------------------------------
     //  Flags
