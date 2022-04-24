@@ -52,7 +52,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
 
     public function getSelectSql(): string
     {
-        return $this->getSelectFieldsSql($this->pool->getEscapedTypeFields($this->type));
+        return $this->getSelectFieldsSql($this->pool->getTypeFieldsReadStatement($this->type));
     }
 
     public function getSelectIdsSql(): string
@@ -279,9 +279,13 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->load_by_type_field;
     }
 
-    private function getSelectFieldsSql(string $escaped_field_names): string
+    private function getSelectFieldsSql(string $fields_read_statement): string
     {
-        $result = "SELECT $escaped_field_names FROM " . $this->getEscapedTableName();
+        $result = sprintf(
+            'SELECT %s FROM %s',
+            $fields_read_statement,
+            $this->getEscapedTableName()
+        );
 
         if ($this->join) {
             $result .= " $this->join";

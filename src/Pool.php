@@ -300,7 +300,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      *
      * @param array|string|null $conditions
      */
-    public function count(string $type, $conditions = null): int
+    public function count(string $type, mixed $conditions = null): int
     {
         $this->requireRegisteredType($type);
 
@@ -359,10 +359,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return Finder::class;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function findBySql(string $type, string $sql, ...$arguments)
+    public function findBySql(string $type, string $sql, mixed ...$arguments): mixed
     {
         if (empty($type)) {
             throw new InvalidArgumentException('Type is required');

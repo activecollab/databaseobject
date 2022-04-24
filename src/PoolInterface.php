@@ -36,11 +36,9 @@ interface PoolInterface
     /**
      * Return number of records of the given type that match the given conditions.
      *
-     * @param  string            $type
      * @param  array|string|null $conditions
-     * @return int
      */
-    public function count(string $type, $conditions = null): int;
+    public function count(string $type, mixed $conditions = null): int;
 
     /**
      * Return true if object of the given type with the given ID exists.
@@ -62,13 +60,9 @@ interface PoolInterface
     /**
      * Return result by a prepared SQL statement.
      *
-     * @param  string                                 $type
-     * @param  string                                 $sql
-     * @param  mixed                                  $arguments
      * @return ResultInterface|EntityInterface[]|null
      */
-    public function findBySql(string $type, string $sql, ...$arguments);
-
+    public function findBySql(string $type, string $sql, mixed ...$arguments): mixed;
     public function getTypeTable(string $type, bool $escaped = false): string;
 
     /**
