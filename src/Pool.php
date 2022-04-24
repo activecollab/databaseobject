@@ -27,13 +27,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    protected $connection;
-    protected $logger;
+    protected ConnectionInterface $connection;
+    protected LoggerInterface $logger;
 
     /**
      * @var EntityInterface[]
      */
-    private $objects_pool = [];
+    private array $objects_pool = [];
 
     public function __construct(ConnectionInterface $connection, LoggerInterface $logger)
     {
@@ -45,17 +45,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
-        $object = $this->getProducerForRegisteredType($registered_type)->produce($type, $attributes, $save);
+        $object = $this
+            ->getProducerForRegisteredType($registered_type)
+                ->produce($type, $attributes, $save);
 
-        if ($object instanceof EntityInterface) {
-            if ($object->isLoaded()) {
-                $this->objects_pool[$registered_type][$object->getId()] = $object;
-            }
-
-            return $object;
-        } else {
-            throw new RuntimeException("Failed to produce an instance of '$type'");
+        if ($object->isLoaded()) {
+            $this->objects_pool[$registered_type][$object->getId()] = $object;
         }
+
+        return $object;
     }
 
     public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
@@ -66,11 +64,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
         $registered_type = $this->requireRegisteredType(get_class($instance));
 
-        $instance = $this->getProducerForRegisteredType($registered_type)->modify($instance, $attributes, $save);
+        $instance = $this
+            ->getProducerForRegisteredType($registered_type)
+                ->modify($instance, $attributes, $save);
 
-        if ($instance instanceof EntityInterface) {
-            $this->objects_pool[$registered_type][$instance->getId()] = $instance;
-        }
+        $this->objects_pool[$registered_type][$instance->getId()] = $instance;
 
         return $instance;
     }
@@ -93,7 +91,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
-    private $default_producer_class = Producer::class;
+    private string $default_producer_class = Producer::class;
 
     public function getDefaultProducerClass(): string
     {
@@ -116,10 +114,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this;
     }
 
-    /**
-     * @var ProducerInterface
-     */
-    private $default_producer;
+    private ?ProducerInterface $default_producer = null;
 
     public function getDefaultProducer(): ProducerInterface
     {
@@ -146,15 +141,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * @var ProducerInterface[]
      */
-    private $producers = [];
+    private array $producers = [];
 
     protected function getProducerForRegisteredType(string $registered_type): ProducerInterface
     {
         if (empty($this->producers[$registered_type])) {
             return $this->getDefaultProducer();
-        } else {
-            return $this->producers[$registered_type];
         }
+
+        return $this->producers[$registered_type];
     }
 
     public function registerProducer(string $type, ProducerInterface $producer): PoolInterface
@@ -199,36 +194,36 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
-        $id = (int) $id;
-
         if ($id < 1) {
             throw new InvalidArgumentException('ID is expected to be a number larger than 0');
         }
 
         if (isset($this->objects_pool[$registered_type][$id]) && $use_cache) {
             return $this->objects_pool[$registered_type][$id];
-        } else {
-            $type_fields = $this->getTypeFields($registered_type);
-
-            if ($row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id])) {
-                $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
-
-                /** @var object|EntityInterface $object */
-                $object = new $object_class($this->connection, $this, $this->logger);
-
-                if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
-                    $object->setContainer($this->getContainer());
-                }
-
-                $object->loadFromRow($row);
-
-                return $this->addToObjectPool($registered_type, $id, $object);
-            } else {
-                $object = null;
-
-                return $this->addToObjectPool($registered_type, $id, $object);
-            }
         }
+
+        $type_fields = $this->getTypeFields($registered_type);
+
+        $row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id]);
+
+        if (empty($row)) {
+            $object = null;
+
+            return $this->addToObjectPool($registered_type, $id, $object);
+        }
+
+        $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
+
+        /** @var object|EntityInterface $object */
+        $object = new $object_class($this->connection, $this, $this->logger);
+
+        if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
+            $object->setContainer($this->getContainer());
+        }
+
+        $object->loadFromRow($row);
+
+        return $this->addToObjectPool($registered_type, $id, $object);
     }
 
     public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface
@@ -251,8 +246,6 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     {
         $this->requireRegisteredType($type);
 
-        $id = (int) $id;
-
         if ($id < 1) {
             throw new InvalidArgumentException('ID is expected to be a number larger than 0');
         }
@@ -260,15 +253,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return isset($this->objects_pool[$type][$id]);
     }
 
-    /**
-     * Add object to the object pool.
-     *
-     * @param  string               $registered_type
-     * @param  int                  $id
-     * @param  EntityInterface|null $value_to_store
-     * @return EntityInterface
-     */
-    private function &addToObjectPool($registered_type, $id, &$value_to_store)
+    private function &addToObjectPool(
+        string $registered_type,
+        int $id,
+        ?EntityInterface $value_to_store
+    ): ?EntityInterface
     {
         if (empty($this->objects_pool[$registered_type])) {
             $this->objects_pool[$registered_type] = [];
@@ -281,11 +270,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     public function remember(EntityInterface $object): void
     {
-        if ($object->isLoaded()) {
-            $this->addToObjectPool($this->requireRegisteredType(get_class($object)), $object->getId(), $object);
-        } else {
+        if (!$object->isLoaded()) {
             throw new InvalidArgumentException('Object needs to be saved in the database to be remembered');
         }
+
+        $this->addToObjectPool(
+            $this->requireRegisteredType(get_class($object)),
+            $object->getId(),
+            $object
+        );
     }
     public function forget(string $type, int ...$ids_to_forget): void
     {
@@ -305,19 +298,26 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     /**
      * Return number of records of the given type that match the given conditions.
      *
-     * @param  string            $type
-     * @param  array|string|null $conditions
-     * @return int
+     * @param array|string|null $conditions
      */
     public function count(string $type, $conditions = null): int
     {
         $this->requireRegisteredType($type);
 
-        if ($conditions = $this->connection->prepareConditions($conditions)) {
-            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true) . " WHERE $conditions");
-        } else {
-            return $this->connection->executeFirstCell('SELECT COUNT(`id`) AS "row_count" FROM ' . $this->getTypeTable($type, true));
+        $conditions = $this->connection->prepareConditions($conditions);
+
+        if ($conditions) {
+            return $this->connection->executeFirstCell(
+                sprintf('SELECT COUNT(`id`) AS "row_count" FROM %s WHERE %s',
+                    $this->getTypeTable($type, true),
+                    $conditions
+                )
+            );
         }
+
+        return $this->connection->executeFirstCell(
+            sprintf('SELECT COUNT(`id`) AS "row_count" FROM %s', $this->getTypeTable($type, true))
+        );
     }
 
     /**
@@ -383,15 +383,35 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
 
         if ($this->hasContainer()) {
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->logger], $this->getContainer());
-        } else {
-            return $this->connection->advancedExecute($sql, $arguments, ConnectionInterface::LOAD_ALL_ROWS, $return_by, $return_by_value, [&$this->connection, &$this, &$this->logger]);
+            return $this->connection->advancedExecute(
+                $sql,
+                $arguments,
+                ConnectionInterface::LOAD_ALL_ROWS,
+                $return_by,
+                $return_by_value,
+                [
+                    &$this->connection,
+                    &$this,
+                    &$this->logger,
+                ],
+                $this->getContainer()
+            );
         }
+
+        return $this->connection->advancedExecute(
+            $sql,
+            $arguments,
+            ConnectionInterface::LOAD_ALL_ROWS,
+            $return_by,
+            $return_by_value,
+            [
+                &$this->connection,
+                &$this,
+                &$this->logger,
+            ]
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function getTypeTable(string $type, bool $escaped = false): string
     {
         $registered_type = $this->requireRegisteredType($type);
@@ -417,15 +437,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->types[$this->requireRegisteredType($type)]['generated_fields'];
     }
 
-    /**
-     * Get a particular type property, and make it (using $callback) if it is not set already.
-     *
-     * @param  string   $type
-     * @param  string   $property
-     * @param  callable $callback
-     * @return mixed
-     */
-    public function getTypeProperty(string $type, string $property, callable $callback)
+    public function getTypeProperty(string $type, string $property, callable $callback): mixed
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -438,14 +450,15 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     /**
      * Return select by ID-s query for the given type.
-     *
-     * @param  string $type
-     * @return string
      */
-    private function getSelectOneByType($type)
+    private function getSelectOneByType(string $type): string
     {
         if (empty($this->types[$type]['sql_select_by_ids'])) {
-            $this->types[$type]['sql_select_by_ids'] = 'SELECT ' . $this->getEscapedTypeFields($type) . ' FROM ' . $this->getTypeTable($type, true) . ' WHERE `id` IN ? ORDER BY `id`';
+            $this->types[$type]['sql_select_by_ids'] = sprintf(
+                'SELECT %s FROM %s WHERE `id` IN ? ORDER BY `id`',
+                $this->getEscapedTypeFields($type),
+                $this->getTypeTable($type, true)
+            );
         }
 
         return $this->types[$type]['sql_select_by_ids'];
@@ -453,21 +466,48 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     public function getEscapedTypeFields(string $type): string
     {
-        return $this->getTypeProperty($type, 'escaped_fields', function () use ($type) {
-            $table_name = $this->getTypeTable($type, true);
+        return $this->getTypeProperty(
+            $type,
+            'escaped_fields',
+            function () use ($type) {
+                $table_name = $this->getTypeTable($type, true);
 
-            $escaped_field_names = [];
+                $escaped_field_names = [];
 
-            foreach ($this->getTypeFields($type) as $field_name) {
-                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                foreach ($this->getTypeFields($type) as $field_name) {
+                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                }
+
+                foreach ($this->getGeneratedTypeFields($type) as $field_name) {
+                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                }
+
+                return implode(',', $escaped_field_names);
             }
+        );
+    }
 
-            foreach ($this->getGeneratedTypeFields($type) as $field_name) {
-                $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+    public function getTypeFieldsReadStatement(string $type): string
+    {
+        return $this->getTypeProperty(
+            $type,
+            'escaped_fields',
+            function () use ($type) {
+                $table_name = $this->getTypeTable($type, true);
+
+                $escaped_field_names = [];
+
+                foreach ($this->getTypeFields($type) as $field_name) {
+                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                }
+
+                foreach ($this->getGeneratedTypeFields($type) as $field_name) {
+                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                }
+
+                return implode(',', $escaped_field_names);
             }
-
-            return implode(',', $escaped_field_names);
-        });
+        );
     }
 
     public function getTypeOrderBy(string $type): array
@@ -477,23 +517,30 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     public function getEscapedTypeOrderBy(string $type): string
     {
-        return $this->getTypeProperty($type, 'escaped_order_by', function () use ($type) {
-            $table_name = $this->getTypeTable($type, true);
+        return $this->getTypeProperty(
+            $type,
+            'escaped_order_by',
+            function () use ($type) {
+                $table_name = $this->getTypeTable($type, true);
 
-            return implode(',', array_map(function ($field_name) use ($table_name) {
-                if (substr($field_name, 0, 1) == '!') {
-                    return $table_name . '.' . $this->connection->escapeFieldName(substr($field_name, 1)) . ' DESC';
-                } else {
-                    return $table_name . '.' . $this->connection->escapeFieldName($field_name);
-                }
-            }, $this->getTypeOrderBy($type)));
-        });
+                return implode(
+                    ',',
+                    array_map(
+                        function ($field_name) use ($table_name) {
+                            if (str_starts_with($field_name, '!')) {
+                                return $table_name . '.' . $this->connection->escapeFieldName(substr($field_name, 1)) . ' DESC';
+                            }
+
+                            return $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                        },
+                        $this->getTypeOrderBy($type)
+                    )
+                );
+            }
+        );
     }
 
-    /**
-     * @var array
-     */
-    private $types = [];
+    private array $types = [];
 
     public function getRegisteredTypes(): array
     {
@@ -502,16 +549,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     /**
      * Cached type to registered type map.
-     *
-     * @var array
      */
-    private $known_types = [];
+    private array $known_types = [];
 
     /**
      * Return registered type for the given $type. This function is subclassing aware.
-     *
-     * @param  string      $type
-     * @return string|null
      */
     public function getRegisteredType(string $type): ?string
     {
@@ -545,11 +587,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     public function requireRegisteredType(string $type): string
     {
-        if ($registered_type = $this->getRegisteredType($type)) {
-            return $registered_type;
-        } else {
+        $registered_type = $this->getRegisteredType($type);
+
+        if (empty($registered_type)) {
             throw new InvalidArgumentException("Type '$type' is not registered");
         }
+
+        return $registered_type;
     }
 
     public function isTypeRegistered(string $type): bool
@@ -557,19 +601,13 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return (bool) $this->getRegisteredType($type);
     }
 
-    /**
-     * @var string|null
-     */
-    private $polymorph_type_interface;
+    private ?string $polymorph_type_interface = null;
 
     public function getPolymorphTypeInterface(): ?string
     {
         return $this->polymorph_type_interface;
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &setPolymorphTypeInterface(?string $value): PoolInterface
     {
         $this->polymorph_type_interface = $value;
@@ -577,16 +615,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this;
     }
 
-    /**
-     * @var array
-     */
-    private $polymorph_types = [];
+    private array $polymorph_types = [];
 
     /**
      * Return true if $type is polymorph (has type column that is used to figure out a class of individual record).
-     *
-     * @param  string $type
-     * @return bool
      */
     public function isTypePolymorph(string $type): bool
     {
@@ -613,42 +645,42 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         foreach ($types as $type) {
             $type = ltrim($type, '\\');
 
-            if (class_exists($type, true)) {
-                $reflection = new ReflectionClass($type);
-
-                if ($reflection->implementsInterface(EntityInterface::class)) {
-                    $default_properties = $reflection->getDefaultProperties();
-
-                    if (empty($default_properties['order_by'])) {
-                        $default_properties['order_by'] = '';
-                    }
-
-                    $this->types[$type] = [
-                        'table_name' => $default_properties['table_name'],
-                        'fields' => $default_properties['entity_fields'],
-                        'generated_fields' => $default_properties['generated_entity_fields'],
-                        'order_by' => $default_properties['order_by'],
-                    ];
-                } else {
-                    throw new InvalidArgumentException("Type '$type' does not implement '" . EntityInterface::class . "' interface");
-                }
-            } else {
-                throw new InvalidArgumentException("Type '$type' is not defined");
+            if (!class_exists($type, true)) {
+                throw new InvalidArgumentException(sprintf("Type '%s' is not defined.", $type));
             }
+
+            $reflection = new ReflectionClass($type);
+
+            if (!$reflection->implementsInterface(EntityInterface::class)) {
+                throw new InvalidArgumentException(
+                    sprintf(
+                        "Type '%s' does not implement '%s' interface.",
+                        $type,
+                        EntityInterface::class
+                    )
+                );
+            }
+
+            $default_properties = $reflection->getDefaultProperties();
+
+            if (empty($default_properties['order_by'])) {
+                $default_properties['order_by'] = '';
+            }
+
+            $this->types[$type] = [
+                'table_name' => $default_properties['table_name'],
+                'fields' => $default_properties['entity_fields'],
+                'generated_fields' => $default_properties['generated_entity_fields'],
+                'order_by' => $default_properties['order_by'],
+            ];
         }
 
         return $this;
     }
 
-    /**
-     * @var TraitsResolverInterface
-     */
-    private $traits_resolver;
+    private ?TraitsResolverInterface $traits_resolver = null;
 
-    /**
-     * @return TraitsResolverInterface
-     */
-    private function &getTraitsResolver()
+    private function getTraitsResolver(): TraitsResolverInterface
     {
         if (empty($this->traits_resolver)) {
             $this->traits_resolver = new TraitsResolver();
@@ -661,10 +693,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
      * Return trait names by object.
      *
      * Note: $type does not need to be directly registered, because we need to support subclasses, which call can have
-     * different traits impelemnted!
-     *
-     * @param  string $type
-     * @return array
+     * different traits implemented!
      */
     public function getTraitNamesByType(string $type): array
     {

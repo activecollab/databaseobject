@@ -6,11 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Base;
 
-use ActiveCollab\DatabaseConnection\Connection;
 use ActiveCollab\DatabaseConnection\Connection\MysqliConnection;
+use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseObject\Pool;
+use ActiveCollab\DatabaseObject\PoolInterface;
 use Monolog\Handler\TestHandler;
 use Monolog\Logger;
 use mysqli;
@@ -19,30 +22,12 @@ use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase as BaseTestCase;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Base
- */
 abstract class TestCase extends BaseTestCase
 {
-    /**
-     * @var mysqli
-     */
-    protected $link;
-
-    /**
-     * @var Connection
-     */
-    protected $connection;
-
-    /**
-     * @var Pool
-     */
-    protected $pool;
-
-    /**
-     * @var LoggerInterface
-     */
-    protected $logger;
+    protected mysqli $link;
+    protected ConnectionInterface $connection;
+    protected PoolInterface $pool;
+    protected LoggerInterface $logger;
 
     public function setUp(): void
     {
@@ -69,13 +54,8 @@ abstract class TestCase extends BaseTestCase
         $this->logger->pushHandler(new TestHandler());
     }
 
-    /**
-     * Tear down test environment.
-     */
     public function tearDown(): void
     {
-        $this->connection = null;
-        $this->pool = null;
         $this->link->close();
 
         parent::tearDown();

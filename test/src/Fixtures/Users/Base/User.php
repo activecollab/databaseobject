@@ -18,24 +18,25 @@ abstract class User extends Entity
 {
     /**
      * Name of the table where records are stored.
-     *
-     * @var string
      */
-    protected $table_name = 'users';
+    protected string $table_name = 'users';
 
     /**
      * All table fields.
      *
      * @var array
      */
-    protected $entity_fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
+    protected array $entity_fields = ['id', 'type', 'first_name', 'last_name', 'email', 'homepage_url', 'password'];
+
+    /**
+     * Table fields prepared for SELECT SQL query.
+     */
+    protected array $sql_read_statements = ['`id`', '`type`', '`first_name`', '`last_name`', '`email`', '`homepage_url`', '`password`'];
 
     /**
      * List of default field values.
-     *
-     * @var array
      */
-    protected $default_entity_field_values = [
+    protected array $default_entity_field_values = [
         'type' => 'ActiveCollab\DatabaseObject\Test\Fixtures\Users\User',
         'first_name' => '',
         'last_name' => '',

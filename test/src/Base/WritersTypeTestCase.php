@@ -11,14 +11,8 @@ namespace ActiveCollab\DatabaseObject\Test\Base;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateValue;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Base
- */
 abstract class WritersTypeTestCase extends TestCase
 {
-    /**
-     * Set up test environment.
-     */
     public function setUp(): void
     {
         parent::setUp();
@@ -53,9 +47,6 @@ abstract class WritersTypeTestCase extends TestCase
         $this->assertTrue($this->pool->isTypeRegistered(Writer::class));
     }
 
-    /**
-     * Tear down test environment.
-     */
     public function tearDown(): void
     {
         if ($this->connection->tableExists('writers')) {

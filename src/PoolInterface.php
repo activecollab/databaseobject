@@ -82,14 +82,10 @@ interface PoolInterface
 
     /**
      * Get a particular type property, and make it (using $callback) if it is not set already.
-     *
-     * @param  string   $type
-     * @param  string   $property
-     * @param  callable $callback
-     * @return mixed
      */
-    public function getTypeProperty(string $type, string $property, callable $callback);
+    public function getTypeProperty(string $type, string $property, callable $callback): mixed;
     public function getEscapedTypeFields(string $type): string;
+    public function getTypeFieldsReadStatement(string $type): string;
     public function getTypeOrderBy(string $type): array;
     public function getEscapedTypeOrderBy(string $type): string;
     public function getRegisteredTypes(): array;

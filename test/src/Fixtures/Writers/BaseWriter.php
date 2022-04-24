@@ -20,36 +20,39 @@ abstract class BaseWriter extends Entity implements EntityInterface
 {
     /**
      * Name of the table where records are stored.
-     *
-     * @var string
      */
-    protected $table_name = 'writers';
+    protected string $table_name = 'writers';
 
     /**
      * All table fields.
      *
      * @var array
      */
-    protected $entity_fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
+    protected array $entity_fields = ['id', 'name', 'birthday', 'created_at', 'updated_at'];
+
+    /**
+     * Table fields prepared for SELECT SQL query.
+     */
+    protected array $sql_read_statements = ['`id`', '`name`', '`birthday`', '`created_at`', '`updated_at`'];
 
     /**
      * List of default field values.
      *
      * @var array
      */
-    protected $default_entity_field_values = ['name' => 'Unknown Writer'];
+    protected array $default_entity_field_values = ['name' => 'Unknown Writer'];
 
     /**
      * Name of AI field (if any).
      *
      * @var string
      */
-    protected $auto_increment = 'id';
+    protected string $auto_increment = 'id';
 
     /**
      * @var string[]
      */
-    protected $order_by = ['!id'];
+    protected array $order_by = ['!id'];
 
     /**
      * Return value of name field.

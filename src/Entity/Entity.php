@@ -12,7 +12,6 @@ use ActiveCollab\ContainerAccess\ContainerAccessInterface;
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation as ContainerAccessInterfaceImplementation;
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
-use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\PoolInterface;
 use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
@@ -36,48 +35,43 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Name of the table.
-     *
-     * @var string
      */
-    protected $table_name;
+    protected string $table_name = '';
 
     /**
      * Primary key fields.
-     *
-     * @var array
      */
-    protected $primary_key = 'id';
+    protected string $primary_key = 'id';
 
     /**
      * Name of autoincrement field (if exists).
-     *
-     * @var string
      */
-    protected $auto_increment = 'id';
+    protected string $auto_increment = 'id';
 
     /**
      * @var string[]
      */
-    protected $order_by = ['id'];
+    protected array $order_by = ['id'];
 
     /**
      * Table fields that are managed by this entity.
      */
-    protected $entity_fields = [];
+    protected array $entity_fields = [];
+
+    /**
+     * Table fields prepared for SELECT SQL query.
+     */
+    protected array $sql_read_statements = [];
 
     /**
      * Generated fields that are loaded, but not managed by the entity.
-     *
-     * @var array
      */
-    protected $generated_entity_fields = [];
+    protected array $generated_entity_fields = [];
 
     /**
      * List of default field values.
-     *
-     * @var array
      */
-    protected $default_entity_field_values = [];
+    protected array $default_entity_field_values = [];
 
     public function __construct(
         protected ConnectionInterface $connection,
@@ -218,14 +212,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getPrimaryKey()
+    public function getPrimaryKey(): string
     {
         return $this->primary_key;
     }
-    
+
     public function getTableName(): string
     {
         return $this->table_name;
@@ -240,8 +231,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      *
      * If $cache_row is set to true row data will be added to cache
      *
-     * @param  array                    $row
-     * @throws InvalidArgumentException
+     * @param array $row
      */
     public function loadFromRow(array $row)
     {
@@ -284,7 +274,6 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * Save object into database (insert or update).
      *
      * @return $this
-     * @throws ValidationException
      */
     public function &save()
     {
@@ -725,10 +714,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * runs fine - modifications are saved, in case of primary key old value
      * will be remembered in case we need to update the row and so on
      *
-     * @param  string                   $field
-     * @param  mixed                    $value
+     * @param  string $field
+     * @param  mixed  $value
      * @return $this
-     * @throws InvalidArgumentException
      */
     public function &setFieldValue($field, $value)
     {

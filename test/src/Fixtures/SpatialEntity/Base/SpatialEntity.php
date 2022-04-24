@@ -6,41 +6,46 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
-namespace ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\Base;
+declare(strict_types=1);
+
+namespace ActiveCollab\DatabaseObject\Test\Fixtures\SpatialEntity\Base;
 
 use ActiveCollab\DatabaseConnection\Record\ValueCaster;
 use ActiveCollab\DatabaseConnection\Record\ValueCasterInterface;
 use ActiveCollab\DatabaseObject\Entity\Entity;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots\Base
- */
-abstract class StatsSnapshot extends Entity
+abstract class SpatialEntity extends Entity
 {
     /**
      * Name of the table where records are stored.
      */
-    protected string $table_name = 'stats_snapshots';
+    protected string $table_name = 'spatial_entities';
 
     /**
      * Table fields that are managed by this entity.
-     *
-     * @var array
      */
-    protected array $entity_fields = ['id', 'account_id', 'day', 'stats'];
+    protected array $entity_fields = [
+        'id',
+        'name',
+        'polygon',
+    ];
 
     /**
      * Table fields prepared for SELECT SQL query.
      */
-    protected array $sql_read_statements = ['`id`', '`account_id`', '`day`', '`stats`'];
+    protected array $sql_read_statements = [
+        '`id`',
+        '`name`',
+        'ST_GEOMFROMTEXT(`polygon`) AS \'polygon\'',
+    ];
 
     /**
      * Generated fields that are loaded, but not managed by the entity.
      *
      * @var array
      */
-    protected array $generated_entity_fields = ['is_used_on_day', 'plan_name', 'number_of_users'];
+    protected array $generated_entity_fields = [];
 
     /**
      * List of default field values.
@@ -48,40 +53,24 @@ abstract class StatsSnapshot extends Entity
     protected array $default_entity_field_values = [];
 
     /**
-     * {@inheritdoc}
+     * Return value of name field.
+     *
+     * @return string
      */
-    protected function configure()
+    public function getName()
     {
-        $this->setGeneratedFieldsValueCaster(
-            new ValueCaster(
-                [
-                    'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
-                    'plan_name' => ValueCasterInterface::CAST_STRING,
-                    'number_of_users' => ValueCasterInterface::CAST_INT,
-                ]
-            )
-        );
+        return $this->getFieldValue('name');
     }
 
     /**
-     * Return value of account_id field.
+     * Set value of name field.
      *
-     * @return int
-     */
-    public function getAccountId()
-    {
-        return $this->getFieldValue('account_id');
-    }
-
-    /**
-     * Set value of account_id field.
-     *
-     * @param  int   $value
+     * @param  string $value
      * @return $this
      */
-    public function &setAccountId($value)
+    public function &setName($value)
     {
-        $this->setFieldValue('account_id', $value);
+        $this->setFieldValue('name', $value);
 
         return $this;
     }
@@ -202,8 +191,8 @@ abstract class StatsSnapshot extends Entity
         } else {
             switch ($name) {
                 case 'id':
-                case 'account_id':
-                    return parent::setFieldValue($name, (int) $value);
+                case 'name':
+                    return parent::setFieldValue($name, (string) $value);
                 case 'day':
                     return parent::setFieldValue($name, $this->getDateTimeValueInstanceFrom($value));
                 case 'stats':
