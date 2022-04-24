@@ -117,6 +117,10 @@ class GeneratedFieldsTest extends TestCase
         $escaped_type_fields = $this->pool->getEscapedTypeFields(StatsSnapshot::class);
         $this->assertIsString($escaped_type_fields);
         $this->assertStringContainsString('is_used_on_day', $escaped_type_fields);
+
+        $type_fields_read_statement = $this->pool->getTypeFieldsReadStatement(StatsSnapshot::class);
+        $this->assertIsString($type_fields_read_statement);
+        $this->assertStringContainsString('is_used_on_day', $type_fields_read_statement);
     }
 
     public function testGeneratedFieldsAreHydrated()

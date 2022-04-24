@@ -437,6 +437,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $this->types[$this->requireRegisteredType($type)]['generated_fields'];
     }
 
+    public function getTypeSqlReadStatements(string $type): array
+    {
+        return $this->types[$this->requireRegisteredType($type)]['sql_read_statements'];
+    }
     public function getTypeProperty(string $type, string $property, callable $callback): mixed
     {
         $registered_type = $this->requireRegisteredType($type);
@@ -456,7 +460,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         if (empty($this->types[$type]['sql_select_by_ids'])) {
             $this->types[$type]['sql_select_by_ids'] = sprintf(
                 'SELECT %s FROM %s WHERE `id` IN ? ORDER BY `id`',
-                $this->getEscapedTypeFields($type),
+                $this->getTypeFieldsReadStatement($type),
                 $this->getTypeTable($type, true)
             );
         }
@@ -491,21 +495,21 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     {
         return $this->getTypeProperty(
             $type,
-            'escaped_fields',
+            'field_read_statements',
             function () use ($type) {
                 $table_name = $this->getTypeTable($type, true);
 
-                $escaped_field_names = [];
+                $field_read_statements = [];
 
-                foreach ($this->getTypeFields($type) as $field_name) {
-                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                foreach ($this->getTypeSqlReadStatements($type) as $sql_read_statement) {
+                    $field_read_statements[] = $sql_read_statement;
                 }
 
                 foreach ($this->getGeneratedTypeFields($type) as $field_name) {
-                    $escaped_field_names[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
+                    $field_read_statements[] = $table_name . '.' . $this->connection->escapeFieldName($field_name);
                 }
 
-                return implode(',', $escaped_field_names);
+                return implode(',', $field_read_statements);
             }
         );
     }
@@ -671,6 +675,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                 'table_name' => $default_properties['table_name'],
                 'fields' => $default_properties['entity_fields'],
                 'generated_fields' => $default_properties['generated_entity_fields'],
+                'sql_read_statements' => $default_properties['sql_read_statements'],
                 'order_by' => $default_properties['order_by'],
             ];
         }
