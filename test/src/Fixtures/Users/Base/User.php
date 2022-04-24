@@ -31,7 +31,15 @@ abstract class User extends Entity
     /**
      * Table fields prepared for SELECT SQL query.
      */
-    protected array $sql_read_statements = ['`id`', '`type`', '`first_name`', '`last_name`', '`email`', '`homepage_url`', '`password`'];
+    protected array $sql_read_statements = [
+        '`users`.`id`',
+        '`users`.`type`',
+        '`users`.`first_name`',
+        '`users`.`last_name`',
+        '`users`.`email`',
+        '`users`.`homepage_url`',
+        '`users`.`password`',
+    ];
 
     /**
      * List of default field values.

@@ -35,9 +35,9 @@ abstract class SpatialEntity extends Entity
      * Table fields prepared for SELECT SQL query.
      */
     protected array $sql_read_statements = [
-        '`id`',
-        '`name`',
-        'ST_GEOMFROMTEXT(`polygon`) AS \'polygon\'',
+        '`spatial_entities`.`id`',
+        '`spatial_entities`.`name`',
+        'ST_GEOMFROMTEXT(`spatial_entities`.`polygon`) AS \'polygon\'',
     ];
 
     /**

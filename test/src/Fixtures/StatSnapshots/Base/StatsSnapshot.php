@@ -33,7 +33,12 @@ abstract class StatsSnapshot extends Entity
     /**
      * Table fields prepared for SELECT SQL query.
      */
-    protected array $sql_read_statements = ['`id`', '`account_id`', '`day`', '`stats`'];
+    protected array $sql_read_statements = [
+        '`stats_snapshots`.`id`',
+        '`stats_snapshots`.`account_id`',
+        '`stats_snapshots`.`day`',
+        '`stats_snapshots`.`stats`',
+    ];
 
     /**
      * Generated fields that are loaded, but not managed by the entity.

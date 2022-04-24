@@ -33,7 +33,13 @@ abstract class BaseWriter extends Entity implements EntityInterface
     /**
      * Table fields prepared for SELECT SQL query.
      */
-    protected array $sql_read_statements = ['`id`', '`name`', '`birthday`', '`created_at`', '`updated_at`'];
+    protected array $sql_read_statements = [
+        '`writers`.`id`',
+        '`writers`.`name`',
+        '`writers`.`birthday`',
+        '`writers`.`created_at`',
+        '`writers`.`updated_at`',
+    ];
 
     /**
      * List of default field values.
