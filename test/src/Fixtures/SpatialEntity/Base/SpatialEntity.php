@@ -181,9 +181,6 @@ abstract class SpatialEntity extends Entity
         }
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function &setFieldValue($name, $value)
     {
         if ($value === null) {

@@ -155,10 +155,9 @@ abstract class BaseWriter extends Entity implements EntityInterface
     /**
      * Set value of specific field.
      *
-     * @param  string                   $name
-     * @param  mixed                    $value
+     * @param  string $name
+     * @param  mixed  $value
      * @return mixed
-     * @throws InvalidArgumentException
      */
     public function &setFieldValue($name, $value)
     {

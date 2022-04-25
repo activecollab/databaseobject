@@ -191,10 +191,9 @@ abstract class User extends Entity
     /**
      * Set value of specific field.
      *
-     * @param  string                    $name
-     * @param  mixed                     $value
+     * @param  string $name
+     * @param  mixed  $value
      * @return $this
-     * @throws \InvalidArgumentException
      */
     public function &setFieldValue($name, $value)
     {
