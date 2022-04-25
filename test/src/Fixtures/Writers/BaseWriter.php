@@ -154,31 +154,27 @@ abstract class BaseWriter extends Entity implements EntityInterface
 
     /**
      * Set value of specific field.
-     *
-     * @param  string $name
-     * @param  mixed  $value
-     * @return mixed
      */
-    public function &setFieldValue($name, $value)
+    public function setFieldValue(string $field, mixed $value): static
     {
         if ($value === null) {
-            parent::setFieldValue($name, null);
+            parent::setFieldValue($field, null);
         } else {
-            switch ($name) {
+            switch ($field) {
                 case 'id':
-                    parent::setFieldValue($name, (int) $value);
+                    parent::setFieldValue($field, (int) $value);
                     break;
                 case 'name':
-                    parent::setFieldValue($name, (string) $value);
+                    parent::setFieldValue($field, (string) $value);
                     break;
                 case 'birthday':
-                    parent::setFieldValue($name, $this->getDateValueInstanceFrom($value));
+                    parent::setFieldValue($field, $this->getDateValueInstanceFrom($value));
                     break;
                 case 'created_at':
                 case 'updated_at':
-                    return parent::setFieldValue($name, $this->getDateTimeValueInstanceFrom($value));
+                    return parent::setFieldValue($field, $this->getDateTimeValueInstanceFrom($value));
                 default:
-                    throw new InvalidArgumentException("'$name' is not a known field");
+                    throw new InvalidArgumentException("'$field' is not a known field");
             }
         }
 

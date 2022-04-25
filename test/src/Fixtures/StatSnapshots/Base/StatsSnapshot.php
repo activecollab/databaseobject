@@ -197,27 +197,27 @@ abstract class StatsSnapshot extends Entity
         }
     }
 
-    public function &setFieldValue($name, $value)
+    public function setFieldValue(string $field, mixed $value): static
     {
         if ($value === null) {
-            parent::setFieldValue($name, null);
+            parent::setFieldValue($field, null);
         } else {
-            switch ($name) {
+            switch ($field) {
                 case 'id':
                 case 'account_id':
-                    return parent::setFieldValue($name, (int) $value);
+                    return parent::setFieldValue($field, (int) $value);
                 case 'day':
-                    return parent::setFieldValue($name, $this->getDateTimeValueInstanceFrom($value));
+                    return parent::setFieldValue($field, $this->getDateTimeValueInstanceFrom($value));
                 case 'stats':
-                    return parent::setFieldValue($name, $this->isLoading() ? $value : json_encode($value));
+                    return parent::setFieldValue($field, $this->isLoading() ? $value : json_encode($value));
                 default:
                     if ($this->isLoading()) {
-                        return parent::setFieldValue($name, $value);
+                        return parent::setFieldValue($field, $value);
                     } else {
-                        if ($this->isGeneratedField($name)) {
-                            throw new \LogicException("Generated field $name cannot be set by directly assigning a value");
+                        if ($this->isGeneratedField($field)) {
+                            throw new \LogicException("Generated field $field cannot be set by directly assigning a value");
                         } else {
-                            throw new \InvalidArgumentException("Field $name does not exist in this table");
+                            throw new \InvalidArgumentException("Field $field does not exist in this table");
                         }
                     }
             }

@@ -245,13 +245,8 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
      * Set value of the $field. This function will make sure that everything
      * runs fine - modifications are saved, in case of primary key old value
      * will be remembered in case we need to update the row and so on
-     *
-     * @param  string                   $field
-     * @param  mixed                    $value
-     * @return mixed
-     * @throws InvalidArgumentException
      */
-    public function &setFieldValue($field, $value);
+    public function setFieldValue(string $field, mixed $value): static;
 
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls.

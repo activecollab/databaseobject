@@ -713,12 +713,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * Set value of the $field. This function will make sure that everything
      * runs fine - modifications are saved, in case of primary key old value
      * will be remembered in case we need to update the row and so on
-     *
-     * @param  string $field
-     * @param  mixed  $value
-     * @return $this
      */
-    public function &setFieldValue($field, $value)
+    public function setFieldValue(string $field, mixed $value): static
     {
         if ($this->entityFieldExists($field)) {
             if ($field === 'id') {

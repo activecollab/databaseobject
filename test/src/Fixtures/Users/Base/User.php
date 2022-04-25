@@ -190,28 +190,24 @@ abstract class User extends Entity
 
     /**
      * Set value of specific field.
-     *
-     * @param  string $name
-     * @param  mixed  $value
-     * @return $this
      */
-    public function &setFieldValue($name, $value)
+    public function setFieldValue(string $field, mixed $value): static
     {
         if ($value === null) {
-            parent::setFieldValue($name, null);
+            parent::setFieldValue($field, null);
         } else {
-            switch ($name) {
+            switch ($field) {
                 case 'id':
-                    return parent::setFieldValue($name, (int) $value);
+                    return parent::setFieldValue($field, (int) $value);
                 case 'type':
                 case 'first_name':
                 case 'last_name':
                 case 'email':
                 case 'homepage_url':
                 case 'password':
-                    return parent::setFieldValue($name, (string) $value);
+                    return parent::setFieldValue($field, (string) $value);
                 default:
-                    throw new \InvalidArgumentException("Field $name does not exist in this table");
+                    throw new \InvalidArgumentException("Field $field does not exist in this table");
             }
         }
 
