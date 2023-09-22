@@ -202,8 +202,6 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             return $this->objects_pool[$registered_type][$id];
         }
 
-        $type_fields = $this->getTypeFields($registered_type);
-
         $row = $this->connection->executeFirstRow($this->getSelectOneByType($registered_type), [$id]);
 
         if (empty($row)) {
@@ -212,18 +210,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             return $this->addToObjectPool($registered_type, $id, $object);
         }
 
-        $object_class = in_array('type', $type_fields) ? $row['type'] : $type;
-
-        /** @var object|EntityInterface $object */
-        $object = new $object_class($this->connection, $this, $this->logger);
-
-        if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
-            $object->setContainer($this->getContainer());
-        }
-
-        $object->loadFromRow($row);
-
-        return $this->addToObjectPool($registered_type, $id, $object);
+        return $this->getObjectFromRow(
+            $type,
+            $registered_type,
+            $row,
+        );
     }
 
     public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface
@@ -235,6 +226,56 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         }
 
         return $result;
+    }
+
+    public function getFirstBy(string $type, string $where, mixed ...$arguments): ?EntityInterface
+    {
+        if (empty($where)) {
+            throw new LogicException('Conditions are required');
+        }
+
+        $registered_type = $this->requireRegisteredType($type);
+
+        $row = $this->connection->executeFirstRow(
+            sprintf(
+                'SELECT %s FROM %s WHERE %s LIMIT 0, 1',
+                $this->getTypeFieldsReadStatement($type),
+                $this->getTypeTable($type, true),
+                $this->connection->prepare($where, $arguments),
+            )
+        );
+
+        if (empty($row)) {
+            return null;
+        }
+
+        return $this->getObjectFromRow(
+            $type,
+            $registered_type,
+            $row,
+        );
+    }
+
+    private function getObjectFromRow(
+        string $type,
+        string $registered_type,
+        array $row,
+    ): EntityInterface
+    {
+        $object_class = in_array('type', $this->getTypeFields($registered_type))
+            ? $row['type']
+            : $type;
+
+        /** @var object|EntityInterface $object */
+        $object = new $object_class($this->connection, $this, $this->logger);
+
+        if ($object instanceof ContainerAccessInterface && $this->hasContainer()) {
+            $object->setContainer($this->getContainer());
+        }
+
+        $object->loadFromRow($row);
+
+        return $this->addToObjectPool($registered_type, $object->getId(), $object);
     }
 
     public function reload(string $type, int $id): ?EntityInterface
@@ -438,6 +479,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
     {
         return $this->types[$this->requireRegisteredType($type)]['sql_read_statements'];
     }
+
     public function getTypeProperty(string $type, string $property, callable $callback): mixed
     {
         $registered_type = $this->requireRegisteredType($type);

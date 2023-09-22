@@ -50,6 +50,13 @@ interface PoolInterface
      * @param  class-string<TClassName> $type
      * @return ?TClassName
      */
+    public function getFirstBy(string $type, string $where, mixed ...$arguments): ?EntityInterface;
+
+    /**
+     * @template TClassName
+     * @param  class-string<TClassName> $type
+     * @return ?TClassName
+     */
     public function reload(string $type, int $id): ?EntityInterface;
     public function isInPool(string $type, int $id): bool;
     public function remember(EntityInterface $object): void;

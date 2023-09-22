@@ -37,8 +37,17 @@ class ContainerPropagatesToObjectTest extends WritersTypeTestCase
      */
     public function testGetByIdInstantination()
     {
-        /** @var Writer $special_writer */
         $special_writer = $this->pool->getById(Writer::class, 1);
+
+        $this->assertInstanceOf(Writer::class, $special_writer);
+        $this->assertTrue($special_writer->hasContainer());
+        $this->assertTrue($special_writer->is_special);
+    }
+
+    public function testGetFirstByInstantination()
+    {
+        /** @var Writer $special_writer */
+        $special_writer = $this->pool->getFirstBy(Writer::class, '`name` = ?', 'Leo Tolstoy');
 
         $this->assertInstanceOf(Writer::class, $special_writer);
         $this->assertTrue($special_writer->hasContainer());
