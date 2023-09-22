@@ -15,6 +15,11 @@ use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 interface PoolInterface
 {
+    /**
+     * @template TClassName
+     * @param  class-string<TClassName> $type
+     * @return TClassName
+     */
     public function produce(string $type, array $attributes = null, $save = true): EntityInterface;
     public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface;
     public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface;
@@ -26,8 +31,25 @@ interface PoolInterface
     public function registerProducer(string $type, ProducerInterface $producer): PoolInterface;
     public function registerProducerByClass(string $type, string $producer_class): PoolInterface;
 
+    /**
+     * @template TClassName
+     * @param  class-string<TClassName> $type
+     * @return ?TClassName
+     */
     public function getById(string $type, int $id, bool $use_cache = true): ?EntityInterface;
+
+    /**
+     * @template TClassName
+     * @param  class-string<TClassName> $type
+     * @return TClassName
+     */
     public function mustGetById(string $type, int $id, bool $use_cache = true): EntityInterface;
+
+    /**
+     * @template TClassName
+     * @param  class-string<TClassName> $type
+     * @return ?TClassName
+     */
     public function reload(string $type, int $id): ?EntityInterface;
     public function isInPool(string $type, int $id): bool;
     public function remember(EntityInterface $object): void;
@@ -42,10 +64,6 @@ interface PoolInterface
 
     /**
      * Return true if object of the given type with the given ID exists.
-     *
-     * @param  string $type
-     * @param  int    $id
-     * @return bool
      */
     public function exists(string $type, int $id): bool;
 
