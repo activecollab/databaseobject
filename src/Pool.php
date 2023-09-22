@@ -41,7 +41,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         $this->logger = $logger;
     }
 
-    public function produce($type, array $attributes = null, $save = true): EntityInterface
+    public function produce(string $type, array $attributes = null, $save = true): EntityInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 

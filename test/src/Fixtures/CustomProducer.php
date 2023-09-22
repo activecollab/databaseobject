@@ -16,7 +16,7 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
 class CustomProducer extends Producer
 {
-    public function produce($type, array $attributes = null, $save = true): EntityInterface
+    public function produce(string $type, array $attributes = null, $save = true): EntityInterface
     {
         $object = parent::produce($type, $attributes, $save);
 

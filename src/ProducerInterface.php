@@ -14,7 +14,7 @@ use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 interface ProducerInterface
 {
-    public function produce($type, array $attributes = null, $save = true): EntityInterface;
+    public function produce(string $type, array $attributes = null, $save = true): EntityInterface;
     public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface;
     public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface;
 }
