@@ -374,7 +374,7 @@ class Validator implements ValidatorInterface
 
         return $this->connection->prepare(
             sprintf(
-                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE (%s) AND (`id` != ?)",
+                "SELECT COUNT(`id`) AS 'row_count' FROM %s WHERE `id` != ? AND (%s)",
                 $this->connection->escapeTableName($this->table_name),
                 implode(' AND ', $conditions)
             ),
