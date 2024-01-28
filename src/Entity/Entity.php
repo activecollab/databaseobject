@@ -95,7 +95,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Execute post-construction configuration.
      */
-    protected function configure()
+    protected function configure(): void
     {
     }
 
@@ -500,7 +500,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         return in_array($attribute, $this->modified_attributes);
     }
 
-    protected function recordModifiedAttribute($attribute)
+    protected function recordModifiedAttribute(string $attribute): void
     {
         if (!in_array($attribute, $this->modified_attributes)) {
             $this->modified_attributes[] = $attribute;
@@ -534,63 +534,37 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         return $this->entity_fields;
     }
 
-    /**
-     * @deprecated Use entityFieldExists() instead.
-     */
-    public function fieldExists($field)
-    {
-        return $this->entityFieldExists($field);
-    }
-
     public function entityFieldExists(string $entity_field): bool
     {
         return in_array($entity_field, $this->entity_fields) || in_array($entity_field, $this->generated_entity_fields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getGeneratedFields()
+    public function getGeneratedFields(): array
     {
         return $this->generated_entity_fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function generatedFieldExists($field)
+    public function generatedFieldExists(string $field): bool
     {
         return in_array($field, $this->generated_entity_fields);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function isGeneratedField($field)
+    public function isGeneratedField(string $field): bool
     {
         return $this->generatedFieldExists($field);
     }
 
-    /**
-     * @var ValueCasterInterface
-     */
-    private $generated_fields_value_caster;
+    private ?ValueCasterInterface $generated_fields_value_caster = null;
 
-    /**
-     * @return ValueCasterInterface
-     */
-    private function getGeneratedFieldsValueCaster()
+    private function getGeneratedFieldsValueCaster(): ?ValueCasterInterface
     {
         return $this->generated_fields_value_caster;
     }
 
     /**
      * Set generated fields value caster.
-     *
-     * @param  ValueCasterInterface|null $value_caster
-     * @return $this
      */
-    protected function &setGeneratedFieldsValueCaster(ValueCasterInterface $value_caster = null)
+    protected function setGeneratedFieldsValueCaster(ValueCasterInterface $value_caster = null): static
     {
         $this->generated_fields_value_caster = $value_caster;
 
@@ -611,23 +585,22 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Return old field values, before fields were updated.
-     *
-     * @return array
      */
-    public function getOldValues()
+    public function getOldValues(): array
     {
         return $this->old_values;
     }
 
     /**
-     * Return all field value.
-     *
-     * @param  string $field
-     * @return mixed
+     * Return old field value.
      */
-    public function getOldFieldValue($field)
+    public function getOldFieldValue(string $field): mixed
     {
-        return isset($this->old_values[$field]) ? $this->old_values[$field] : null;
+        if (array_key_exists($field, $this->old_values)) {
+            return $this->old_values[$field];
+        }
+
+        return null;
     }
 
     /**
@@ -689,33 +662,24 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Return a list of attributes that this object supports.
-     *
-     * @return array
      */
-    protected function getAttributes()
+    protected function getAttributes(): array
     {
         return [];
     }
 
     /**
      * Return setter method name for the given attribute.
-     *
-     * @param  string $attribute
-     * @return string
      */
-    private function getAttributeSetter($attribute)
+    private function getAttributeSetter(string $attribute): string
     {
         return sprintf('set%s', InflectorFactory::create()->build()->classify($attribute));
     }
 
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls.
-     *
-     * @param  string $attribute
-     * @param  mixed  $value
-     * @return $this
      */
-    public function &setAttribute($attribute, $value)
+    public function setAttribute(string $attribute, mixed $value): static
     {
         if (in_array($attribute, $this->getAttributes())) {
             $setter = $this->getAttributeSetter($attribute);
@@ -732,36 +696,34 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Use input $value and return a valid DateValue instance.
-     *
-     * @param  mixed          $value
-     * @return DateValue|null
      */
-    protected function getDateValueInstanceFrom($value)
+    protected function getDateValueInstanceFrom(mixed $value): ?DateValueInterface
     {
         if ($value === null) {
             return null;
-        } elseif ($value instanceof DateTime) {
-            return new DateValue($value->format('Y-m-d'));
-        } else {
-            return new DateValue($value);
         }
+
+        if ($value instanceof DateTime) {
+            return new DateValue($value->format('Y-m-d'));
+        }
+
+        return new DateValue($value);
     }
 
     /**
      * Use input $value and return a valid DateTimeValue instance.
-     *
-     * @param  mixed              $value
-     * @return DateTimeValue|null
      */
-    protected function getDateTimeValueInstanceFrom($value)
+    protected function getDateTimeValueInstanceFrom(mixed $value): ?DateTimeValueInterface
     {
         if ($value === null) {
             return null;
-        } elseif ($value instanceof DateTime) {
-            return new DateTimeValue($value->format('Y-m-d H:i:s'), 'UTC');
-        } else {
-            return new DateTimeValue($value, 'UTC');
         }
+
+        if ($value instanceof DateTime) {
+            return new DateTimeValue($value->format('Y-m-d H:i:s'), 'UTC');
+        }
+
+        return new DateTimeValue($value, 'UTC');
     }
 
     // ---------------------------------------------------
@@ -771,7 +733,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Insert record in the database.
      */
-    private function insert()
+    private function insert(): void
     {
         $last_insert_id = $this->connection->insert($this->table_name, $this->values);
 
@@ -786,39 +748,38 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Update database record.
      */
-    private function update()
+    private function update(): void
     {
-        if (count($this->modified_fields)) {
-            $updates = [];
-
-            foreach ($this->modified_fields as $modified_field) {
-                $updates[$modified_field] = $this->values[$modified_field];
-            }
-
-            if ($this->primary_key_modified) {
-                $old_id = isset($this->old_values['id']) ? $this->old_values['id'] : $this->getId();
-
-                if ($this->pool->exists(get_class($this), $this->getId())) {
-                    throw new LogicException('Object #' . $this->getId() . " can't be overwritten");
-                } else {
-                    $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
-                }
-            } else {
-                $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
-            }
-
-            $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($this->getId()));
-            $this->setAsLoaded();
+        if (empty($this->modified_fields)) {
+            return;
         }
+
+        $updates = [];
+
+        foreach ($this->modified_fields as $modified_field) {
+            $updates[$modified_field] = $this->values[$modified_field];
+        }
+
+        if ($this->primary_key_modified) {
+            $old_id = $this->old_values['id'] ?? $this->getId();
+
+            if ($this->pool->exists(get_class($this), $this->getId())) {
+                throw new LogicException('Object #' . $this->getId() . " can't be overwritten");
+            } else {
+                $this->connection->update($this->table_name, $updates, $this->getWherePartById($old_id));
+            }
+        } else {
+            $this->connection->update($this->table_name, $updates, $this->getWherePartById($this->getId()));
+        }
+
+        $this->values = array_merge($this->values, $this->refreshGeneratedFieldValues($this->getId()));
+        $this->setAsLoaded();
     }
 
     /**
      * Return an array with potentially refreshed values of generated fields.
-     *
-     * @param  int   $id
-     * @return array
      */
-    private function refreshGeneratedFieldValues($id)
+    private function refreshGeneratedFieldValues(int $id): array
     {
         $result = [];
 
@@ -845,13 +806,10 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Return where part of query.
-     *
-     * @param  int    $id
-     * @return string
      */
-    private function getWherePartById($id)
+    private function getWherePartById(int $id): string
     {
-        if (empty($id)) {
+        if ($id < 1) {
             throw new InvalidArgumentException("Value '$id' is not a valid ID");
         }
 
@@ -865,7 +823,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * anything (just loading data from database in fresh object using
      * setFieldValue function)
      */
-    private function resetModifiedFlags()
+    private function resetModifiedFlags(): void
     {
         $this->modified_fields = [];
         $this->modified_attributes = [];
@@ -879,41 +837,33 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Registered event handlers.
-     *
-     * @var array
      */
-    private $event_handlers = [];
+    private array $event_handlers = [];
 
     /**
      * Register an internal event handler.
-     *
-     * @param string   $event
-     * @param callable $handler
      */
-    protected function registerEventHandler($event, callable $handler)
+    protected function registerEventHandler(string $event, callable $handler): void
     {
         if (empty($event)) {
             throw new InvalidArgumentException('Event name is required');
         }
 
-        if (is_callable($handler)) {
-            if (empty($this->event_handlers[$event])) {
-                $this->event_handlers[$event] = [];
-            }
-
-            $this->event_handlers[$event][] = $handler;
-        } else {
+        if (!is_callable($handler)) {
             throw new InvalidArgumentException('Handler not callable');
         }
+
+        if (empty($this->event_handlers[$event])) {
+            $this->event_handlers[$event] = [];
+        }
+
+        $this->event_handlers[$event][] = $handler;
     }
 
     /**
      * Trigger an internal event.
-     *
-     * @param string $event
-     * @param array  $event_parameters
      */
-    protected function triggerEvent($event, array $event_parameters = [])
+    protected function triggerEvent(string $event, array $event_parameters = []): void
     {
         if (isset($this->event_handlers[$event])) {
             foreach ($this->event_handlers[$event] as $handler) {
@@ -935,10 +885,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         return $result;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function jsonSerializeDetails()
+    public function jsonSerializeDetails(): array
     {
         return [];
     }

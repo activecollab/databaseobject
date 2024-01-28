@@ -126,37 +126,24 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
     public function getEntityFields(): array;
 
     /**
-     * @deprecated Use entityFieldExists() instead.
-     */
-    public function fieldExists($field);
-
-    /**
      * Return true if $field exists (both generated and non-generated fields are checked).
      */
     public function entityFieldExists(string $entity_field): bool;
 
     /**
      * Return a list of fields that this entity is aware of, but does not manage.
-     *
-     * @return array
      */
-    public function getGeneratedFields();
+    public function getGeneratedFields(): array;
 
     /**
      * Check if generated field exists.
-     *
-     * @param  string $field Field name
-     * @return bool
      */
-    public function generatedFieldExists($field);
+    public function generatedFieldExists(string $field): bool;
 
     /**
      * Return true if $field is generated field.
-     *
-     * @param  string $field
-     * @return bool
      */
-    public function isGeneratedField($field);
+    public function isGeneratedField(string $field): bool;
 
     /**
      * Check if selected field is primary key.
@@ -175,18 +162,13 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Return old field values, before fields were updated.
-     *
-     * @return array
      */
-    public function getOldValues();
+    public function getOldValues(): array;
 
     /**
      * Return all field value.
-     *
-     * @param  string $field
-     * @return mixed
      */
-    public function getOldFieldValue($field);
+    public function getOldFieldValue(string $field): mixed;
 
     /**
      * Revert field to old value.
@@ -204,17 +186,11 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Set non-field value during DataManager::create() and DataManager::update() calls.
-     *
-     * @param  string $attribute
-     * @param  mixed  $value
-     * @return $this
      */
-    public function &setAttribute($attribute, $value);
+    public function setAttribute(string $attribute, mixed $value): static;
 
     /**
      * Return an array of object properties that are needed to fully display this object on a page.
-     *
-     * @return array
      */
-    public function jsonSerializeDetails();
+    public function jsonSerializeDetails(): array;
 }

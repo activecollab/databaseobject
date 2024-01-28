@@ -163,10 +163,7 @@ use ActiveCollab\DatabaseObject\Entity\Entity;
 
 class StatsSnapshot extends Entity
 {
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setGeneratedFieldsValueCaster(new ValueCaster([
             'is_used_on_day' => ValueCasterInterface::CAST_BOOL,
