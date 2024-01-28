@@ -6,39 +6,39 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Entity;
 
 use ActiveCollab\DatabaseConnection\Record\LoadFromRow;
-use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 use ActiveCollab\Object\ObjectInterface;
-use InvalidArgumentException;
 use JsonSerializable;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 {
     /**
      * Load data from database row.
      *
-     * If $cache_row is set to true row data will be added to cache
-     *
-     * @param  array                    $row
-     * @throws InvalidArgumentException
+     * If $cache_row is set to true row data will be added to cache.
      */
-    public function loadFromRow(array $row);
+    public function loadFromRow(array $row): static;
 
     /**
      * Validate object properties before object is saved.
      *
      * This method is called before the item is saved and can be used to fetch
-     * errors in data before we really save it database. $errors is instance of
-     * ValidationErrors class that is used for error collection. If collection
+     * errors in data before we really save it to the database. $errors is instance
+     * of ValidationErrors class that is used for error collection. If collection
      * is empty object is considered valid and save process will continue
      */
     public function validate(ValidatorInterface $validator): ValidatorInterface;
+
+    /**
+     * Return true if $object is the same as this object (of same type, and
+     * with the same ID).
+     */
+    public function is(mixed $object): bool;
 
     /**
      * Save object into database (insert or update).
@@ -47,19 +47,13 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Create a copy of this object and optionally save it.
-     *
-     * @param  bool            $save
-     * @return EntityInterface
      */
-    public function copy($save = false);
+    public function copy(bool $save = false): static;
 
     /**
-     * Delete specific object (and related objects if neccecery).
-     *
-     * @param  bool  $bulk
-     * @return $this
+     * Delete specific object (and related objects if necessary).
      */
-    public function &delete($bulk = false);
+    public function delete(bool $bulk = false): static;
 
     /**
      * Return primary key columns.
@@ -77,78 +71,54 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Return value of $is_new variable.
-     *
-     * @return bool
      */
-    public function isNew();
+    public function isNew(): bool;
 
     /**
      * Returns true if this object have row in database.
-     *
-     * @return bool
      */
-    public function isLoaded();
+    public function isLoaded(): bool;
 
     // ---------------------------------------------------
     //  Fields
     // ---------------------------------------------------
 
+    public function getId(): ?int;
+
     /**
      * Set value of id field.
-     *
-     * @param  int   $value
-     * @return $this
      */
-    public function &setId($value);
+    public function setId(?int $value): static;
 
     /**
      * Check if this object has modified columns.
-     *
-     * @return bool
      */
-    public function isModified();
+    public function isModified(): bool;
 
     /**
-     * Return modificications indexed by field name, with value composed of an old and new value.
-     *
-     * @return array
+     * Return modifications indexed by field name, with value composed of an old and new value.
      */
-    public function getModifications();
+    public function getModifications(): array;
 
     /**
      * Return array of modified fields.
-     *
-     * @return array
      */
-    public function getModifiedFields();
+    public function getModifiedFields(): array;
 
     /**
      * Returns true if specific field is modified.
-     *
-     * @param  string $field
-     * @return bool
      */
-    public function isModifiedField($field);
+    public function isModifiedField(string $field): bool;
 
     /**
      * Return a list of modified attributes.
-     *
-     * @return array
      */
-    public function getModifiedAttributes();
+    public function getModifiedAttributes(): array;
 
     /**
      * Return true if $attribute is modified.
-     *
-     * @param  string $attribute
-     * @return bool
      */
-    public function isModifiedAttribute($attribute);
-
-    /**
-     * @deprecated Use getEntityFields() instead.
-     */
-    public function getFields();
+    public function isModifiedAttribute(string $attribute): bool;
 
     /**
      * Return a list of fields that are managed by this entity.
@@ -190,27 +160,18 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Check if selected field is primary key.
-     *
-     * @param  string $field Field that need to be checked
-     * @return bool
      */
-    public function isPrimaryKey($field);
+    public function isPrimaryKey(string $field): bool;
 
     /**
      * Return true if primary key is modified.
-     *
-     * @return bool
      */
-    public function isPrimaryKeyModified();
+    public function isPrimaryKeyModified(): bool;
 
     /**
-     * Return value of specific field and typecast it...
-     *
-     * @param  string $field   Field value
-     * @param  mixed  $default Default value that is returned in case of any error
-     * @return mixed
+     * Return value of specific field and typecast it.
      */
-    public function getFieldValue($field, $default = null);
+    public function getFieldValue(string $field, mixed $default = null): mixed;
 
     /**
      * Return old field values, before fields were updated.
@@ -229,10 +190,8 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Revert field to old value.
-     *
-     * @param string $field
      */
-    public function revertField($field);
+    public function revertField(string $field): void;
 
     /**
      * Set specific field value.

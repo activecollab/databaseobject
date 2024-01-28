@@ -105,24 +105,18 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Indicates if this is new object (not saved).
-     *
-     * @var bool
      */
-    private $is_new = true;
+    private bool $is_new = true;
 
     /**
      * This flag is set to true when data from row are inserted into fields.
-     *
-     * @var bool
      */
-    private $is_loading = false;
+    private bool $is_loading = false;
 
     /**
      * Field values.
-     *
-     * @var array
      */
-    private $values = [];
+    private array $values = [];
 
     /**
      * Array of modified field values.
@@ -130,36 +124,26 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * Elements of this array are populated on setter call. Real name is
      * resolved, old value is saved here (if exists) and new one is set. Keys
      * used in this array are real field names only!
-     *
-     * @var array
      */
-    private $old_values = [];
+    private array $old_values = [];
 
     /**
-     * Array of modified fiels.
-     *
-     * @var array
+     * Array of modified fields.
      */
-    private $modified_fields = [];
-
-    /**
-     * @var array
-     */
-    private $modified_attributes = [];
+    private array $modified_fields = [];
+    private array $modified_attributes = [];
 
     /**
      * Primary key is updated.
-     *
-     * @var bool
      */
-    private $primary_key_modified = false;
+    private bool $primary_key_modified = false;
 
     /**
      * Validate object properties before object is saved.
      *
      * This method is called before the item is saved and can be used to fetch
-     * errors in data before we really save it database. $errors is instance of
-     * ValidationErrors class that is used for error collection. If collection
+     * errors in data before we really save it to the database. $errors is instance
+     * of ValidationErrors class that is used for error collection. If collection
      * is empty object is considered valid and save process will continue
      */
     public function validate(ValidatorInterface $validator): ValidatorInterface
@@ -169,47 +153,41 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         return $validator;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function is($object)
+    public function is(mixed $object): bool
     {
-        if ($object instanceof EntityInterface) {
-            if ($this->isLoaded()) {
-                return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
-            } else {
-                foreach ($this->getEntityFields() as $field_name) {
-                    if (!$object->entityFieldExists($field_name) ||
-                        !$this->areFieldValuesSame(
-                            $this->getFieldValue($field_name),
-                            $object->getFieldValue($field_name)
-                        )) {
-                        return false;
-                    }
-                }
+        if (!$object instanceof EntityInterface) {
+            return false;
+        }
 
-                return true;
+        if ($this->isLoaded()) {
+            return $object->isLoaded() && get_class($this) == get_class($object) && $this->getId() == $object->getId();
+        }
+
+        foreach ($this->getEntityFields() as $field_name) {
+            if (!$object->entityFieldExists($field_name) ||
+                !$this->areFieldValuesSame(
+                    $this->getFieldValue($field_name),
+                    $object->getFieldValue($field_name)
+                )) {
+                return false;
             }
         }
 
-        return false;
+        return true;
     }
 
     /**
      * Return true if field values match.
-     *
-     * @param  mixed $value_1
-     * @param  mixed $value_2
-     * @return bool
      */
-    private function areFieldValuesSame($value_1, $value_2)
+    private function areFieldValuesSame(mixed $value_1, mixed $value_2): bool
     {
         if (($value_1 instanceof DateValueInterface && $value_2 instanceof DateValueInterface)
-            || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)) {
+            || ($value_1 instanceof DateTimeValueInterface && $value_2 instanceof DateTimeValueInterface)
+        ) {
             return $value_1->getTimestamp() == $value_2->getTimestamp();
-        } else {
-            return $value_1 === $value_2;
         }
+
+        return $value_1 === $value_2;
     }
 
     public function getPrimaryKey(): string
@@ -229,11 +207,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Load data from database row.
      *
-     * If $cache_row is set to true row data will be added to cache
-     *
-     * @param array $row
+     * If $cache_row is set to true row data will be added to cache.
      */
-    public function loadFromRow(array $row)
+    public function loadFromRow(array $row): static
     {
         if (empty($row)) {
             throw new InvalidArgumentException('Database row expected');
@@ -268,6 +244,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         }
 
         $this->doneLoading();
+
+        return $this;
     }
 
     /**
@@ -340,12 +318,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Delete specific object (and related objects if neccecery).
-     *
-     * @param  bool  $bulk
-     * @return $this
+     * Delete specific object (and related objects if necessary).
      */
-    public function &delete($bulk = false)
+    public function delete(bool $bulk = false): static
     {
         if ($this->isLoaded()) {
             $this->connection->transact(function () use ($bulk) {
@@ -363,15 +338,11 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Create a copy of this object and optionally save it.
-     *
-     * @param  bool   $save
-     * @return object
      */
-    public function copy($save = false)
+    public function copy(bool $save = false): static
     {
         $object_class = get_class($this);
 
-        /** @var EntityInterface $copy */
         $copy = new $object_class($this->connection, $this->pool, $this->logger);
 
         foreach ($this->getEntityFields() as $field) {
@@ -395,20 +366,16 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Return value of $is_new variable.
-     *
-     * @return bool
      */
-    public function isNew()
+    public function isNew(): bool
     {
-        return (bool) $this->is_new;
+        return $this->is_new;
     }
 
     /**
      * Returns true if this object have row in database.
-     *
-     * @return bool
      */
-    public function isLoaded()
+    public function isLoaded(): bool
     {
         return !$this->is_new;
     }
@@ -416,7 +383,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Mark start of loading from row.
      */
-    private function startLoading()
+    private function startLoading(): void
     {
         $this->is_loading = true;
     }
@@ -424,7 +391,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Done loading from row.
      */
-    private function doneLoading()
+    private function doneLoading(): void
     {
         if ($this->is_loading) {
             $this->is_loading = false;
@@ -436,7 +403,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Set loaded stamp value.
      */
-    private function setAsLoaded()
+    private function setAsLoaded(): void
     {
         $this->is_new = false;
         $this->resetModifiedFlags();
@@ -445,10 +412,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * Returns true if this object is in the middle of hydration process
      * (loading values from database row).
-     *
-     * @return bool
      */
-    protected function isLoading()
+    protected function isLoading(): bool
     {
         return $this->is_loading;
     }
@@ -459,21 +424,16 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Return object ID.
-     *
-     * @return int
      */
-    public function getId()
+    public function getId(): ?int
     {
         return $this->getFieldValue('id');
     }
 
     /**
      * Set value of id field.
-     *
-     * @param  int   $value
-     * @return $this
      */
-    public function &setId($value)
+    public function setId(?int $value): static
     {
         $this->setFieldValue('id', $value);
 
@@ -482,26 +442,18 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Check if this object has modified columns.
-     *
-     * @return bool
      */
-    public function isModified()
+    public function isModified(): bool
     {
         return !empty($this->modified_fields) || !empty($this->modified_attributes);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getModifiedFields()
+    public function getModifiedFields(): array
     {
         return $this->modified_fields;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getModifications()
+    public function getModifications(): array
     {
         $result = [];
 
@@ -521,40 +473,29 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Returns true if specific field is modified.
-     *
-     * @param  string $field
-     * @return bool
      */
-    public function isModifiedField($field)
+    public function isModifiedField(string $field): bool
     {
         return in_array($field, $this->modified_fields);
     }
 
     /**
      * Return true if primary key is modified.
-     *
-     * @return bool
      */
-    public function isPrimaryKeyModified()
+    public function isPrimaryKeyModified(): bool
     {
         return $this->primary_key_modified;
     }
 
-    /**
-     * @return array
-     */
-    public function getModifiedAttributes()
+    public function getModifiedAttributes(): array
     {
         return $this->modified_attributes;
     }
 
     /**
      * Return true if $attribute is modified.
-     *
-     * @param  string $attribute
-     * @return bool
      */
-    public function isModifiedAttribute($attribute)
+    public function isModifiedAttribute(string $attribute): bool
     {
         return in_array($attribute, $this->modified_attributes);
     }
@@ -568,37 +509,24 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Revert field to old value.
-     *
-     * @param $field
      */
-    public function revertField($field)
+    public function revertField(string $field): void
     {
         if ($this->isModifiedField($field)) {
             $this->setFieldValue($field, $this->getOldFieldValue($field)); // revert field value
 
-            if (($key = array_search($field, $this->modified_fields)) !== false) {
-                unset($this->modified_fields[$field]); // remove modified flag
+            if (array_key_exists($field, $this->modified_fields)) {
+                unset($this->modified_fields[$field]);
             }
         }
     }
 
     /**
      * Check if selected field is primary key.
-     *
-     * @param  string $field Field that need to be checked
-     * @return bool
      */
-    public function isPrimaryKey($field)
+    public function isPrimaryKey(string $field): bool
     {
         return $field === 'id';
-    }
-
-    /**
-     * @deprecated Use getEntityFields() instead.
-     */
-    public function getFields()
-    {
-        return $this->getEntityFields();
     }
 
     public function getEntityFields(): array
@@ -669,10 +597,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldValue($field, $default = null)
+    public function getFieldValue(string $field, mixed $default = null): mixed
     {
         if (empty($this->values[$field]) && !array_key_exists($field, $this->values)) {
             return empty($this->default_entity_field_values[$field])
@@ -934,9 +859,9 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     }
 
     /**
-     * Reset modification idicators.
+     * Reset modification indicators.
      *
-     * Useful when you use setXXX functions but you dont want to modify
+     * Useful when you use setXXX functions, but you don't want to modify
      * anything (just loading data from database in fresh object using
      * setFieldValue function)
      */

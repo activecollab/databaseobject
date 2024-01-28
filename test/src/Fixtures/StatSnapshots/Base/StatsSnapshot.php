@@ -178,10 +178,7 @@ abstract class StatsSnapshot extends Entity
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldValue($field, $default = null)
+    public function getFieldValue(string $field, mixed $default = null): mixed
     {
         $value = parent::getFieldValue($field, $default);
 

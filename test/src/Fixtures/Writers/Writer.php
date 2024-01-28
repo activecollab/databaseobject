@@ -26,6 +26,7 @@ class Writer extends BaseWriter implements ScrapInterface
 {
     use Russian, ClassicWriter;
 
+
     /**
      * @var mixed
      */
