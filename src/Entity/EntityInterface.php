@@ -37,10 +37,8 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
      * errors in data before we really save it database. $errors is instance of
      * ValidationErrors class that is used for error collection. If collection
      * is empty object is considered valid and save process will continue
-     *
-     * @param ValidatorInterface $validator
      */
-    public function validate(ValidatorInterface &$validator);
+    public function validate(ValidatorInterface $validator): ValidatorInterface;
 
     /**
      * Save object into database (insert or update).

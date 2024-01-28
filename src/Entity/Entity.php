@@ -161,12 +161,12 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
      * errors in data before we really save it database. $errors is instance of
      * ValidationErrors class that is used for error collection. If collection
      * is empty object is considered valid and save process will continue
-     *
-     * @param ValidatorInterface $validator
      */
-    public function validate(ValidatorInterface &$validator)
+    public function validate(ValidatorInterface $validator): ValidatorInterface
     {
         $this->triggerEvent('on_validate', [&$validator]);
+
+        return $validator;
     }
 
     /**
@@ -318,7 +318,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
             $values_to_validate
         );
 
-        $this->validate($validator);
+        $validator = $this->validate($validator);
 
         if ($validator->hasErrors()) {
             throw $validator->createException();

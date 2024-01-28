@@ -223,14 +223,11 @@ abstract class SpatialEntity extends Entity
         ]);
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function validate(ValidatorInterface &$validator)
+    public function validate(ValidatorInterface $validator): ValidatorInterface
     {
         $validator->present('day');
         $validator->present('account_id');
 
-        parent::validate($validator);
+        return parent::validate($validator);
     }
 }

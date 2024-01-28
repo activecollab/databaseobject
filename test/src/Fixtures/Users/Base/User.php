@@ -216,14 +216,12 @@ abstract class User extends Entity
 
     /**
      * Validate object properties before object is saved.
-     *
-     * @param ValidatorInterface $validator
      */
-    public function validate(ValidatorInterface &$validator)
+    public function validate(ValidatorInterface $validator): ValidatorInterface
     {
         $validator->presentAndUnique('email');
         $validator->present('password');
 
-        parent::validate($validator);
+        return parent::validate($validator);
     }
 }

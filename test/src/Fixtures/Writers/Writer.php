@@ -129,12 +129,12 @@ class Writer extends BaseWriter implements ScrapInterface
     /**
      * @param ValidatorInterface $validator
      */
-    public function validate(ValidatorInterface &$validator)
+    public function validate(ValidatorInterface $validator): ValidatorInterface
     {
         $validator->present('name');
         $validator->present('birthday');
 
-        parent::validate($validator);
+        return parent::validate($validator);
     }
 
     public function scrap($bulk = false): EntityInterface
