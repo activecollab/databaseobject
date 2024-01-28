@@ -33,7 +33,7 @@ abstract class Collection implements CollectionInterface
         $this->configure();
     }
 
-    protected function configure()
+    protected function configure(): void
     {
     }
 

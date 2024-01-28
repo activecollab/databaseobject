@@ -28,7 +28,7 @@ class PreconfiguredCollection extends Type
     /**
      * Configure the collection when it is created.
      */
-    protected function configure()
+    protected function configure(): void
     {
         $this->where('`name` LIKE ?', 'A%')->orderBy('`name`');
     }

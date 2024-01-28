@@ -52,10 +52,7 @@ abstract class StatsSnapshot extends Entity
      */
     protected array $default_entity_field_values = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setGeneratedFieldsValueCaster(
             new ValueCaster(
@@ -178,10 +175,7 @@ abstract class StatsSnapshot extends Entity
         return $this;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getFieldValue($field, $default = null)
+    public function getFieldValue(string $field, mixed $default = null): mixed
     {
         $value = parent::getFieldValue($field, $default);
 

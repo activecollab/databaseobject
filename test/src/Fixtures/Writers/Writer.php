@@ -30,42 +30,33 @@ class Writer extends BaseWriter implements ScrapInterface
      * @var mixed
      */
     public $custom_attribute_value;
-
-    /**
-     * @var bool
-     */
-    public $modified_using_custom_producer = false;
-
-    /**
-     * @var bool
-     */
-    public $is_scrapped = false;
-
-    /**
-     * @var bool
-     */
-    public $scrapped_using_custom_producer = false;
+    public bool $modified_using_custom_producer = false;
+    public bool $is_scrapped = false;
+    public bool $scrapped_using_custom_producer = false;
 
     public function __construct(ConnectionInterface &$connection, PoolInterface &$pool, LoggerInterface $logger)
     {
         parent::__construct($connection, $pool, $logger);
 
-        $this->registerEventHandler('on_set_attribute', function ($attribute, $value) {
-            if ($attribute == 'custom_attribute') {
-                $this->custom_attribute_value = $value;
-            }
-        });
+        $this->registerEventHandler(
+            'on_set_attribute',
+            function ($attribute, $value) {
+                if ($attribute == 'custom_attribute') {
+                    $this->custom_attribute_value = $value;
+                }
+            },
+        );
 
-        $this->registerEventHandler('on_json_serialize', function (array &$result) {
-            $result['name'] = $this->getName();
-            $result['birthday'] = $this->getBirthday();
-        });
+        $this->registerEventHandler(
+            'on_json_serialize',
+            function (array &$result) {
+                $result['name'] = $this->getName();
+                $result['birthday'] = $this->getBirthday();
+            },
+        );
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    protected function getAttributes()
+    protected function getAttributes(): array
     {
         return array_merge(parent::getAttributes(), ['custom_field_value']);
     }
