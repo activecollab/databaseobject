@@ -42,11 +42,8 @@ interface EntityInterface extends ObjectInterface, LoadFromRow, JsonSerializable
 
     /**
      * Save object into database (insert or update).
-     *
-     * @return $this
-     * @throws ValidationException
      */
-    public function &save();
+    public function save(): static;
 
     /**
      * Create a copy of this object and optionally save it.

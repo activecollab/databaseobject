@@ -15,8 +15,13 @@
             "email": "ilija.studen@activecollab.com"
         }
     ],
+    "config": {
+        "platform": {
+            "php": "8.2.0"
+        }
+    },
     "require": {
-        "php": ">=8.0",
+        "php": ">=8.2",
         "activecollab/databaseconnection": "^5.0",
         "activecollab/etag": "^1.0",
         "activecollab/object": "^1.0",

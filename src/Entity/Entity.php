@@ -272,10 +272,8 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
 
     /**
      * Save object into database (insert or update).
-     *
-     * @return $this
      */
-    public function &save()
+    public function save(): static
     {
         // ---------------------------------------------------
         //  Populate defaults
