@@ -24,11 +24,11 @@ interface FinderInterface
     //  Configuration
     // ---------------------------------------------------
 
-    public function where(string $pattern, ...$arguments): FinderInterface;
-    public function orderBy(string $order_by): FinderInterface;
-    public function limit(int $offset, int $limit): FinderInterface;
-    public function join(string $type, string $field_name = null): FinderInterface;
-    public function joinTable(string $table_name, string $field_name = null): FinderInterface;
+    public function where(string $pattern, mixed ...$arguments): static;
+    public function orderBy(string $order_by): static;
+    public function limit(int $offset, int $limit): static;
+    public function join(string $type, string $field_name = null): static;
+    public function joinTable(string $table_name, string $field_name = null): static;
 
     // ---------------------------------------------------
     //  Execution

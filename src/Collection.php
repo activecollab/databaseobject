@@ -20,11 +20,15 @@ abstract class Collection implements CollectionInterface
 {
     use EtagInterfaceImplementation;
 
-    protected $connection;
-    protected $pool;
-    protected $logger;
+    protected ConnectionInterface $connection;
+    protected PoolInterface $pool;
+    protected LoggerInterface $logger;
 
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
+    public function __construct(
+        ConnectionInterface $connection,
+        PoolInterface $pool,
+        LoggerInterface $logger,
+    )
     {
         $this->connection = $connection;
         $this->pool = $pool;
@@ -49,10 +53,7 @@ abstract class Collection implements CollectionInterface
         return true;
     }
 
-    /**
-     * @var string
-     */
-    private $application_identifier = 'APPv1.0';
+    private string $application_identifier = 'APPv1.0';
 
     /**
      * Return application identifier.
@@ -206,10 +207,12 @@ abstract class Collection implements CollectionInterface
 
         if ($result instanceof ResultInterface) {
             return $result->jsonSerialize();
-        } elseif ($result === null) {
-            return [];
-        } else {
-            return $result;
         }
+
+        if ($result === null) {
+            return [];
+        }
+
+        return $result;
     }
 }

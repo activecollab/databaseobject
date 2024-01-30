@@ -69,14 +69,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
     //  Configuration
     // ---------------------------------------------------
 
-    /**
-     * Set finder  .
-     *
-     * @param  string|array          $pattern
-     * @param  mixed                 ...$arguments
-     * @return FinderInterface|$this
-     */
-    public function where(string $pattern, ...$arguments): FinderInterface
+    public function where(string $pattern, mixed ...$arguments): static
     {
         $conditions_to_prepare = [$pattern];
 
@@ -106,14 +99,14 @@ class Finder implements FinderInterface, ContainerAccessInterface
         }
     }
 
-    public function orderBy(string $order_by): FinderInterface
+    public function orderBy(string $order_by): static
     {
         $this->order_by = $order_by;
 
         return $this;
     }
 
-    public function limit(int $offset, int $limit): FinderInterface
+    public function limit(int $offset, int $limit): static
     {
         $this->offset = $offset;
         $this->limit = $limit;
@@ -121,12 +114,12 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this;
     }
 
-    public function join(string $type, string $field_name = null): FinderInterface
+    public function join(string $type, string $field_name = null): static
     {
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
 
-    public function joinTable(string $table_name, string $field_name = null): FinderInterface
+    public function joinTable(string $table_name, string $field_name = null): static
     {
         $join_table = $this->connection->escapeTableName($table_name);
         $join_field = $this->connection->escapeFieldName(
