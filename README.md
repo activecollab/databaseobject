@@ -179,4 +179,4 @@ Entity class also refreshes the values of these fields on object save so fresh v
 ## To Do
 
 1. Caching,
-1. Remove deprecated `ObjectInterface` and `Object` class.
+2. <del>Remove deprecated `ObjectInterface` and `Object` class.</del>

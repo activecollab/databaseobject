@@ -6,61 +6,96 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Exception;
 
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 use Exception;
 
-/**
- * @package ActiveCollab\DatabaseObject\Exception
- */
 class ValidationException extends Exception
 {
     const ANY_FIELD = '-- any --';
 
-    /**
-     * Object instance.
-     *
-     * @var EntityInterface
-     */
-    private $object;
+    private ?EntityInterface $object = null;
+    private array $errors = [];
 
-    /**
-     * Errors array.
-     *
-     * @var array
-     */
-    private $errors = [];
-
-    public function __construct($message = 'Validation failed', int $code = 0, Exception $previous = null)
+    public function __construct(
+        string $message = 'Validation failed',
+        int $code = 0,
+        Exception $previous = null,
+    )
     {
         parent::__construct($message, $code, $previous);
     }
 
-    /**
-     * Return parent object instance.
-     *
-     * @return object
-     */
-    public function getObject()
+    public function getObject(): ?EntityInterface
     {
         return $this->object;
     }
 
-    /**
-     * @param EntityInterface $object
-     */
-    public function setObject(EntityInterface $object)
+    public function setObject(EntityInterface $object): static
     {
         $this->object = $object;
+
+        return $this;
+    }
+
+    public function getErrors(): ?array
+    {
+        if (empty($this->errors)) {
+            return null;
+        }
+
+        return $this->errors;
     }
 
     /**
-     * Return array or property => value pairs that describes this object.
+     * Set errors.
      *
-     * @return array
+     * Key is field name, value is array of error messages for the given field
      */
-    public function jsonSerialize()
+    public function setErrors(array $errors): static
+    {
+        $this->errors = $errors;
+
+        return $this;
+    }
+
+    public function getFieldErrors(string $field): ?array
+    {
+        return $this->errors[$field] ?? null;
+    }
+
+    public function hasErrors(): bool
+    {
+        return (bool) count($this->errors);
+    }
+
+    public function hasError(string $field): bool
+    {
+        return !empty($this->errors[$field]);
+    }
+
+    public function addError(
+        string $error,
+        string $field = self::ANY_FIELD,
+    ): static
+    {
+        if (empty($field)) {
+            $field = self::ANY_FIELD;
+        }
+
+        if (empty($this->errors[$field])) {
+            $this->errors[$field] = [];
+        }
+
+        $this->errors[$field][] = $error;
+
+        return $this;
+    }
+
+    public function jsonSerialize(): array
     {
         $result = [
             'message' => $this->getMessage(),
@@ -83,88 +118,5 @@ class ValidationException extends Exception
         }
 
         return $result;
-    }
-
-    // ---------------------------------------------------
-    //  Utility methods
-    // ---------------------------------------------------
-
-    /**
-     * Return number of errors from specific form.
-     *
-     * @return array
-     */
-    public function getErrors()
-    {
-        return count($this->errors) ? $this->errors : null;
-    }
-
-    /**
-     * Set errors.
-     *
-     * Key is field name, value is array of error messages for the given field
-     *
-     * @param  array $errors
-     * @return $this
-     */
-    public function &setErrors(array $errors)
-    {
-        $this->errors = $errors;
-
-        return $this;
-    }
-
-    /**
-     * Return field errors.
-     *
-     * @param  string $field
-     * @return array
-     */
-    public function getFieldErrors($field)
-    {
-        return isset($this->errors[$field]) ? $this->errors[$field] : null;
-    }
-
-    /**
-     * Returns true if there are error messages reported.
-     *
-     * @return bool
-     */
-    public function hasErrors()
-    {
-        return (bool) count($this->errors);
-    }
-
-    /**
-     * Check if a specific field has reported errors.
-     *
-     * @param  string $field
-     * @return bool
-     */
-    public function hasError($field)
-    {
-        return !empty($this->errors[$field]);
-    }
-
-    /**
-     * Add error to array.
-     *
-     * @param  string $error
-     * @param  string $field
-     * @return $this
-     */
-    public function &addError(string $error, string $field = self::ANY_FIELD)
-    {
-        if (empty($field)) {
-            $field = self::ANY_FIELD;
-        }
-
-        if (empty($this->errors[$field])) {
-            $this->errors[$field] = [];
-        }
-
-        $this->errors[$field][] = $error;
-
-        return $this;
     }
 }

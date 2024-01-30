@@ -6,23 +6,25 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Exception;
 
 use Exception;
 use RuntimeException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Exception
- */
 class ObjectNotFoundException extends RuntimeException
 {
-    /**
-     * @param string         $type
-     * @param int            $id
-     * @param Exception|null $previous
-     */
-    public function __construct($type, $id, Exception $previous = null)
+    public function __construct(
+        string $type,
+        int $id,
+        Exception $previous = null,
+    )
     {
-        parent::__construct("{$type} #{$id} not found", 0, $previous);
+        parent::__construct(
+            sprintf("%s #%d not found", $type, $id),
+            0,
+            $previous,
+        );
     }
 }

@@ -16,14 +16,11 @@ use Psr\Log\LoggerInterface;
 
 abstract class Manager implements ManagerInterface
 {
-    protected $connection;
-    protected $pool;
-    protected $logger;
-
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
+    public function __construct(
+        protected ConnectionInterface $connection,
+        protected PoolInterface $pool,
+        protected LoggerInterface $logger,
+    )
     {
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->logger = $logger;
     }
 }
