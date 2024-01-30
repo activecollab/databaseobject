@@ -6,25 +6,24 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\TraitsResolver;
 
 use ReflectionClass;
 
 class TraitsResolver implements TraitsResolverInterface
 {
-    private $type_traits = [];
+    private array $type_traits = [];
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getClassTraits($class_name)
+    public function getClassTraits(string $class_name): array
     {
         if (empty($this->type_traits[$class_name])) {
             $this->type_traits[$class_name] = [];
 
             $this->recursiveGetClassTraits(
                 new ReflectionClass($class_name),
-                $this->type_traits[$class_name]
+                $this->type_traits[$class_name],
             );
         }
 
@@ -33,11 +32,8 @@ class TraitsResolver implements TraitsResolverInterface
 
     /**
      * Recursively get trait names for the given class name.
-     *
-     * @param ReflectionClass $class
-     * @param array           $trait_names
      */
-    private function recursiveGetClassTraits(ReflectionClass $class, array &$trait_names)
+    private function recursiveGetClassTraits(ReflectionClass $class, array &$trait_names): void
     {
         $trait_names = array_merge($trait_names, $class->getTraitNames());
 

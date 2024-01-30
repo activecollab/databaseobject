@@ -18,22 +18,19 @@ use Psr\Log\LoggerInterface;
 
 class FinderFactory implements FinderFactoryInterface
 {
-    private $connection;
-    private $pool;
-    private $logger;
-
     public function __construct(
-        ConnectionInterface $connection,
-        PoolInterface $pool,
-        LoggerInterface $logger
+        private ConnectionInterface $connection,
+        private PoolInterface $pool,
+        private LoggerInterface $logger,
     )
     {
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->logger = $logger;
     }
 
-    public function produceFinder(string $type, string $where_pattern = null, ...$where_arguments): FinderInterface
+    public function produceFinder(
+        string $type,
+        string $where_pattern = null,
+        mixed ...$where_arguments,
+    ): FinderInterface
     {
         $finder = new Finder(
             $this->connection,

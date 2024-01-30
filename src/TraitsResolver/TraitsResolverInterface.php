@@ -6,15 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\TraitsResolver;
 
 interface TraitsResolverInterface
 {
     /**
      * Return trait names for the given class.
-     *
-     * @param  string $class_name
-     * @return array
      */
-    public function getClassTraits($class_name);
+    public function getClassTraits(string $class_name): array;
 }

@@ -14,5 +14,9 @@ use ActiveCollab\DatabaseObject\FinderInterface;
 
 interface FinderFactoryInterface
 {
-    public function produceFinder(string $type, string $where_pattern = null, ...$where_arguments): FinderInterface;
+    public function produceFinder(
+        string $type,
+        string $where_pattern = null,
+        mixed ...$where_arguments,
+    ): FinderInterface;
 }
