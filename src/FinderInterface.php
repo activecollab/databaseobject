@@ -67,8 +67,6 @@ interface FinderInterface
 
     /**
      * Prepare SQL and load one or more records.
-     *
-     * @return mixed
      */
-    public function execute();
+    public function execute(): mixed;
 }

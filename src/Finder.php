@@ -87,16 +87,17 @@ class Finder implements FinderInterface, ContainerAccessInterface
      */
     private function getWhere(): string
     {
-        switch (count($this->where)) {
-            case 0:
-                return '';
-            case 1:
-                return $this->where[0];
-            default:
-                return implode(' AND ', array_map(function ($condition) {
-                    return "($condition)";
-                }, $this->where));
-        }
+        return match (count($this->where)) {
+            0 => '',
+            1 => $this->where[0],
+            default => implode(
+                ' AND ',
+                array_map(
+                    fn ($condition) => sprintf("(%s)", $condition),
+                    $this->where,
+                ),
+            ),
+        };
     }
 
     public function orderBy(string $order_by): static
@@ -119,11 +120,14 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return $this->joinTable($this->pool->getTypeTable($type), $field_name);
     }
 
-    public function joinTable(string $table_name, string $field_name = null): static
+    public function joinTable(
+        string $table_name,
+        string $field_name = null,
+    ): static
     {
         $join_table = $this->connection->escapeTableName($table_name);
         $join_field = $this->connection->escapeFieldName(
-            $field_name ? $field_name : $this->getJoinFieldNameFromType()
+            $field_name ?: $this->getJoinFieldNameFromType()
         );
 
         $this->join = "LEFT JOIN $join_table ON {$this->getEscapedTableName()}.`id` = $join_table.$join_field";
@@ -212,10 +216,7 @@ class Finder implements FinderInterface, ContainerAccessInterface
         return empty($ids) ? [] : $ids;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function execute()
+    public function execute(): mixed
     {
         $select_sql = $this->getSelectSql();
 
