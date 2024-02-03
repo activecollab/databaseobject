@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
@@ -17,22 +19,22 @@ use ActiveCollab\DateValue\DateValue;
 use InvalidArgumentException;
 use LogicException;
 use RuntimeException;
+use stdClass;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class ProducerTest extends WritersTypeTestCase
 {
     /**
      * Test if default producer is used by default.
      */
-    public function testDefaultProducerIsUsedByDefault()
+    public function testDefaultProducerIsUsedByDefault(): void
     {
-        /** @var Writer $object */
-        $object = $this->pool->produce(Writer::class, [
-            'name' => 'Anton Chekhov',
-            'birthday' => new DateValue('1860-01-29'),
-        ]);
+        $object = $this->pool->produce(
+            Writer::class,
+            [
+                'name' => 'Anton Chekhov',
+                'birthday' => new DateValue('1860-01-29'),
+            ],
+        );
 
         $this->assertInstanceOf(Writer::class, $object);
         $this->assertNull($object->custom_attribute_value);
@@ -45,12 +47,14 @@ class ProducerTest extends WritersTypeTestCase
     {
         $this->pool->registerProducer(Writer::class, new CustomProducer($this->connection, $this->pool, $this->logger));
 
-        /** @var Writer $object */
-        $object = $this->pool->produce(Writer::class, [
-            'name' => 'Anton Chekhov',
-            'birthday' => new DateValue('1860-01-29'),
-            'custom_producer_set_custom_attribute_to' => 1234,
-        ]);
+        $object = $this->pool->produce(
+            Writer::class,
+            [
+                'name' => 'Anton Chekhov',
+                'birthday' => new DateValue('1860-01-29'),
+                'custom_producer_set_custom_attribute_to' => 1234,
+            ],
+        );
 
         $this->assertInstanceOf(Writer::class, $object);
         $this->assertSame(1234, $object->custom_attribute_value);
@@ -63,12 +67,14 @@ class ProducerTest extends WritersTypeTestCase
     {
         $this->pool->registerProducer(AwesomeWriter::class, new CustomProducer($this->connection, $this->pool, $this->logger));
 
-        /** @var Writer $object */
-        $object = $this->pool->produce(AwesomeWriter::class, [
-            'name' => 'Anton Chekhov',
-            'birthday' => new DateValue('1860-01-29'),
-            'custom_producer_set_custom_attribute_to' => 1234,
-        ]);
+        $object = $this->pool->produce(
+            AwesomeWriter::class,
+            [
+                'name' => 'Anton Chekhov',
+                'birthday' => new DateValue('1860-01-29'),
+                'custom_producer_set_custom_attribute_to' => 1234,
+            ],
+        );
 
         $this->assertInstanceOf(AwesomeWriter::class, $object);
         $this->assertSame(1234, $object->custom_attribute_value);
@@ -81,12 +87,14 @@ class ProducerTest extends WritersTypeTestCase
     {
         $this->pool->registerProducerByClass(Writer::class, CustomProducer::class);
 
-        /** @var Writer $object */
-        $object = $this->pool->produce(Writer::class, [
-            'name' => 'Anton Chekhov',
-            'birthday' => new DateValue('1860-01-29'),
-            'custom_producer_set_custom_attribute_to' => 1234,
-        ]);
+        $object = $this->pool->produce(
+            Writer::class,
+            [
+                'name' => 'Anton Chekhov',
+                'birthday' => new DateValue('1860-01-29'),
+                'custom_producer_set_custom_attribute_to' => 1234,
+            ],
+        );
 
         $this->assertInstanceOf(Writer::class, $object);
         $this->assertSame(1234, $object->custom_attribute_value);
@@ -110,7 +118,7 @@ class ProducerTest extends WritersTypeTestCase
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage("Class 'stdClass' does not implement 'ActiveCollab\DatabaseObject\ProducerInterface' interface");
-        $this->pool->registerProducerByClass(Writer::class, \stdClass::class);
+        $this->pool->registerProducerByClass(Writer::class, stdClass::class);
     }
 
     public function testUnsavedObjectsCantBeModified()

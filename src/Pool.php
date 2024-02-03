@@ -623,7 +623,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
                     if ($reflection_class->implementsInterface(EntityInterface::class)) {
                         foreach ($this->types as $registered_type => $registered_type_properties) {
                             if ($reflection_class->isSubclassOf($registered_type)) {
-                                $this->known_types[ $type ] = $registered_type;
+                                $this->known_types[$type] = $registered_type;
                                 break;
                             }
                         }
