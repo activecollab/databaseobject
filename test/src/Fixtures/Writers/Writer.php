@@ -128,7 +128,7 @@ class Writer extends BaseWriter implements ScrapInterface
         return parent::validate($validator);
     }
 
-    public function scrap($bulk = false): EntityInterface
+    public function scrap(bool $bulk = false): EntityInterface
     {
         $this->is_scrapped = true;
 

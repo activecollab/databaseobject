@@ -17,32 +17,22 @@ use InvalidArgumentException;
 class Validator implements ValidatorInterface
 {
     private array $errors = [];
-    private ConnectionInterface $connection;
-    private string $table_name;
-    private ?int $object_id;
-    private ?int $old_object_id;
-    private array $field_values;
 
     public function __construct(
-        ConnectionInterface $connection,
-        string $table_name,
-        ?int $object_id,
-        ?int $old_object_id,
-        array $field_values
+        private ConnectionInterface $connection,
+        private string $table_name,
+        private ?int $object_id,
+        private ?int $old_object_id,
+        private array $field_values,
     )
     {
-        $this->connection = $connection;
-        $this->table_name = $table_name;
-        $this->object_id = $object_id;
-        $this->old_object_id = $old_object_id;
-        $this->field_values = $field_values;
     }
 
     /**
      * Check if value of $field_name is present.
      *
-     * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are consdiered
-     * to be present (because we check strlen(trim($value)).
+     * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are considered
+     * to be present (because we check strlen(trim($value))).
      */
     public function present(string $field_name): bool
     {
@@ -77,9 +67,9 @@ class Validator implements ValidatorInterface
      * @param  string $field_name
      * @return bool
      */
-    private function failPresenceValidation($field_name)
+    private function failPresenceValidation(string $field_name): bool
     {
-        $this->addFieldError($field_name, "Value of '$field_name' is required.");
+        $this->addFieldError($field_name, sprintf("Value of '%s' is required.", $field_name));
 
         return false;
     }
@@ -465,7 +455,7 @@ class Validator implements ValidatorInterface
         $first_messages = [];
         $counter = 0;
 
-        foreach ($this->errors as $field => $error_messages) {
+        foreach ($this->errors as $error_messages) {
             foreach ($error_messages as $error_message) {
                 $first_messages[] = $error_message;
                 ++$counter;

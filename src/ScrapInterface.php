@@ -14,5 +14,5 @@ use ActiveCollab\DatabaseObject\Entity\EntityInterface;
 
 interface ScrapInterface
 {
-    public function scrap($bulk = false): EntityInterface;
+    public function scrap(bool $bulk = false): EntityInterface;
 }
