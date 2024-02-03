@@ -28,7 +28,11 @@ class Producer implements ProducerInterface, ContainerAccessInterface
     {
     }
 
-    public function produce(string $type, array $attributes = null, $save = true): EntityInterface
+    public function produce(
+        string $type,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         /** @var EntityInterface $object */
         $object = new $type($this->connection, $this->pool, $this->logger);

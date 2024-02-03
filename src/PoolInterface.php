@@ -17,12 +17,12 @@ interface PoolInterface
 {
     /**
      * @template TClassName
-     * @param  class-string<TClassName> $type
+     * @param class-string<TClassName> $type
      * @return TClassName
      */
-    public function produce(string $type, array $attributes = null, $save = true): EntityInterface;
-    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface;
-    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface;
+    public function produce(string $type, array $attributes = null, bool $save = true): EntityInterface;
+    public function modify(EntityInterface $instance, array $attributes = null, bool $save = true): EntityInterface;
+    public function scrap(EntityInterface $instance, bool $force_delete = false): EntityInterface;
 
     public function getDefaultProducerClass(): string;
     public function getDefaultProducer(): ProducerInterface;

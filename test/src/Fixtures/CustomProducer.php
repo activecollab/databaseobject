@@ -16,7 +16,11 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 
 class CustomProducer extends Producer
 {
-    public function produce(string $type, array $attributes = null, $save = true): EntityInterface
+    public function produce(
+        string $type,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         $object = parent::produce($type, $attributes, $save);
 
@@ -27,7 +31,11 @@ class CustomProducer extends Producer
         return $object;
     }
 
-    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
+    public function modify(
+        EntityInterface $instance,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         $instance = parent::modify($instance, $attributes, $save);
 
@@ -38,7 +46,10 @@ class CustomProducer extends Producer
         return $instance;
     }
 
-    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
+    public function scrap(
+        EntityInterface $instance,
+        bool $force_delete = false,
+    ): EntityInterface
     {
         $instance = parent::scrap($instance, $force_delete);
 

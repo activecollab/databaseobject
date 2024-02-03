@@ -41,7 +41,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         $this->logger = $logger;
     }
 
-    public function produce(string $type, array $attributes = null, $save = true): EntityInterface
+    public function produce(
+        string $type,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         $registered_type = $this->requireRegisteredType($type);
 
@@ -56,7 +60,11 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $object;
     }
 
-    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
+    public function modify(
+        EntityInterface $instance,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
@@ -73,7 +81,10 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
-    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
+    public function scrap(
+        EntityInterface $instance,
+        bool $force_delete = false,
+    ): EntityInterface
     {
         if ($instance->isNew()) {
             throw new RuntimeException('Only objects that are saved to database can be modified');
