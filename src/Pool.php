@@ -100,7 +100,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
 
     public function setDefaultProducerClass(string $default_producer_class): PoolInterface
     {
-        if (!class_exists($default_producer_class, true)) {
+        if (!class_exists($default_producer_class)) {
             throw new InvalidArgumentException('Producer class not found.');
         }
 
@@ -606,7 +606,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
             if (isset($this->types[$type])) {
                 $this->known_types[$type] = $type;
             } else {
-                if (class_exists($type, true)) {
+                if (class_exists($type)) {
                     $reflection_class = new ReflectionClass($type);
 
                     if ($reflection_class->implementsInterface(EntityInterface::class)) {
@@ -688,7 +688,7 @@ class Pool implements PoolInterface, ProducerInterface, ContainerAccessInterface
         foreach ($types as $type) {
             $type = ltrim($type, '\\');
 
-            if (!class_exists($type, true)) {
+            if (!class_exists($type)) {
                 throw new InvalidArgumentException(sprintf("Type '%s' is not defined.", $type));
             }
 
