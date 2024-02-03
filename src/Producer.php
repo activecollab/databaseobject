@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -18,15 +20,12 @@ class Producer implements ProducerInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;
 
-    protected $connection;
-    protected $pool;
-    protected $logger;
-
-    public function __construct(ConnectionInterface $connection, PoolInterface $pool, LoggerInterface $logger)
+    public function __construct(
+        protected ConnectionInterface $connection,
+        protected PoolInterface $pool,
+        protected LoggerInterface $logger
+    )
     {
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->logger = $logger;
     }
 
     public function produce(string $type, array $attributes = null, $save = true): EntityInterface
@@ -55,7 +54,11 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         return $object;
     }
 
-    public function modify(EntityInterface &$instance, array $attributes = null, $save = true): EntityInterface
+    public function modify(
+        EntityInterface $instance,
+        array $attributes = null,
+        bool $save = true,
+    ): EntityInterface
     {
         if ($attributes) {
             foreach ($attributes as $k => $v) {
@@ -74,12 +77,15 @@ class Producer implements ProducerInterface, ContainerAccessInterface
         return $instance;
     }
 
-    public function scrap(EntityInterface &$instance, $force_delete = false): EntityInterface
+    public function scrap(
+        EntityInterface $instance,
+        bool $force_delete = false,
+    ): EntityInterface
     {
         if (!$force_delete && $instance instanceof ScrapInterface) {
             return $instance->scrap();
-        } else {
-            return $instance->delete();
         }
+
+        return $instance->delete();
     }
 }
