@@ -26,7 +26,7 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
      *
      * @return ResultInterface|EntityInterface[]
      */
-    public function execute();
+    public function execute(): ?iterable;
 
     /**
      * Return ID-s of matching records.

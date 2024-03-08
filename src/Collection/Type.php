@@ -150,7 +150,7 @@ abstract class Type extends Collection
      *
      * @return ResultInterface|EntityInterface[]
      */
-    public function execute()
+    public function execute(): ?iterable
     {
         if (!$this->isReady()) {
             throw new LogicException('Collection is not ready');
@@ -158,31 +158,34 @@ abstract class Type extends Collection
 
         if (is_callable($this->pre_execute_callback)) {
             $ids = $this->executeIds();
+            $ids_count = count($ids);
 
-            if ($ids_count = count($ids)) {
-                call_user_func($this->pre_execute_callback, $ids);
-
-                if ($ids_count > 1000) {
-                    $sql = $this->getSelectSql(); // Don't escape more than 1000 ID-s using DB::escape(), let MySQL do the dirty work instead of PHP
-                } else {
-                    $escaped_ids = $this->connection->escapeValue($ids);
-
-                    $sql = "SELECT * FROM {$this->getTableName()} WHERE id IN ($escaped_ids) ORDER BY FIELD (id, $escaped_ids)";
-                }
-
-                return $this->pool->findBySql($this->getType(), $sql);
+            if ($ids_count === 0) {
+                return null;
             }
 
-            return null;
+            call_user_func($this->pre_execute_callback, $ids);
+
+            if ($ids_count > 1000) {
+                $sql = $this->getSelectSql(); // Don't escape more than 1000 ID-s using DB::escape(), let MySQL do the dirty work instead of PHP
+            } else {
+                $escaped_ids = $this->connection->escapeValue($ids);
+
+                $sql = sprintf(
+                    "SELECT * FROM %s WHERE `id` IN (%s) ORDER BY FIELD (`id`, %s)",
+                    $this->getTableName(),
+                    $escaped_ids,
+                    $escaped_ids,
+                );
+            }
+
+            return $this->pool->findBySql($this->getType(), $sql);
         }
 
         return $this->pool->findBySql($this->getType(), $this->getSelectSql());
     }
 
-    /**
-     * @var int[]
-     */
-    private $ids = false;
+    private ?array $ids = null;
 
     /**
      * Return ID-s of matching records.
@@ -193,7 +196,7 @@ abstract class Type extends Collection
             throw new LogicException('Collection is not ready');
         }
 
-        if ($this->ids === false) {
+        if ($this->ids === null) {
             $this->ids = $this->connection->executeFirstColumn($this->getSelectSql(false));
 
             if (empty($this->ids)) {
@@ -206,10 +209,8 @@ abstract class Type extends Collection
 
     /**
      * Return number of items that will be displayed on the current page of paginated collection (or total, if collection is not paginated).
-     *
-     * @return int
      */
-    public function countIds()
+    public function countIds(): int
     {
         return count($this->executeIds());
     }
