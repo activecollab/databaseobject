@@ -37,28 +37,32 @@ class Validator implements ValidatorInterface
     public function present(string $field_name): bool
     {
         if (empty($field_name)) {
-            throw new InvalidArgumentException("Value '$field_name' is not a valid field name");
+            throw new InvalidArgumentException(
+                sprintf("Value '%s' is not a valid field name", $field_name),
+            );
         }
 
-        if (array_key_exists($field_name, $this->field_values)) {
-            if (is_string($this->field_values[$field_name])) {
-                if (mb_strlen(trim($this->field_values[$field_name])) > 0) {
-                    return true;
-                } else {
-                    return $this->failPresenceValidation($field_name);
-                }
-            } elseif (is_bool($this->field_values[$field_name])) {
-                return true;
-            } else {
-                if (empty($this->field_values[$field_name])) {
-                    return $this->failPresenceValidation($field_name);
-                } else {
-                    return true;
-                }
-            }
-        } else {
+        if (!array_key_exists($field_name, $this->field_values)) {
             return $this->failPresenceValidation($field_name);
         }
+
+        if (is_string($this->field_values[$field_name])) {
+            if (mb_strlen(trim($this->field_values[$field_name])) > 0) {
+                return true;
+            }
+
+            return $this->failPresenceValidation($field_name);
+        }
+
+        if (is_bool($this->field_values[$field_name])) {
+            return true;
+        }
+
+        if (empty($this->field_values[$field_name])) {
+            return $this->failPresenceValidation($field_name);
+        }
+
+        return true;
     }
 
     /**
