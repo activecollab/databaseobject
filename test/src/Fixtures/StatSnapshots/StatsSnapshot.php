@@ -6,11 +6,10 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\StatSnapshots;
 
-/**
- * @package ActiveCollab\Shepherd\Model
- */
 class StatsSnapshot extends Base\StatsSnapshot
 {
     /**

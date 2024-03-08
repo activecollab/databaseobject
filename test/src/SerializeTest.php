@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
@@ -13,9 +15,6 @@ use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use JsonSerializable;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class SerializeTest extends WritersTypeTestCase
 {
     /**

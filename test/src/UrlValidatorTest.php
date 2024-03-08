@@ -6,15 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Validator;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class UrlValidatorTest extends TestCase
 {
     public function setUp(): void

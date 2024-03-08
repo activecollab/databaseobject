@@ -6,14 +6,13 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base;
 
 use ActiveCollab\DatabaseObject\Entity\Entity;
 use ActiveCollab\DatabaseObject\ValidatorInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base
- */
 abstract class User extends Entity
 {
     /**

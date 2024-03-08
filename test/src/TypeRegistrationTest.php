@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation;
@@ -19,9 +21,6 @@ use ActiveCollab\DatabaseObject\Validator;
 use ActiveCollab\DateValue\DateValue;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class TypeRegistrationTest extends TestCase
 {
     /**

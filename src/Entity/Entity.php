@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Entity;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface;
@@ -26,9 +28,6 @@ use LogicException;
 use Psr\Log\LoggerInterface;
 use ReturnTypeWillChange;
 
-/**
- * @package ActiveCollab\DatabaseObject
- */
 abstract class Entity implements EntityInterface, ContainerAccessInterface
 {
     use ContainerAccessInterfaceImplementation;

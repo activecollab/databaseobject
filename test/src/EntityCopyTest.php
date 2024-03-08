@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Entity\EntityInterface;
@@ -14,9 +16,6 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DateValue\DateTimeValueInterface;
 use ActiveCollab\DateValue\DateValueInterface;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class EntityCopyTest extends WritersTypeTestCase
 {
     /**

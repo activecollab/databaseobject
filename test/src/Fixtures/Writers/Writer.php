@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseConnection\ConnectionInterface;
@@ -19,8 +21,6 @@ use Psr\Log\LoggerInterface;
 
 /**
  * @property string $is_special
- *
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
  */
 class Writer extends BaseWriter implements ScrapInterface
 {

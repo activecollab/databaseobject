@@ -6,15 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Exception\ValidationException;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Validator;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class ValidatorTest extends WritersTypeTestCase
 {
     /**

@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\ContainerAccess\ContainerAccessInterface\Implementation;
@@ -15,9 +17,6 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits\Russian;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use ActiveCollab\DatabaseObject\TraitsResolver\TraitsResolver;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class TraitTest extends TestCase
 {
     /**

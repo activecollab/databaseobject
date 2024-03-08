@@ -6,15 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
 use ActiveCollab\DatabaseObject\Test\Base\WritersTypeTestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\PreconfiguredCollection;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class TypePreconfiguredCollectionTest extends WritersTypeTestCase
 {
     /**

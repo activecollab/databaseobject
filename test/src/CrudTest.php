@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Exception\ObjectNotFoundException;
@@ -17,9 +19,6 @@ use ActiveCollab\DateValue\DateValue;
 use InvalidArgumentException;
 use LogicException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class CrudTest extends WritersTypeTestCase
 {
     /**

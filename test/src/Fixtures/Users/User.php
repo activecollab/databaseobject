@@ -6,13 +6,12 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Users;
 
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\Base\User as BaseUser;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Users
- */
 class User extends BaseUser
 {
 }

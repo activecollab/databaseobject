@@ -6,18 +6,14 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class AutoloaderTest extends TestCase
 {
-    /**
-     * Test if classes are properly loaded.
-     */
     public function testAutoloader()
     {
         $this->assertTrue(class_exists('\ActiveCollab\DatabaseObject\Entity\Entity'));

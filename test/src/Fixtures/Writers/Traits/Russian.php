@@ -6,17 +6,13 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Traits
- */
 trait Russian
 {
-    /**
-     * @var bool
-     */
-    public $is_russian = false;
+    public bool $is_russian = false;
 
     /**
      * Call when object is created.

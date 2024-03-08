@@ -6,21 +6,25 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
 use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Validator;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class InArrayValidatorTest extends TestCase
 {
-    /**
-     * @var array
-     */
-    private $continents = ['Asia', 'Africa', 'North America', 'South America', 'Antarctica', 'Europe', 'Australia'];
+    private array $continents = [
+        'Asia',
+        'Africa',
+        'North America',
+        'South America',
+        'Antarctica',
+        'Europe',
+        'Australia',
+    ];
 
     /**
      * Set up test environment.

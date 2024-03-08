@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
@@ -15,11 +17,6 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Writers\Writer;
 use InvalidArgumentException;
 use LogicException;
 
-/**
- * Test data object collection.
- *
- * @package angie.tests
- */
 class TypeCollectionTest extends WritersTypeTestCase
 {
     /**

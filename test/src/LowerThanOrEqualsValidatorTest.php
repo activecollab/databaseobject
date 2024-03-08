@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test;
 
 use ActiveCollab\DatabaseObject\Test\Base\TestCase;
@@ -13,15 +15,9 @@ use ActiveCollab\DatabaseObject\Test\Fixtures\Users\User;
 use ActiveCollab\DatabaseObject\Validator;
 use InvalidArgumentException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test
- */
 class LowerThanOrEqualsValidatorTest extends TestCase
 {
-    /**
-     * @var int
-     */
-    private $max_age = 125;
+    private int $max_age = 125;
 
     /**
      * Set up test environment.
