@@ -6,6 +6,8 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Collection;
 
 use ActiveCollab\DatabaseConnection\Result\ResultInterface;
@@ -15,35 +17,27 @@ use Doctrine\Inflector\InflectorFactory;
 use InvalidArgumentException;
 use LogicException;
 
-/**
- * @package ActiveCollab\DatabaseObject\Collection
- */
 abstract class Type extends Collection
 {
-    /**
-     * @var string
-     */
-    private $registered_type;
+    private ?string $registered_type = null;
 
     /**
      * Return type that this collection works with.
-     *
-     * @return string
      */
-    abstract public function getType();
+    abstract public function getType(): string;
 
     /**
      * Return registered type.
-     *
-     * @return string
      */
-    protected function getRegisteredType()
+    protected function getRegisteredType(): string
     {
-        if (empty($this->registered_type)) {
+        if ($this->registered_type === null) {
             $this->registered_type = $this->pool->getRegisteredType($this->getType());
 
             if (empty($this->registered_type)) {
-                throw new InvalidArgumentException("Type '" . $this->getType() . "' is not registered");
+                throw new InvalidArgumentException(
+                    sprintf("Type '%s' is not registered", $this->getType())
+                );
             }
         }
 
@@ -56,20 +50,16 @@ abstract class Type extends Collection
 
     /**
      * Return true if this object can be tagged and cached on client side.
-     *
-     * @return bool|null
      */
-    public function canBeEtagged()
+    public function canBeEtagged(): bool
     {
         return (bool) $this->getTimestampField();
     }
 
     /**
      * Cached tag value.
-     *
-     * @var string
      */
-    private $tag = false;
+    private ?string $tag = null;
 
     /**
      * Return collection etag.
@@ -82,36 +72,30 @@ abstract class Type extends Collection
     {
         $timestamp_field = $this->getTimestampField();
 
-        if ($timestamp_field && ($this->tag === false || !$use_cache)) {
-            $this->tag = $this->prepareTagFromBits($this->getAdditionalIdentifier(), $visitor_identifier, $this->getTimestampHash($timestamp_field));
+        if ($timestamp_field && ($this->tag === null || !$use_cache)) {
+            $this->tag = $this->prepareTagFromBits(
+                $this->getAdditionalIdentifier(),
+                $visitor_identifier,
+                $this->getTimestampHash($timestamp_field),
+            );
         }
 
         return $this->tag;
     }
 
-    /**
-     * @return string
-     */
-    protected function getAdditionalIdentifier()
+    protected function getAdditionalIdentifier(): string
     {
         return 'na';
     }
 
     /**
      * Cached time stamp field name.
-     *
-     * @var string|bool
      */
-    private $timestamp_field = null;
+    private string|false $timestamp_field = '';
 
-    /**
-     * Return timestamp field name.
-     *
-     * @return string|bool
-     */
-    public function getTimestampField()
+    public function getTimestampField(): string|false
     {
-        if ($this->timestamp_field === null) {
+        if ($this->timestamp_field === '') {
             $fields = $this->pool->getTypeFields($this->getRegisteredType());
 
             if (in_array('updated_at', $fields)) {
@@ -128,11 +112,8 @@ abstract class Type extends Collection
 
     /**
      * Return timestamp hash.
-     *
-     * @param  string $timestamp_field
-     * @return string
      */
-    public function getTimestampHash($timestamp_field)
+    public function getTimestampHash(string $timestamp_field): string
     {
         if (!$this->isReady()) {
             throw new LogicException('Collection is not ready');
@@ -143,13 +124,21 @@ abstract class Type extends Collection
 
         if ($this->count() > 0) {
             if ($join_expression = $this->getJoinExpression()) {
-                return sha1($this->connection->executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY $table_name.id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $join_expression $conditions"));
-            } else {
-                return sha1($this->connection->executeFirstCell("SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $conditions"));
+                return sha1(
+                    $this->connection->executeFirstCell(
+                        "SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY $table_name.id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $join_expression $conditions",
+                    ),
+                );
             }
+
+            return sha1(
+                $this->connection->executeFirstCell(
+                    "SELECT GROUP_CONCAT($table_name.$timestamp_field ORDER BY id SEPARATOR ',') AS 'timestamp_hash' FROM $table_name $conditions"
+                ),
+            );
         }
 
-        return sha1(get_class($this));
+        return sha1($this::class);
     }
 
     // ---------------------------------------------------
@@ -185,9 +174,9 @@ abstract class Type extends Collection
             }
 
             return null;
-        } else {
-            return $this->pool->findBySql($this->getType(), $this->getSelectSql());
         }
+
+        return $this->pool->findBySql($this->getType(), $this->getSelectSql());
     }
 
     /**
@@ -197,10 +186,8 @@ abstract class Type extends Collection
 
     /**
      * Return ID-s of matching records.
-     *
-     * @return array
      */
-    public function executeIds()
+    public function executeIds(): array
     {
         if (!$this->isReady()) {
             throw new LogicException('Collection is not ready');
@@ -257,10 +244,8 @@ abstract class Type extends Collection
 
     /**
      * Return number of records that match conditions set by the collection.
-     *
-     * @return int
      */
-    public function count()
+    public function count(): int
     {
         if (!$this->isReady()) {
             throw new LogicException('Collection is not ready');
@@ -426,7 +411,7 @@ abstract class Type extends Collection
      *
      * If $join_field is null, join field will be based on model name. There are two ways to specify it:
      *
-     * 1. As string, where value is for target field and it will map with ID column of the source table,
+     * 1. As string, where value is for target field, and it will map with ID column of the source table,
      * 2. As array, where first element is ID in the source table and second element is field in target table
      *
      * @param  string            $table_name

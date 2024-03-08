@@ -488,7 +488,7 @@ class TypeCollectionTest extends WritersTypeTestCase
     {
         $collection = (new WritersCollection($this->connection, $this->pool, $this->logger))
             ->setApplicationIdentifier('MyApp v1.0')
-            ->setAdditionalIdenfitifier('addidf');
+            ->setAdditionalIdentifier('addidf');
 
         $etag = $collection->getEtag('ilija.studen@activecollab.com');
 

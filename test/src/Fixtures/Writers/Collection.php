@@ -6,30 +6,21 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Collection\Type;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
- */
 class Collection extends Type
 {
-    /**
-     * Return type that this collection manages.
-     *
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return Writer::class;
     }
 
-    private $is_ready = true;
+    private bool $is_ready = true;
 
-    /**
-     * {@inheritdoc}
-     */
     protected function isReady(): bool
     {
         return $this->is_ready;
@@ -37,34 +28,22 @@ class Collection extends Type
 
     /**
      * Set collection as not ready.
-     *
-     * @return $this
      */
-    public function &setAsNotReady()
+    public function setAsNotReady(): static
     {
         $this->is_ready = false;
 
         return $this;
     }
 
-    /**
-     * @var string
-     */
-    private $additional_identifier = 'na';
+    private string $additional_identifier = 'na';
 
-    /**
-     * @return string
-     */
-    protected function getAdditionalIdentifier()
+    protected function getAdditionalIdentifier(): string
     {
         return $this->additional_identifier;
     }
 
-    /**
-     * @param  string $value
-     * @return $this
-     */
-    public function &setAdditionalIdenfitifier($value)
+    public function setAdditionalIdentifier(string $value): static
     {
         $this->additional_identifier = $value;
 

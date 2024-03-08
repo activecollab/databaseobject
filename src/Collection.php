@@ -20,20 +20,12 @@ abstract class Collection implements CollectionInterface
 {
     use EtagInterfaceImplementation;
 
-    protected ConnectionInterface $connection;
-    protected PoolInterface $pool;
-    protected LoggerInterface $logger;
-
     public function __construct(
-        ConnectionInterface $connection,
-        PoolInterface $pool,
-        LoggerInterface $logger,
+        protected ConnectionInterface $connection,
+        protected PoolInterface $pool,
+        protected LoggerInterface $logger,
     )
     {
-        $this->connection = $connection;
-        $this->pool = $pool;
-        $this->logger = $logger;
-
         $this->configure();
     }
 
@@ -45,8 +37,6 @@ abstract class Collection implements CollectionInterface
      * Return true if ready.
      *
      * If collection declares that it is not ready, but execute methods get called, we should throw an exception
-     *
-     * @return bool
      */
     protected function isReady(): bool
     {
@@ -55,23 +45,12 @@ abstract class Collection implements CollectionInterface
 
     private string $application_identifier = 'APPv1.0';
 
-    /**
-     * Return application identifier.
-     *
-     * @return string
-     */
-    public function getApplicationIdentifier()
+    public function getApplicationIdentifier(): string
     {
         return $this->application_identifier;
     }
 
-    /**
-     * Set application identifier.
-     *
-     * @param  string $value
-     * @return $this
-     */
-    public function &setApplicationIdentifier($value)
+    public function setApplicationIdentifier(string $value): static
     {
         $this->application_identifier = $value;
 
@@ -80,13 +59,12 @@ abstract class Collection implements CollectionInterface
 
     /**
      * Prepare collection tag from bits of information.
-     *
-     * @param  string $additional_identifier
-     * @param  string $visitor_identifier
-     * @param  string $hash
-     * @return string
      */
-    protected function prepareTagFromBits($additional_identifier, $visitor_identifier, $hash)
+    protected function prepareTagFromBits(
+        string $additional_identifier,
+        string $visitor_identifier,
+        string $hash
+    ): string
     {
         return implode(
             ',',
@@ -106,24 +84,16 @@ abstract class Collection implements CollectionInterface
         return true;
     }
 
-    // ---------------------------------------------------
-    //  Pagination
-    // ---------------------------------------------------
-
-    /**
-     * Set pagination configuration.
-     *
-     * @param  int   $current_page
-     * @param  int   $items_per_page
-     * @return $this
-     */
-    public function &pagination($current_page = 1, $items_per_page = 100)
+    public function pagination(
+        int $current_page = 1,
+        int $items_per_page = 100,
+    ): static
     {
         $this->is_paginated = true;
 
         $this->currentPage($current_page);
 
-        $this->items_per_page = (int) $items_per_page;
+        $this->items_per_page = $items_per_page;
 
         if ($this->items_per_page < 1) {
             $this->items_per_page = 100;
@@ -132,38 +102,17 @@ abstract class Collection implements CollectionInterface
         return $this;
     }
 
-    /**
-     * @var bool
-     */
-    private $is_paginated = false;
+    private bool $is_paginated = false;
 
-    /**
-     * Return true if collection is paginated.
-     *
-     * @return bool
-     */
-    public function isPaginated()
+    public function isPaginated(): bool
     {
         return $this->is_paginated;
     }
 
-    /**
-     * @var int|null
-     */
-    private $current_page = null;
+    private ?int $current_page = null;
+    private ?int $items_per_page = null;
 
-    /**
-     * @var int|null
-     */
-    private $items_per_page = null;
-
-    /**
-     * Set current page.
-     *
-     * @param  int   $value
-     * @return $this
-     */
-    public function &currentPage($value)
+    public function currentPage(?int $value): static
     {
         if (!$this->is_paginated) {
             throw new LogicException('Page can be set only for paginated collections');
@@ -178,22 +127,12 @@ abstract class Collection implements CollectionInterface
         return $this;
     }
 
-    /**
-     * Return current page #.
-     *
-     * @return int|null
-     */
-    public function getCurrentPage()
+    public function getCurrentPage(): ?int
     {
         return $this->current_page;
     }
 
-    /**
-     * Return number of items that are displayed per page.
-     *
-     * @return int|null
-     */
-    public function getItemsPerPage()
+    public function getItemsPerPage(): ?int
     {
         return $this->items_per_page;
     }

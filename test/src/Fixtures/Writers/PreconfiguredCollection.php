@@ -6,28 +6,19 @@
  * (c) A51 doo <info@activecollab.com>. All rights reserved.
  */
 
+declare(strict_types=1);
+
 namespace ActiveCollab\DatabaseObject\Test\Fixtures\Writers;
 
 use ActiveCollab\DatabaseObject\Collection\Type;
 
-/**
- * @package ActiveCollab\DatabaseObject\Test\Fixtures\Writers
- */
 class PreconfiguredCollection extends Type
 {
-    /**
-     * Return type that this collection manages.
-     *
-     * @return string
-     */
-    public function getType()
+    public function getType(): string
     {
         return Writer::class;
     }
 
-    /**
-     * Configure the collection when it is created.
-     */
     protected function configure(): void
     {
         $this->where('`name` LIKE ?', 'A%')->orderBy('`name`');

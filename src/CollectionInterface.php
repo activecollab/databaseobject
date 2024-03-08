@@ -17,21 +17,8 @@ use JsonSerializable;
 
 interface CollectionInterface extends EtagInterface, JsonSerializable
 {
-    /**
-     * Return application identifier.
-     *
-     * @return string
-     */
-    public function getApplicationIdentifier();
-
-    /**
-     * Set application identifier.
-     *
-     * @param  string $value
-     * @return $this
-     */
-    public function &setApplicationIdentifier($value);
-
+    public function getApplicationIdentifier(): string;
+    public function setApplicationIdentifier(string $value): static;
     public function canBeTagged(): bool;
 
     /**
@@ -43,53 +30,39 @@ interface CollectionInterface extends EtagInterface, JsonSerializable
 
     /**
      * Return ID-s of matching records.
-     *
-     * @return array
      */
-    public function executeIds();
+    public function executeIds(): array;
 
     /**
      * Return number of records that match conditions set by the collection.
-     *
-     * @return int
      */
-    public function count();
+    public function count(): int;
 
     /**
      * Set pagination configuration.
-     *
-     * @param  int   $current_page
-     * @param  int   $items_per_page
-     * @return $this
      */
-    public function &pagination($current_page = 1, $items_per_page = 100);
+    public function pagination(
+        int $current_page = 1,
+        int $items_per_page = 100,
+    ): static;
 
     /**
      * Return true if collection is paginated.
-     *
-     * @return bool
      */
-    public function isPaginated();
+    public function isPaginated(): bool;
 
     /**
      * Set current page.
-     *
-     * @param  int   $value
-     * @return $this
      */
-    public function &currentPage($value);
+    public function currentPage(?int $value): static;
 
     /**
      * Return current page #.
-     *
-     * @return int|null
      */
-    public function getCurrentPage();
+    public function getCurrentPage(): ?int;
 
     /**
      * Return number of items that are displayed per page.
-     *
-     * @return int|null
      */
-    public function getItemsPerPage();
+    public function getItemsPerPage(): ?int;
 }
