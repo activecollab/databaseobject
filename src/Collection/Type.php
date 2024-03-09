@@ -63,12 +63,11 @@ abstract class Type extends Collection
 
     /**
      * Return collection etag.
-     *
-     * @param  string $visitor_identifier
-     * @param  bool   $use_cache
-     * @return string
      */
-    public function getEtag($visitor_identifier, $use_cache = true)
+    public function getEtag(
+        string $visitor_identifier,
+        bool $use_cache = true
+    ): string
     {
         $timestamp_field = $this->getTimestampField();
 
