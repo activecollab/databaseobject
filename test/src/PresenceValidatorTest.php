@@ -42,6 +42,21 @@ class PresenceValidatorTest extends WritersTypeTestCase
         $this->assertCount(0, $name_errors);
     }
 
+    public function testPassAllowEmpty()
+    {
+        $validator = new Validator($this->connection, 'writers', null, null, ['name' => '']);
+
+        $is_present = $validator->present('name', true);
+
+        $this->assertTrue($is_present);
+        $this->assertFalse($validator->hasErrors());
+
+        $name_errors = $validator->getFieldErrors('name');
+
+        $this->assertIsArray($name_errors);
+        $this->assertCount(0, $name_errors);
+    }
+
     /**
      * Test validation failure.
      */
