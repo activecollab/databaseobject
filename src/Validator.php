@@ -34,10 +34,7 @@ class Validator implements ValidatorInterface
      * Note: strings are trimmed prior to check, and values that empty() would return true for (like '0') are considered
      * to be present (because we check strlen(trim($value))).
      */
-    public function present(
-        string $field_name,
-        bool $allow_empty = false,
-    ): bool
+    public function present(string $field_name): bool
     {
         if (empty($field_name)) {
             throw new InvalidArgumentException(
@@ -47,10 +44,6 @@ class Validator implements ValidatorInterface
 
         if (!array_key_exists($field_name, $this->field_values)) {
             return $this->failPresenceValidation($field_name);
-        }
-
-        if ($allow_empty && empty($this->field_values[$field_name])) {
-            return true;
         }
 
         if (is_string($this->field_values[$field_name])) {
