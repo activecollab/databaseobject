@@ -179,4 +179,5 @@ Entity class also refreshes the values of these fields on object save so fresh v
 ## To Do
 
 1. Caching,
-2. <del>Remove deprecated `ObjectInterface` and `Object` class.</del>
+2. Add support for PHP enums 
+3. <del>Remove deprecated `ObjectInterface` and `Object` class.</del>
