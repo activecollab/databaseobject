@@ -1028,6 +1028,7 @@ abstract class Entity implements EntityInterface, ContainerAccessInterface
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $result = [
