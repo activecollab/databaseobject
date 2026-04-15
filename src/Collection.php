@@ -202,6 +202,7 @@ abstract class Collection implements CollectionInterface
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $result = $this->execute();

@@ -222,6 +222,7 @@ abstract class StatsSnapshot extends Entity
     /**
      * {@inheritdoc}
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return array_merge(parent::jsonSerialize(), [

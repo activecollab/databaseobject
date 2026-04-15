@@ -60,6 +60,7 @@ class ValidationException extends Exception
      *
      * @return array
      */
+    #[\ReturnTypeWillChange]
     public function jsonSerialize()
     {
         $result = [
